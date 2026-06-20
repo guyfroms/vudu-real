@@ -311,13 +311,11 @@ function dollSVG(color,death,dead,poseName,px){
     <line x1="${w*.59}" y1="${h*.15}" x2="${w*.53}" y2="${h*.17}" stroke="${ec}" stroke-width="2.8" stroke-linecap="round"/>
     <path d="M ${w*.42} ${h*.21} Q ${w/2} ${h*.195} ${w*.58} ${h*.21}" stroke="${ec}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
   `:`
-    <path d="M ${w*.39} ${h*.135} Q ${w*.44} ${h*.127} ${w*.49} ${h*.135}" stroke="${ec}" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-    <path d="M ${w*.51} ${h*.135} Q ${w*.56} ${h*.127} ${w*.61} ${h*.135}" stroke="${ec}" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-    <circle cx="${w*.44}" cy="${h*.155}" r="4.8" fill="${ec}"/>
-    <circle cx="${w*.56}" cy="${h*.155}" r="4.8" fill="${ec}"/>
-    <circle cx="${w*.455}" cy="${h*.149}" r="1.4" fill="${ec2}"/>
-    <circle cx="${w*.575}" cy="${h*.149}" r="1.4" fill="${ec2}"/>
-    <path d="M ${w*.4} ${h*.202} Q ${w/2} ${h*.228} ${w*.6} ${h*.202}" stroke="${ec}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <circle cx="${w*.44}" cy="${h*.157}" r="3.6" fill="${ec}"/>
+    <circle cx="${w*.56}" cy="${h*.157}" r="3.6" fill="${ec}"/>
+    <circle cx="${w*.452}" cy="${h*.151}" r="1.1" fill="${ec2}"/>
+    <circle cx="${w*.572}" cy="${h*.151}" r="1.1" fill="${ec2}"/>
+    <path d="M ${w*.41} ${h*.199} Q ${w/2} ${h*.224} ${w*.59} ${h*.199}" stroke="${ec}" stroke-width="2.3" fill="none" stroke-linecap="round"/>
   `;
 
   // Death effects
@@ -887,18 +885,23 @@ function setupCanvas(){
 // ── Init ──────────────────────────────────────────────
 async function init(){
   sb.auth.onAuthStateChange(async(event,session)=>{
-    if(event==='SIGNED_IN'&&session?.user){
-      user=session.user;await loadProfile();
-      if(!profile){const u=user.user_metadata?.username||user.email.split('@')[0];await sb.from('profiles').upsert({id:user.id,username:u,doll_color:pendingSignup.color||DOLL_COLORS[0]});await loadProfile();}
-      await loadTodayPost();view='home';paint();
-    }else if(event==='SIGNED_OUT'){user=null;profile=null;todayPost=null;authStep='form';view='auth';paint();}
+    try{
+      if(event==='SIGNED_IN'&&session?.user){
+        user=session.user;await loadProfile();
+        if(!profile){const u=user.user_metadata?.username||user.email.split('@')[0];await sb.from('profiles').upsert({id:user.id,username:u,doll_color:pendingSignup.color||DOLL_COLORS[0]});await loadProfile();}
+        await loadTodayPost();view='home';paint();
+      }else if(event==='SIGNED_OUT'){user=null;profile=null;todayPost=null;authStep='form';view='auth';paint();}
+    }catch(e){console.error('auth change error',e);view='auth';paint();}
   });
-  const {data:{session}}=await sb.auth.getSession();
-  if(session?.user){
-    user=session.user;await loadProfile();
-    if(!profile){const u=user.user_metadata?.username||user.email.split('@')[0];await sb.from('profiles').upsert({id:user.id,username:u,doll_color:DOLL_COLORS[0]});await loadProfile();}
-    await loadTodayPost();view='home';
-  }else{view='auth';}
+  try{
+    const res=await sb.auth.getSession();
+    const session=res?.data?.session;
+    if(session?.user){
+      user=session.user;await loadProfile();
+      if(!profile){const u=user.user_metadata?.username||user.email.split('@')[0];await sb.from('profiles').upsert({id:user.id,username:u,doll_color:DOLL_COLORS[0]});await loadProfile();}
+      await loadTodayPost();view='home';
+    }else{view='auth';}
+  }catch(e){console.error('init error',e);view='auth';}
   paint();
 }
 

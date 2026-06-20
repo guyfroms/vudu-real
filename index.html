@@ -545,6 +545,17 @@ function renderAuth(){
       btn.disabled=true;btn.textContent='...';
       const e=await doSignIn(email,pass);
       if(e){err.textContent=e;btn.disabled=false;btn.textContent='Entrar';}
+      else{
+        try{
+          const res=await sb.auth.getSession();
+          const s=res?.data?.session;
+          if(s?.user){
+            user=s.user;await loadProfile();
+            if(!profile){const u=user.user_metadata?.username||user.email.split('@')[0];await sb.from('profiles').upsert({id:user.id,username:u,doll_color:DOLL_COLORS[0]});await loadProfile();}
+            await loadTodayPost();view='home';paint();
+          }
+        }catch(ex){console.error('login nav error',ex);err.textContent='Error al cargar, recarga la página';btn.disabled=false;btn.textContent='Entrar';}
+      }
     }else{
       const uname=(ge('aUser').value||'').trim();
       if(!uname){err.textContent='Pon un nombre de usuario';return;}

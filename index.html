@@ -229,8 +229,9 @@ body::before{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;
 .auth-brand p{font-size:clamp(12px,3vw,14px);color:var(--bone2);margin-top:12px;letter-spacing:.3px;}
 /* Topbar logo — slightly bigger */
 .logo{font-size:clamp(15px,4vw,18px);letter-spacing:4px;}
-/* Friend card left warm accent */
-.fc-friend{border-left:2px solid rgba(176,120,48,.38)!important;padding-left:12px;margin-left:-2px;}
+/* Friend avatar dot indicator */
+.avatar{position:relative;}
+.friend-dot{position:absolute;bottom:0;right:0;width:8px;height:8px;border-radius:50%;background:var(--warm);border:1.5px solid var(--bg);}
 /* Dep button — given state more dramatic */
 .dep-btn.given{background:rgba(192,57,43,.07);border-color:rgba(192,57,43,.42);color:var(--text);}
 /* Dep button base — slightly warmer */
@@ -1074,14 +1075,13 @@ function renderFeed(){
     const d=DEATHS.find(x=>x.id===item.castigo);
     const hasPrev=!!item.previous_post_id&&!!item._prev,isOpen=expandedPrev.has(item.id);
     // Each feed card uses its own stored doll_color
-    return `<div class="feed-card${friend&&!own?' fc-friend':''}">
+    return `<div class="feed-card">
       <div class="feed-head">
-        <div class="avatar">${avatarDoll(item.doll_color,clamp(26,32))}</div>
+        <div class="avatar">${avatarDoll(item.doll_color,clamp(26,32))}${friend&&!own?'<span class="friend-dot"></span>':''}</div>
         <div class="feed-meta">
           <div class="feed-name">${esc(item.username)}</div>
           <div class="feed-time">${timeAgo(item.created_at)}</div>
         </div>
-        ${friend&&!own?`<span class="friend-tag">amigo</span>`:''}
         ${!own?`<button class="follow-btn ${friend?'following':''}" data-uid="${item.user_id}">${friend?ICO.check+' siguiendo':ICO.plus+' seguir'}</button>`:''}
       </div>
       <p class="feed-razon">${esc(item.razon)}</p>

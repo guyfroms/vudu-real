@@ -118,12 +118,28 @@ body{font-family:-apple-system,system-ui,'Segoe UI',sans-serif;background:var(--
 .draw-cell .dlabel{color:var(--text);font-size:clamp(13px,3.5vw,14px);font-weight:600;}
 .draw-cell .dsub{color:var(--muted2);font-size:clamp(10px,2.5vw,11px);margin-top:2px;}
 .unlock-bar{position:absolute;bottom:0;left:0;height:2px;background:var(--blue);border-radius:0 0 10px 10px;transition:width .3s;}
+/* Deaths collection */
+.deaths-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:clamp(7px,2vw,10px);margin-top:14px;}
+.death-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;overflow:hidden;transition:border-color .16s;}
+.death-card.unlocked{border-color:var(--border2);}
+.death-card.locked-streak{opacity:.32;}
+.death-card.locked-deps{border-color:var(--blue);opacity:.65;}
+.death-card .dc-label{color:var(--text);font-size:clamp(9px,2.5vw,11px);font-weight:600;text-align:center;line-height:1.2;}
+.death-card .dc-req{font-size:clamp(8px,2vw,9px);font-weight:700;text-align:center;padding:2px 5px;border-radius:3px;letter-spacing:.3px;}
+.dc-req-streak{color:var(--warm);background:rgba(176,120,48,.13);}
+.dc-req-deps{color:#5A8FD4;background:rgba(42,95,168,.13);}
+.dc-req-ok{color:#4CAF82;background:rgba(46,125,82,.12);}
+.dc-bar{position:absolute;bottom:0;left:0;height:2px;background:var(--blue);border-radius:0;}
+.deaths-stats{display:flex;gap:10px;margin-top:4px;margin-bottom:2px;}
+.ds-pill{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;}
+.ds-num{font-family:'Cinzel',serif;font-size:clamp(20px,5vw,26px);font-weight:900;line-height:1;}
+.ds-lbl{color:var(--muted2);font-size:clamp(9px,2.3vw,10px);text-transform:uppercase;letter-spacing:.8px;margin-top:3px;}
 /* Feed */
 .feed-list{margin-top:8px;}
 .feed-card{border-bottom:1px solid var(--border);padding:clamp(14px,3.5vw,18px) 0;animation:fadeUp .2s ease;}
 .feed-card:last-child{border-bottom:none;}
 .feed-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-.avatar{width:clamp(26px,6.5vw,32px);height:clamp(26px,6.5vw,32px);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(9px,2.5vw,11px);color:rgba(0,0,0,.65);}
+.avatar{width:clamp(26px,6.5vw,32px);height:clamp(26px,6.5vw,32px);border-radius:50%;flex-shrink:0;overflow:hidden;background:var(--surface2);display:flex;align-items:center;justify-content:center;}
 .feed-meta{flex:1;min-width:0;}
 .feed-name{color:var(--text);font-weight:600;font-size:clamp(13px,3.5vw,14px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .feed-time{color:var(--muted2);font-size:clamp(10px,2.5vw,11px);}
@@ -219,6 +235,28 @@ const SB_ERRORS={
   "Password should be at least 6 characters":"La contraseña es demasiado corta",
 };
 
+// ── Tiny doll avatar (for feed cards) ─────────────────
+function avatarDoll(color,px){
+  px=px||32;
+  const w=px,h=px,r=w*.28,cx=w/2,cy=h*.32;
+  const dark=color==="#C0B898"||color==="#D0C8B8";
+  const ec=dark?"#2A1E38":"#080808";
+  const sw=Math.max(2,w*.1);
+  const bx1=cx,by1=cy+r,bx2=cx,by2=h*.82;
+  const alx=cx-(w*.28),aly=h*.56,arx=cx+(w*.28),ary=h*.56;
+  const llx=cx-(w*.2),lly=h*.99,lrx=cx+(w*.2),lry=h*.99;
+  return `<svg viewBox="0 0 ${w} ${h}" width="${px}" height="${px}" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}"/>
+    <circle cx="${cx-.12*w}" cy="${cy-.03*h}" r="${w*.055}" fill="${ec}"/>
+    <circle cx="${cx+.12*w}" cy="${cy-.03*h}" r="${w*.055}" fill="${ec}"/>
+    <line x1="${bx1}" y1="${by1}" x2="${bx2}" y2="${by2}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>
+    <line x1="${cx}" y1="${h*.56}" x2="${alx}" y2="${aly}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>
+    <line x1="${cx}" y1="${h*.56}" x2="${arx}" y2="${ary}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>
+    <line x1="${cx}" y1="${by2}" x2="${llx}" y2="${lly}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>
+    <line x1="${cx}" y1="${by2}" x2="${lrx}" y2="${lry}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>
+  </svg>`;
+}
+
 // ── SVG Icons ──────────────────────────────────────────
 const ICO={
   doll:`<svg width="22" height="28" viewBox="0 0 22 28" fill="none"><circle cx="11" cy="5" r="4.2" fill="currentColor"/><path d="M11 9.2Q10.5 14 11 18.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M11 12.5Q7 13.5 4.5 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M11 12.5Q15 13.5 17.5 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M11 18.5Q8 21.5 7 27" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M11 18.5Q14 21.5 15 27" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
@@ -231,6 +269,7 @@ const ICO={
   check:`<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
   lock:`<svg width="14" height="16" viewBox="0 0 14 16" fill="none"><rect x="2" y="7" width="10" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M4 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
   mail:`<svg width="36" height="28" viewBox="0 0 36 28" fill="none"><rect x="1" y="1" width="34" height="26" rx="4" stroke="currentColor" stroke-width="1.8"/><path d="M1 7l17 11 17-11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+  skull:`<svg width="20" height="22" viewBox="0 0 20 22" fill="none"><path d="M10 2C5.58 2 2 5.36 2 9.5c0 2.5 1.28 4.7 3.2 6.1V18a1 1 0 0 0 1 1h7.6a1 1 0 0 0 1-1v-2.4C16.72 14.2 18 12 18 9.5 18 5.36 14.42 2 10 2Z" stroke="currentColor" stroke-width="1.7"/><circle cx="7" cy="10" r="1.6" fill="currentColor"/><circle cx="13" cy="10" r="1.6" fill="currentColor"/><path d="M7 19v2M10 19v2M13 19v2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`,
 };
 
 // ── State ──────────────────────────────────────────────
@@ -699,10 +738,12 @@ function shell(content){
   <div class="bottomnav">
     <button class="navbtn ${inMain?'on':''}" id="navHoy">${ICO.doll}<span>Hoy</span></button>
     <button class="navbtn ${view==='feed'?'on':''}" id="navFeed">${ICO.feed}<span>Feed</span></button>
+    <button class="navbtn ${view==='muertes'?'on':''}" id="navMuertes">${ICO.skull}<span>Muertes</span></button>
   </div>`;
   ge('btnGear').onclick=()=>{view='ajustes';paint();};
   ge('navHoy').onclick=()=>{view='home';paint();};
   ge('navFeed').onclick=async()=>{await loadFeed();view='feed';paint();};
+  ge('navMuertes').onclick=()=>{view='muertes';paint()};
   attachListeners();
   if(view==='dibujo')setupCanvas();
 }
@@ -717,6 +758,7 @@ function paint(){
   else if(view==='dibujo')c=renderDibujo();
   else if(view==='posted')c=renderPosted();
   else if(view==='feed')c=renderFeed();
+  else if(view==='muertes')c=renderMuertes();
   else if(view==='ajustes')c=renderAjustes();
   shell(c);
 }
@@ -846,6 +888,44 @@ function renderPosted(){
   </div>`;
 }
 
+function renderMuertes(){
+  const streak=profile?.streak||0;
+  const unlocked=DEATHS.filter(d=>streak>=d.min&&totalDeps>=d.deps).length;
+  const cards=DEATHS.map(d=>{
+    const streakOk=streak>=d.min,depsOk=totalDeps>=d.deps,ok=streakOk&&depsOk;
+    let cls='death-card ',req='',barW=0;
+    if(ok){
+      cls+='unlocked';
+      req=`<span class="dc-req dc-req-ok">${ICO.check} desbloqueada</span>`;
+    } else if(!streakOk){
+      cls+='locked-streak';
+      req=`<span class="dc-req dc-req-streak">${ICO.flame} ${d.min}d racha</span>`;
+    } else {
+      cls+='locked-deps';
+      barW=Math.min(100,Math.round(totalDeps/d.deps*100));
+      req=`<span class="dc-req dc-req-deps">${ICO.candle} ${totalDeps}/${d.deps} DEPs</span>`;
+    }
+    return `<div class="${cls}">
+      ${ok
+        ? dollSVG(profile.doll_color,d.id,true,d.pose,clamp(52,68))
+        : `<div style="display:flex;align-items:center;justify-content:center;height:${clamp(52,68)}px;opacity:.25;color:var(--muted2);">${ICO.lock}</div>`}
+      <span class="dc-label">${d.label}</span>
+      ${req}
+      ${barW>0?`<div class="dc-bar" style="width:${barW}%"></div>`:''}
+    </div>`;
+  }).join('');
+  return `<div class="screen">
+    ${hdr("Muertes","Tu colección de castigos")}
+    <div class="deaths-stats">
+      <div class="ds-pill"><div class="ds-num" style="color:var(--warm)">${unlocked}</div><div class="ds-lbl">desbloqueadas</div></div>
+      <div class="ds-pill"><div class="ds-num" style="color:var(--muted2)">${DEATHS.length-unlocked}</div><div class="ds-lbl">bloqueadas</div></div>
+      <div class="ds-pill"><div class="ds-num">${streak}</div><div class="ds-lbl">${ICO.flame} racha</div></div>
+      <div class="ds-pill"><div class="ds-num" style="color:#5A8FD4">${totalDeps}</div><div class="ds-lbl">${ICO.candle} DEPs</div></div>
+    </div>
+    <div class="deaths-grid">${cards}</div>
+  </div>`;
+}
+
 function renderFeed(){
   if(!feedData.length)return`<div class="screen">${hdr("Feed","Lo de hoy")}<div style="text-align:center;color:var(--muted2);margin-top:60px;font-size:clamp(13px,3.5vw,15px);">Nadie ha publicado hoy<br><span style="font-size:clamp(11px,3vw,12px);opacity:.45;display:block;margin-top:6px;">sé el primero</span></div></div>`;
   const cards=feedData.map(item=>{
@@ -857,7 +937,7 @@ function renderFeed(){
     // Each feed card uses its own stored doll_color
     return `<div class="feed-card">
       <div class="feed-head">
-        <div class="avatar" style="background:${item.doll_color};">${initials(item.username)}</div>
+        <div class="avatar">${avatarDoll(item.doll_color,clamp(26,32))}</div>
         <div class="feed-meta">
           <div class="feed-name">${esc(item.username)}</div>
           <div class="feed-time">${timeAgo(item.created_at)}</div>
@@ -887,10 +967,6 @@ function renderFeed(){
 
 function renderAjustes(){
   const streak=profile?.streak||0;
-  const nextStreak=DEATHS.filter(d=>d.min>streak&&d.deps===0).sort((a,b)=>a.min-b.min)[0];
-  const nextDeps=DEATHS.filter(d=>d.deps>totalDeps&&d.min<=streak).sort((a,b)=>a.deps-b.deps)[0];
-  const streakPct=nextStreak?Math.min(100,Math.round(streak/nextStreak.min*100)):100;
-  const depsPct=nextDeps?Math.min(100,Math.round(totalDeps/nextDeps.deps*100)):100;
   return `<div class="screen">
     ${hdr("Ajustes",`@${esc(profile.username)}`)}
     <div style="display:flex;justify-content:center;margin:22px 0;">
@@ -910,14 +986,6 @@ function renderAjustes(){
         <div class="stat-label">${ICO.candle} DEPs totales</div>
       </div>
     </div>
-    ${nextStreak?`<div class="next-unlock">
-      <div style="flex:1;"><div style="font-size:clamp(10px,2.5vw,11px);color:var(--text2);margin-bottom:5px;">${nextStreak.min-streak}d para <strong>${nextStreak.label}</strong></div>
-      <div class="next-unlock-bar"><div class="next-unlock-fill" style="width:${streakPct}%;background:var(--warm);"></div></div></div>
-    </div>`:''}
-    ${nextDeps?`<div class="next-unlock" style="margin-top:8px;">
-      <div style="flex:1;"><div style="font-size:clamp(10px,2.5vw,11px);color:var(--text2);margin-bottom:5px;">${nextDeps.deps-totalDeps} DEPs para <strong>${nextDeps.label}</strong></div>
-      <div class="next-unlock-bar"><div class="next-unlock-fill" style="width:${depsPct}%;"></div></div></div>
-    </div>`:''}
     <div style="height:1px;background:var(--border);margin:clamp(20px,5vw,26px) 0;"></div>
     <button class="btn-ghost" id="btnLogout">Cerrar sesión</button>
     <button class="btn-link" id="volverAjustes">← volver</button>

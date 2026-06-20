@@ -344,74 +344,105 @@ function dollSVG(color,death,dead,poseName,px){
     <circle cx="${w*.572}" cy="${h*.151}" r="1.1" fill="${ec2}"/>
     <path d="M ${w*.41} ${h*.199} Q ${w/2} ${h*.224} ${w*.59} ${h*.199}" stroke="${ec}" stroke-width="2.3" fill="none" stroke-linecap="round"/>
   `;
+  // Unified visual language: monochromatic, line-based, no saturated colors.
+  // Palette: near-black overlays, bone whites (#C4BDB2), muted crimson (#8A1818→#A82828), dark greys.
   let fx="";
   if(death==="fuego"){
-    fx=`<defs><radialGradient id="fl${px}" cx="50%" cy="100%" r="80%"><stop offset="0%" stop-color="#FFE08A"/><stop offset="50%" stop-color="#E8602C"/><stop offset="100%" stop-color="#7A1F2B"/></radialGradient></defs>`;
-    [[.22,.92,18,46],[.5,.87,15,52],[.78,.92,18,46],[.35,.96,9,22],[.65,.96,9,22]].forEach(([x,y,rx,ry],i)=>{
-      fx+=`<ellipse cx="${w*x}" cy="${h*y}" rx="${rx}" ry="${ry}" fill="url(#fl${px})" opacity=".88" style="animation:flicker ${.9+i*.15}s ease-in-out infinite ${i*.1}s"/>`;
+    // Char marks: thin dark-crimson wisps rising from base, ash dots
+    const rs=['#701010','#8A1A1A','#A02020','#8A1A1A','#701010'];
+    [[.28,.97,.32,.72],[.5,.99,.47,.66],[.72,.97,.68,.72],[.38,.99,.41,.78],[.62,.99,.59,.78]].forEach(([x1,y1,x2,y2],i)=>{
+      fx+=`<line x1="${w*x1}" y1="${h*y1}" x2="${w*x2}" y2="${h*y2}" stroke="${rs[i]}" stroke-width="2.5" stroke-linecap="round" opacity=".8" style="animation:flicker ${1+i*.2}s ease-in-out infinite ${i*.08}s"/>`;
     });
+    // ash dots
+    [[.22,.95],[.58,.98],[.78,.94],[.42,.99]].forEach(([x,y])=>{
+      fx+=`<circle cx="${w*x}" cy="${h*y}" r="1.8" fill="#3A1010" opacity=".7"/>`;
+    });
+    // subtle dark vignette at base
+    fx+=`<ellipse cx="${w/2}" cy="${h}" rx="${w*.48}" ry="${h*.12}" fill="#1A0808" opacity=".55"/>`;
   }
   if(death==="agujas"){
+    // Fine bone-colored needles, consistent angles, dark tips
     [[.3,.22,.27,.08],[.62,.3,.68,.14],[.4,.47,.46,.3],[.74,.57,.81,.4],[.24,.7,.31,.52],[.57,.82,.63,.65],[.45,.2,.38,.07],[.68,.72,.74,.57]].forEach(([x1,y1,x2,y2])=>{
-      fx+=`<line x1="${w*x1}" y1="${h*y1}" x2="${w*x2}" y2="${h*y2}" stroke="#D4CCB8" stroke-width="2"/>
-           <circle cx="${w*x2}" cy="${h*y2}" r="2.8" fill="#AEA090"/>`;
+      fx+=`<line x1="${w*x1}" y1="${h*y1}" x2="${w*x2}" y2="${h*y2}" stroke="#C4BDB2" stroke-width="1.5" opacity=".85"/>
+           <circle cx="${w*x2}" cy="${h*y2}" r="2.2" fill="#1A1614"/>`;
     });
   }
   if(death==="ahogo"){
-    fx=`<defs><linearGradient id="wt${px}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2A5FA8" stop-opacity=".4"/><stop offset="100%" stop-color="#0E2A50" stop-opacity=".75"/></linearGradient></defs>
-    <rect x="0" y="${h*.4}" width="${w}" height="${h*.6}" fill="url(#wt${px})"/>
-    <path d="M-5 ${h*.4} Q${w*.2} ${h*.37} ${w*.5} ${h*.4} Q${w*.8} ${h*.43} ${w+5} ${h*.4}" stroke="#7AAFD8" stroke-width="2.5" fill="none" opacity=".65"/>
-    <circle cx="${w*.25}" cy="${h*.55}" r="4" stroke="#7AAFD8" stroke-width="1.5" fill="none" opacity=".4"/>
-    <circle cx="${w*.7}" cy="${h*.62}" r="3" stroke="#7AAFD8" stroke-width="1.5" fill="none" opacity=".4"/>`;
+    // Dark water overlay + thin bone-white ripples + small bubbles
+    fx=`<rect x="0" y="${h*.42}" width="${w}" height="${h*.58}" fill="#0D1520" opacity=".72"/>
+    <path d="M0 ${h*.42} Q${w*.25} ${h*.39} ${w*.5} ${h*.42} Q${w*.75} ${h*.45} ${w} ${h*.42}" stroke="#C4BDB2" stroke-width="1.2" fill="none" opacity=".3"/>
+    <path d="M0 ${h*.56} Q${w*.3} ${h*.53} ${w*.6} ${h*.56} Q${w*.8} ${h*.58} ${w} ${h*.56}" stroke="#C4BDB2" stroke-width="1" fill="none" opacity=".18"/>
+    <circle cx="${w*.28}" cy="${h*.62}" r="3.5" stroke="#C4BDB2" stroke-width="1" fill="none" opacity=".22"/>
+    <circle cx="${w*.68}" cy="${h*.7}" r="2.5" stroke="#C4BDB2" stroke-width="1" fill="none" opacity=".18"/>
+    <circle cx="${w*.45}" cy="${h*.8}" r="1.8" stroke="#C4BDB2" stroke-width="1" fill="none" opacity=".14"/>`;
   }
   if(death==="rayo"){
-    fx=`<defs><filter id="gl${px}"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-    <polyline filter="url(#gl${px})" points="${w*.53},${h*.01} ${w*.37},${h*.29} ${w*.57},${h*.32} ${w*.39},${h*.65}" stroke="#F5E44A" stroke-width="10" fill="none" stroke-linejoin="round" opacity=".9" style="animation:shockPulse 1.4s ease-in-out infinite"/>
-    <polyline points="${w*.53},${h*.01} ${w*.37},${h*.29} ${w*.57},${h*.32} ${w*.39},${h*.65}" stroke="#FFF8A0" stroke-width="2.5" fill="none" stroke-linejoin="round" opacity=".7"/>`;
+    // Stark bone-white zigzag — no glow, no color, pure line
+    const pts=`${w*.52},${h*.02} ${w*.36},${h*.3} ${w*.56},${h*.33} ${w*.38},${h*.66}`;
+    fx=`<polyline points="${pts}" stroke="#1A1614" stroke-width="5" fill="none" stroke-linejoin="round" opacity=".5"/>
+    <polyline points="${pts}" stroke="#C4BDB2" stroke-width="1.8" fill="none" stroke-linejoin="round" opacity=".9" style="animation:shockPulse 1.6s ease-in-out infinite"/>`;
   }
   if(death==="aplastado"){
-    fx=`<defs><linearGradient id="rk${px}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#9A9A9A"/><stop offset="100%" stop-color="#3A3838"/></linearGradient></defs>
-    <ellipse cx="${w/2}" cy="${h*.09}" rx="86" ry="46" fill="url(#rk${px})"/>
-    <ellipse cx="${w/2}" cy="${h*.09}" rx="86" ry="46" fill="none" stroke="#5A5858" stroke-width="1.5"/>`;
+    // Dark near-black slab + crack lines underneath
+    fx=`<ellipse cx="${w/2}" cy="${h*.08}" rx="${w*.42}" ry="${h*.1}" fill="#151212"/>
+    <ellipse cx="${w/2}" cy="${h*.08}" rx="${w*.42}" ry="${h*.1}" fill="none" stroke="#2A2626" stroke-width="1.5"/>
+    <line x1="${w*.5}" y1="${h*.18}" x2="${w*.44}" y2="${h*.32}" stroke="#2A2626" stroke-width="1" opacity=".6"/>
+    <line x1="${w*.5}" y1="${h*.18}" x2="${w*.57}" y2="${h*.28}" stroke="#2A2626" stroke-width="1" opacity=".6"/>
+    <line x1="${w*.44}" y1="${h*.32}" x2="${w*.38}" y2="${h*.38}" stroke="#2A2626" stroke-width="1" opacity=".4"/>`;
   }
   if(death==="hielo"){
-    fx=`<defs><linearGradient id="ice${px}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#B8E8FF" stop-opacity=".3"/><stop offset="100%" stop-color="#2A5090" stop-opacity=".5"/></linearGradient></defs>
-    <rect x="0" y="0" width="${w}" height="${h}" fill="url(#ice${px})"/>
-    <g stroke="#D8F4FF" stroke-width="1.5" opacity=".75">
-      <line x1="${w*.18}" y1="${h*.06}" x2="${w*.18}" y2="${h*.18}"/>
-      <line x1="${w*.12}" y1="${h*.09}" x2="${w*.24}" y2="${h*.09}"/>
-      <line x1="${w*.12}" y1="${h*.07}" x2="${w*.18}" y2="${h*.12}"/>
-      <line x1="${w*.24}" y1="${h*.07}" x2="${w*.18}" y2="${h*.12}"/>
-      <line x1="${w*.77}" y1="${h*.68}" x2="${w*.77}" y2="${h*.8}"/>
-      <line x1="${w*.71}" y1="${h*.71}" x2="${w*.83}" y2="${h*.71}"/>
-      <line x1="${w*.71}" y1="${h*.69}" x2="${w*.77}" y2="${h*.74}"/>
-      <line x1="${w*.83}" y1="${h*.69}" x2="${w*.77}" y2="${h*.74}"/>
-    </g>`;
+    // Bone-white frost geometry — no coloured overlay, just mark language
+    fx=`<g stroke="#C4BDB2" stroke-linecap="round" opacity=".55">
+      <line x1="${w*.17}" y1="${h*.05}" x2="${w*.17}" y2="${h*.19}" stroke-width="1.2"/>
+      <line x1="${w*.1}" y1="${h*.08}" x2="${w*.24}" y2="${h*.08}" stroke-width="1.2"/>
+      <line x1="${w*.1}" y1="${h*.06}" x2="${w*.17}" y2="${h*.12}" stroke-width="1"/>
+      <line x1="${w*.24}" y1="${h*.06}" x2="${w*.17}" y2="${h*.12}" stroke-width="1"/>
+      <line x1="${w*.1}" y1="${h*.1}" x2="${w*.17}" y2="${h*.04}" stroke-width="1"/>
+      <line x1="${w*.24}" y1="${h*.1}" x2="${w*.17}" y2="${h*.04}" stroke-width="1"/>
+      <line x1="${w*.78}" y1="${h*.62}" x2="${w*.78}" y2="${h*.76}" stroke-width="1.2"/>
+      <line x1="${w*.71}" y1="${h*.66}" x2="${w*.85}" y2="${h*.66}" stroke-width="1.2"/>
+      <line x1="${w*.71}" y1="${h*.64}" x2="${w*.78}" y2="${h*.7}" stroke-width="1"/>
+      <line x1="${w*.85}" y1="${h*.64}" x2="${w*.78}" y2="${h*.7}" stroke-width="1"/>
+      <line x1="${w*.71}" y1="${h*.68}" x2="${w*.78}" y2="${h*.62}" stroke-width="1"/>
+      <line x1="${w*.85}" y1="${h*.68}" x2="${w*.78}" y2="${h*.62}" stroke-width="1"/>
+      <line x1="${w*.5}" y1="${h*.88}" x2="${w*.5}" y2="${h*.98}" stroke-width="1"/>
+      <line x1="${w*.45}" y1="${h*.91}" x2="${w*.55}" y2="${h*.91}" stroke-width="1"/>
+    </g>
+    <rect x="0" y="0" width="${w}" height="${h}" fill="#0A0D12" opacity=".22"/>`;
   }
   if(death==="guillotina"){
-    fx=`<defs><linearGradient id="bl${px}" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#888"/><stop offset="50%" stop-color="#DDD"/><stop offset="100%" stop-color="#888"/></linearGradient></defs>
-    <rect x="${w*.13}" y="0" width="7" height="${h*.5}" fill="#4A3A2A"/>
-    <rect x="${w*.8}" y="0" width="7" height="${h*.5}" fill="#4A3A2A"/>
-    <rect x="${w*.1}" y="0" width="${w*.82}" height="9" fill="#4A3A2A"/>
-    <polygon points="${w*.22},${h*.36} ${w*.78},${h*.38} ${w*.78},${h*.46} ${w*.22},${h*.44}" fill="url(#bl${px})" opacity=".95"/>
-    <line x1="${w*.24}" y1="${h*.39}" x2="${w*.7}" y2="${h*.41}" stroke="rgba(255,255,255,.4)" stroke-width="1.5"/>`;
+    // Very dark wood + muted grey blade, structural and clean
+    fx=`<rect x="${w*.15}" y="0" width="6" height="${h*.52}" fill="#100E0C"/>
+    <rect x="${w*.81}" y="0" width="6" height="${h*.52}" fill="#100E0C"/>
+    <rect x="${w*.12}" y="0" width="${w*.78}" height="8" fill="#100E0C"/>
+    <rect x="${w*.14}" y="${h*.14}" width="${w*.74}" height="4" fill="#1C1816"/>
+    <polygon points="${w*.23},${h*.36} ${w*.77},${h*.38} ${w*.77},${h*.45} ${w*.23},${h*.43}" fill="#484848"/>
+    <line x1="${w*.25}" y1="${h*.38}" x2="${w*.68}" y2="${h*.4}" stroke="#C4BDB2" stroke-width="1" opacity=".25"/>
+    <line x1="${w*.23}" y1="${h*.43}" x2="${w*.77}" y2="${h*.45}" stroke="#8A1818" stroke-width="1" opacity=".4"/>`;
   }
   if(death==="fantasma"){
-    fx=`<defs><filter id="fg${px}"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-    <g style="animation:floatSlow 3s ease-in-out infinite">
-      <ellipse cx="${w*.6}" cy="${h*.13}" rx="30" ry="22" fill="white" opacity=".07" filter="url(#fg${px})"/>
-      <ellipse cx="${w*.6}" cy="${h*.13}" rx="18" ry="13" fill="white" opacity=".12"/>
-      <circle cx="${w*.55}" cy="${h*.1}" r="5" fill="white" opacity=".25"/>
-      <circle cx="${w*.67}" cy="${h*.12}" r="3.5" fill="white" opacity=".2"/>
+    // White wisps — subtle, no filter needed
+    fx=`<g style="animation:floatSlow 3.2s ease-in-out infinite">
+      <ellipse cx="${w*.62}" cy="${h*.12}" rx="22" ry="16" fill="white" opacity=".06"/>
+      <ellipse cx="${w*.62}" cy="${h*.12}" rx="13" ry="9" fill="white" opacity=".1"/>
+      <circle cx="${w*.58}" cy="${h*.09}" r="4" fill="white" opacity=".18"/>
+      <circle cx="${w*.68}" cy="${h*.11}" r="2.8" fill="white" opacity=".14"/>
+      <circle cx="${w*.63}" cy="${h*.16}" r="3" fill="white" opacity=".1"/>
     </g>`;
   }
   if(death==="zombi"){
-    fx=`<defs><filter id="zg${px}"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-    <ellipse cx="${w/2}" cy="${h*.5}" rx="${w*.52}" ry="${h*.46}" fill="#1A5020" opacity=".2" filter="url(#zg${px})" style="animation:glow 2.5s ease-in-out infinite"/>
-    <path d="M${w*.36} ${h*.33} Q${w*.35} ${h*.44} ${w*.37} ${h*.52}" stroke="#2E8A3E" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".7"/>
-    <path d="M${w*.6} ${h*.25} Q${w*.59} ${h*.36} ${w*.61} ${h*.43}" stroke="#2E8A3E" stroke-width="3" fill="none" stroke-linecap="round" opacity=".7"/>
-    <circle cx="${w*.37}" cy="${h*.53}" r="3.5" fill="#2E8A3E" opacity=".8"/>
-    <circle cx="${w*.61}" cy="${h*.44}" r="3" fill="#2E8A3E" opacity=".8"/>`;
+    // Dark sepia decay cracks — no green, no glow, just ruin marks
+    const sc='#2A1E14';
+    fx=`<line x1="${w*.5}" y1="${h*.22}" x2="${w*.36}" y2="${h*.38}" stroke="${sc}" stroke-width="2" opacity=".7"/>
+    <line x1="${w*.36}" y1="${h*.38}" x2="${w*.28}" y2="${h*.44}" stroke="${sc}" stroke-width="1.5" opacity=".5"/>
+    <line x1="${w*.36}" y1="${h*.38}" x2="${w*.4}" y2="${h*.48}" stroke="${sc}" stroke-width="1" opacity=".4"/>
+    <line x1="${w*.5}" y1="${h*.22}" x2="${w*.64}" y2="${h*.3}" stroke="${sc}" stroke-width="2" opacity=".7"/>
+    <line x1="${w*.64}" y1="${h*.3}" x2="${w*.74}" y2="${h*.25}" stroke="${sc}" stroke-width="1.5" opacity=".5"/>
+    <line x1="${w*.5}" y1="${h*.55}" x2="${w*.42}" y2="${h*.7}" stroke="${sc}" stroke-width="1.8" opacity=".6"/>
+    <line x1="${w*.5}" y1="${h*.55}" x2="${w*.6}" y2="${h*.68}" stroke="${sc}" stroke-width="1.8" opacity=".6"/>
+    <circle cx="${w*.36}" cy="${h*.38}" r="2.2" fill="${sc}" opacity=".7"/>
+    <circle cx="${w*.64}" cy="${h*.3}" r="2" fill="${sc}" opacity=".7"/>
+    <ellipse cx="${w/2}" cy="${h*.5}" rx="${w*.44}" ry="${h*.42}" fill="#120C08" opacity=".18"/>`;
   }
   const anim=poseName==='ghost'?'style="animation:floatSlow 3.5s ease-in-out infinite"':'';
   const ht=Math.round(px*280/220);

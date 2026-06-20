@@ -286,26 +286,17 @@ const SB_ERRORS={
 
 // ── Tiny doll avatar (for feed cards) ─────────────────
 function avatarDoll(color,px){
+  // Avatar = just the head. Clean at any small size, instantly recognizable.
   px=px||32;
-  const w=px,h=px;
-  // Smaller head ratio, thinner stroke, angled arms — looks right at 26-36px
-  const r=w*.21,cx=w/2,cy=h*.26;
+  const cx=px/2,cy=px/2,r=px/2-1;
   const dark=color==="#C0B898"||color==="#D0C8B8";
   const ec=dark?"#2A1E38":"#080808";
-  const sw=Math.max(1.5,w*.075);
-  const by2=h*.8;
-  // Arms from chest (h*.43), angled downward to h*.6
-  const alx=cx-(w*.3),aly=h*.6,arx=cx+(w*.3),ary=h*.6;
-  const llx=cx-(w*.22),lly=h*.97,lrx=cx+(w*.22),lry=h*.97;
-  return `<svg viewBox="0 0 ${w} ${h}" width="${px}" height="${px}" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+  const ey=cy-px*.06, ex=px*.17;
+  const er=Math.max(1.2,px*.072);
+  return `<svg viewBox="0 0 ${px} ${px}" width="${px}" height="${px}" xmlns="http://www.w3.org/2000/svg" style="display:block;border-radius:50%">
     <circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}"/>
-    <circle cx="${cx-.13*w}" cy="${cy-.02*h}" r="${w*.045}" fill="${ec}"/>
-    <circle cx="${cx+.13*w}" cy="${cy-.02*h}" r="${w*.045}" fill="${ec}"/>
-    <line x1="${cx}" y1="${cy+r}" x2="${cx}" y2="${by2}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>
-    <line x1="${cx}" y1="${h*.43}" x2="${alx}" y2="${aly}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>
-    <line x1="${cx}" y1="${h*.43}" x2="${arx}" y2="${ary}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>
-    <line x1="${cx}" y1="${by2}" x2="${llx}" y2="${lly}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>
-    <line x1="${cx}" y1="${by2}" x2="${lrx}" y2="${lry}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>
+    <circle cx="${cx-ex}" cy="${ey}" r="${er}" fill="${ec}"/>
+    <circle cx="${cx+ex}" cy="${ey}" r="${er}" fill="${ec}"/>
   </svg>`;
 }
 

@@ -200,6 +200,19 @@ textarea:focus,input:focus{border-color:var(--amber);}
 .done-card{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:clamp(14px,3.5vw,20px);text-align:center;margin-top:16px;}
 .done-razon{color:var(--bone2);font-style:italic;font-size:clamp(13px,3.5vw,14px);line-height:1.55;margin-bottom:8px;}
 .done-castigo{color:var(--amber);font-weight:800;font-size:clamp(13px,3.5vw,14px);}
+/* ── Peor / anterior ── */
+.peor-btn{margin-top:14px;background:none;border:1px dashed var(--coral);border-radius:14px;padding:11px 20px;color:var(--coral2);font-size:clamp(12px,3vw,13px);font-weight:700;cursor:pointer;width:100%;letter-spacing:.3px;transition:all .2s;font-family:inherit;}
+.peor-btn:hover{background:var(--glowC);}
+.prev-toggle{background:none;border:none;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--muted);font-size:clamp(10px,2.5vw,11px);cursor:pointer;padding:10px 0 0;transition:color .2s;font-family:inherit;letter-spacing:.3px;}
+.prev-toggle:hover{color:var(--muted2);}
+.prev-toggle svg{transition:transform .2s;}
+.prev-toggle.open svg{transform:rotate(180deg);}
+.prev-panel{overflow:hidden;max-height:0;transition:max-height .35s ease;opacity:.55;}
+.prev-panel.open{max-height:400px;}
+.prev-inner{padding:12px 0 4px;border-top:1px solid var(--border);margin-top:10px;}
+.prev-label{font-size:clamp(9px,2.5vw,10px);text-transform:uppercase;letter-spacing:1px;color:var(--muted);text-align:center;margin-bottom:8px;}
+.prev-razon{color:var(--muted2);font-style:italic;font-size:clamp(11px,3vw,12px);text-align:center;margin-top:6px;line-height:1.5;}
+.prev-castigo{color:var(--muted);font-size:clamp(10px,2.5vw,11px);font-weight:700;text-align:center;margin-top:3px;}
 
 /* ── Responsive desktop bump ── */
 @media(min-width:560px){
@@ -251,6 +264,7 @@ const ICO={
 // ── State ──────────────────────────────────────────────
 let user=null,profile=null,view="loading",todayPost=null;
 let feedData=[],myDeps=new Set(),myFollowing=new Set();
+let todayPrevPost=null,expandedPrev=new Set();
 let authTab="login",authStep="form";
 let pendingSignup={username:"",email:"",pass:"",color:DOLL_COLORS[0]};
 let draftRazon="";
@@ -377,33 +391,51 @@ async function loadProfile(){
   profile=data;
 }
 async function loadTodayPost(){
-  const {data}=await sb.from('posts').select('*').eq('user_id',user.id).eq('post_date',todayS()).maybeSingle();
-  todayPost=data;
+  const {data}=await sb.from('posts').select('*').eq('user_id',user.id).eq('post_date',todayS()).order('created_at',{ascending:false});
+  const all=data||[];
+  todayPost=all.find(p=>p.is_primary)||all[0]||null;
+  todayPrevPost=todayPost?.previous_post_id ? all.find(p=>p.id===todayPost.previous_post_id)||null : null;
 }
 async function loadFeed(){
   const [{data:posts},{data:deps},{data:follows}]=await Promise.all([
-    sb.from('posts').select('*').eq('post_date',todayS()).order('created_at',{ascending:false}),
+    sb.from('posts').select('*').eq('post_date',todayS()).eq('is_primary',true).order('created_at',{ascending:false}),
     sb.from('deps').select('post_id').eq('user_id',user.id),
     sb.from('follows').select('following_id').eq('follower_id',user.id),
   ]);
   myDeps=new Set((deps||[]).map(d=>d.post_id));
   myFollowing=new Set((follows||[]).map(f=>f.following_id));
-  feedData=(posts||[]).sort((a,b)=>{
-    const af=myFollowing.has(a.user_id)?0:1,bf=myFollowing.has(b.user_id)?0:1;
-    return af-bf||(new Date(b.created_at)-new Date(a.created_at));
-  });
+  const primary=posts||[];
+  // fetch previous posts for cards that have one
+  const prevIds=primary.map(p=>p.previous_post_id).filter(Boolean);
+  let prevMap={};
+  if(prevIds.length){
+    const {data:prevPosts}=await sb.from('posts').select('*').in('id',prevIds);
+    (prevPosts||[]).forEach(p=>{prevMap[p.id]=p;});
+  }
+  feedData=primary.map(p=>({...p,_prev:p.previous_post_id?prevMap[p.previous_post_id]||null:null}))
+    .sort((a,b)=>{
+      const af=myFollowing.has(a.user_id)?0:1,bf=myFollowing.has(b.user_id)?0:1;
+      return af-bf||(new Date(b.created_at)-new Date(a.created_at));
+    });
 }
 async function submitPost(pd){
   const t=todayS(),y=yesterS();
-  const ns=(profile.last_post_date===y)?(profile.streak||0)+1:1;
+  const ns=(profile.last_post_date===y||(profile.last_post_date===t))?(profile.streak||1):1;
+  const prevId=todayPost?.id||null;
+  if(prevId) await sb.from('posts').update({is_primary:false}).eq('id',prevId);
   const {data,error}=await sb.from('posts').insert({
     user_id:user.id,username:profile.username,razon:pd.razon,castigo:pd.castigo,
     dibujo_trazos:pd.dibujo?.trazos||null,dibujo_descripcion:pd.dibujo?.descripcion||null,
-    doll_color:profile.doll_color,post_date:t,
+    doll_color:profile.doll_color,post_date:t,is_primary:true,
+    previous_post_id:prevId,
   }).select().single();
   if(error){alert('Error: '+error.message);return;}
-  await sb.from('profiles').update({streak:ns,last_post_date:t}).eq('id',user.id);
-  profile.streak=ns;profile.last_post_date=t;todayPost=data;view='posted';paint();
+  if(!profile.last_post_date||profile.last_post_date!==t){
+    const newStreak=(profile.last_post_date===y)?(profile.streak||0)+1:1;
+    await sb.from('profiles').update({streak:newStreak,last_post_date:t}).eq('id',user.id);
+    profile.streak=newStreak;profile.last_post_date=t;
+  }
+  todayPrevPost=todayPost;todayPost=data;view='posted';paint();
 }
 async function toggleDep(pid){
   if(myDeps.has(pid)){
@@ -564,11 +596,27 @@ function paint(){
   shell(c);
 }
 
+function prevPostHTML(p,size){
+  if(!p) return '';
+  const d=DEATHS.find(x=>x.id===p.castigo);
+  const lbl=p.castigo==='dibujo'?p.dibujo_descripcion:DEATH_LABELS[p.castigo]||p.castigo;
+  return `<div class="prev-inner">
+    <div class="prev-label">Lo de antes</div>
+    <div style="display:flex;justify-content:center;opacity:.6;">
+      ${dollWithDraw(p.doll_color,p.castigo,p.dibujo_trazos,true,d?.pose||'idle',size||60)}
+    </div>
+    <div class="prev-razon">"${p.razon}"</div>
+    <div class="prev-castigo">${lbl}</div>
+  </div>`;
+}
+
 function renderHome(){
   const dc=profile.doll_color;
   if(todayPost){
     const p=todayPost,d=DEATHS.find(x=>x.id===p.castigo);
-    const lbl=p.castigo==='dibujo'?`${p.dibujo_descripcion}`:DEATH_LABELS[p.castigo]||p.castigo;
+    const lbl=p.castigo==='dibujo'?p.dibujo_descripcion:DEATH_LABELS[p.castigo]||p.castigo;
+    const hasPrev=!!todayPrevPost;
+    const isOpen=expandedPrev.has('home');
     return `<div class="screen" style="text-align:center;">
       ${hdr("Hoy ya está hecho",`"${p.razon}"`)}
       <div style="display:flex;justify-content:center;margin:28px 0;">
@@ -577,8 +625,18 @@ function renderHome(){
       <div class="done-card">
         <div class="done-castigo">${lbl}</div>
         <div style="color:var(--muted2);font-size:clamp(11px,3vw,12px);margin-top:5px;">Tus amigos pueden darle DEP</div>
+        ${hasPrev?`
+          <button class="prev-toggle ${isOpen?'open':''}" id="btnTogglePrev">
+            <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Antes había pasado algo
+          </button>
+          <div class="prev-panel ${isOpen?'open':''}" id="prevPanel">
+            ${prevPostHTML(todayPrevPost,64)}
+          </div>
+        `:''}
       </div>
-      <div style="display:flex;justify-content:center;margin-top:20px;">
+      <button class="peor-btn" id="btnPeor">Ha ido a peor — contar algo nuevo</button>
+      <div style="display:flex;justify-content:center;margin-top:14px;">
         <button class="btn-amber-sm" id="goFeed">Ver el feed</button>
       </div>
     </div>`;
@@ -658,6 +716,8 @@ function renderFeed(){
     const given=myDeps.has(item.id),own=item.user_id===user.id;
     const friend=myFollowing.has(item.user_id);
     const d=DEATHS.find(x=>x.id===item.castigo);
+    const hasPrev=!!item.previous_post_id&&!!item._prev;
+    const isOpen=expandedPrev.has(item.id);
     return `<div class="feed-card">
       <div class="feed-head">
         <div class="avatar" style="background:${item.doll_color};">${initials(item.username)}</div>
@@ -676,6 +736,15 @@ function renderFeed(){
       ${own
         ?`<div class="own-dep">${ICO.candle} ${item.dep_count||0} ${item.dep_count===1?'DEP':'DEPs'}</div>`
         :`<button class="dep-btn ${given?'given':''}" data-pid="${item.id}">${ICO.candle} DEP <span class="dep-count">${item.dep_count||0}</span></button>`}
+      ${hasPrev?`
+        <button class="prev-toggle ${isOpen?'open':''}" data-feedprev="${item.id}">
+          <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Antes había pasado algo
+        </button>
+        <div class="prev-panel ${isOpen?'open':''}">
+          ${prevPostHTML(item._prev,54)}
+        </div>
+      `:''}
     </div>`;
   }).join('');
   return `<div class="screen">${hdr("Feed","Lo de hoy, de tu gente")}<div style="margin-top:16px;">${cards}</div></div>`;
@@ -705,6 +774,14 @@ function attachListeners(){
   if(view==='home'){
     if(ge('empezar'))ge('empezar').onclick=()=>{view='muerte';paint();};
     if(ge('goFeed'))ge('goFeed').onclick=async()=>{await loadFeed();view='feed';paint();};
+    if(ge('btnPeor'))ge('btnPeor').onclick=()=>{view='muerte';paint();};
+    if(ge('btnTogglePrev')){
+      ge('btnTogglePrev').onclick=()=>{
+        if(expandedPrev.has('home'))expandedPrev.delete('home');else expandedPrev.add('home');
+        ge('btnTogglePrev').classList.toggle('open');
+        ge('prevPanel').classList.toggle('open');
+      };
+    }
   }
   if(view==='muerte'){
     document.querySelectorAll('.dcell.on').forEach(c=>{c.onclick=()=>promptRazon(c.getAttribute('data-death'));});
@@ -721,6 +798,14 @@ function attachListeners(){
   if(view==='feed'){
     document.querySelectorAll('.dep-btn').forEach(b=>{b.onclick=async()=>await toggleDep(b.getAttribute('data-pid'));});
     document.querySelectorAll('.follow-btn').forEach(b=>{b.onclick=async()=>await toggleFollow(b.getAttribute('data-uid'));});
+    document.querySelectorAll('[data-feedprev]').forEach(btn=>{
+      btn.onclick=()=>{
+        const id=btn.getAttribute('data-feedprev');
+        if(expandedPrev.has(id))expandedPrev.delete(id);else expandedPrev.add(id);
+        btn.classList.toggle('open');
+        btn.nextElementSibling.classList.toggle('open');
+      };
+    });
   }
   if(view==='ajustes'){
     document.querySelectorAll('.ccircle').forEach(c=>{
@@ -733,7 +818,8 @@ function attachListeners(){
     if(ge('volverAjustes'))ge('volverAjustes').onclick=()=>{view=todayPost?'feed':'home';paint();};
     if(ge('btnLogout'))ge('btnLogout').onclick=async()=>{
       await sb.auth.signOut();
-      user=null;profile=null;todayPost=null;feedData=[];myDeps=new Set();myFollowing=new Set();
+      user=null;profile=null;todayPost=null;todayPrevPost=null;
+      feedData=[];myDeps=new Set();myFollowing=new Set();expandedPrev=new Set();
       authStep='form';view='auth';paint();
     };
   }

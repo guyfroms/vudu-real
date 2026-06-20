@@ -15,16 +15,12 @@
     --wax:#E8C468; --blood:#9C2B3A; --bone:#EDE6D8;
     --smoke:#4A3A50; --smokeLight:#6B5670;
   }
-  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;background:var(--bg);height:100%;}
   body{
     font-family:-apple-system,system-ui,sans-serif;
-    background:radial-gradient(ellipse at 50% 0%, var(--panel2), var(--bg) 70%);
-    color:var(--bone);
-    min-height:100vh;
-    max-width:480px;
-    margin:0 auto;
-    padding-bottom:90px;
+    background:radial-gradient(ellipse at 50% 0%,var(--panel2),var(--bg) 70%);
+    color:var(--bone);min-height:100vh;max-width:480px;margin:0 auto;
   }
   .topbar{display:flex;justify-content:space-between;align-items:center;padding:env(safe-area-inset-top,16px) 20px 0;}
   .logo{font-weight:800;letter-spacing:1px;font-size:16px;}
@@ -32,18 +28,22 @@
   .gear{background:none;border:none;font-size:18px;cursor:pointer;}
   h1.title{color:var(--wax);font-family:Georgia,serif;font-size:22px;margin:0;text-align:center;letter-spacing:.5px;}
   p.sub{color:var(--smokeLight);font-size:12px;margin:4px 0 0;text-align:center;}
-  .screen{padding:20px;}
-  textarea,input{
+  .screen{padding:20px;padding-bottom:100px;}
+  textarea,input[type=text],input[type=email],input[type=password]{
     width:100%;background:var(--panel);border:1px solid var(--smoke);border-radius:14px;
     color:var(--bone);padding:12px;font-size:15px;box-sizing:border-box;font-family:inherit;
   }
-  textarea{min-height:70px;resize:none;border-radius:14px;}
+  textarea{min-height:70px;resize:none;}
   .charcount{text-align:right;font-size:11px;color:var(--smokeLight);}
   .btn-main{
     width:100%;margin-top:14px;background:var(--blood);color:var(--bone);border:none;
     border-radius:14px;padding:14px 0;font-weight:700;font-size:15px;cursor:pointer;letter-spacing:.5px;
   }
   .btn-main:disabled{background:var(--smoke);cursor:default;}
+  .btn-ghost{
+    width:100%;margin-top:10px;background:transparent;color:var(--smokeLight);border:1px solid var(--smoke);
+    border-radius:14px;padding:13px 0;font-weight:700;font-size:14px;cursor:pointer;
+  }
   .btn-wax{
     background:var(--wax);color:var(--bg);border:none;border-radius:14px;
     padding:12px 26px;font-weight:700;font-size:14px;cursor:pointer;
@@ -58,7 +58,7 @@
   .death-card.unlocked{border-color:var(--wax);}
   .death-card.locked{opacity:.45;cursor:default;}
   .death-card span.label{color:var(--bone);font-size:13px;font-weight:600;}
-  .death-card span.streak{color:var(--smokeLight);font-size:10px;}
+  .death-card span.streak-req{color:var(--smokeLight);font-size:10px;}
   .draw-card{
     grid-column:span 2;background:var(--panel2);border:1px dashed var(--wax);border-radius:16px;
     padding:16px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;
@@ -75,7 +75,7 @@
   .clearbtn{background:none;border:1px solid var(--smoke);border-radius:8px;color:var(--smokeLight);font-size:11px;padding:6px 10px;cursor:pointer;}
   .feed-card{background:var(--panel);border-radius:18px;padding:16px;margin-bottom:14px;border:1px solid var(--smoke);}
   .feed-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
-  .avatar{width:30px;height:30px;border-radius:50%;}
+  .avatar{width:30px;height:30px;border-radius:50%;flex-shrink:0;}
   .feed-name{color:var(--bone);font-weight:700;font-size:14px;}
   .feed-time{color:var(--smokeLight);font-size:11px;}
   .feed-razon{color:var(--bone);font-size:14px;margin:4px 0 2px;}
@@ -95,200 +95,302 @@
   }
   .navbtn{background:none;border:none;font-size:13px;font-weight:700;cursor:pointer;color:var(--bone);}
   .navbtn.active{color:var(--wax);}
-  .navbtn.disabled{color:var(--smoke);}
   .backlink{display:block;margin:14px auto 0;background:none;border:none;color:var(--smokeLight);font-size:13px;cursor:pointer;text-align:center;width:100%;}
   .colorpick{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:20px;}
   .colorcircle{width:36px;height:36px;border-radius:50%;border:3px solid transparent;cursor:pointer;padding:0;}
   .colorcircle.active{border-color:var(--wax);}
+  /* Auth */
+  .auth-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;}
+  .auth-logo{font-weight:800;font-size:32px;letter-spacing:2px;margin-bottom:6px;}
+  .auth-logo span{color:var(--blood);}
+  .auth-sub{color:var(--smokeLight);font-size:13px;margin-bottom:32px;text-align:center;line-height:1.6;}
+  .auth-tabs{display:flex;width:100%;border-radius:12px;overflow:hidden;border:1px solid var(--smoke);margin-bottom:20px;}
+  .auth-tab{flex:1;padding:12px;background:transparent;border:none;color:var(--smokeLight);font-weight:700;font-size:14px;cursor:pointer;}
+  .auth-tab.active{background:var(--panel2);color:var(--bone);}
+  .auth-field{margin-bottom:12px;}
+  .auth-field label{display:block;font-size:11px;color:var(--smokeLight);margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+  .auth-err{color:#E8602C;font-size:13px;margin-bottom:10px;text-align:center;min-height:18px;}
+  /* Loading */
+  .loading-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;}
+  .spinner{width:32px;height:32px;border:3px solid var(--smoke);border-top-color:var(--wax);border-radius:50%;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
-<div class="topbar">
-  <span class="logo">VUDÚ<span>REAL</span></span>
-  <button class="gear" id="btnAjustes">⚙️</button>
-</div>
-<div id="app"></div>
-<div class="bottomnav">
-  <button class="navbtn" id="navHoy">🪦 Hoy</button>
-  <button class="navbtn" id="navFeed">🕯️ Feed</button>
-</div>
+<div id="root"><div class="loading-wrap"><div class="spinner"></div></div></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
-// ---------------- Estado ----------------
-const STORAGE_KEY = "vudureal_state_v1";
+const { createClient } = supabase;
+const sb = createClient(
+  'https://vknwuevlvnavkgvtguku.supabase.co',
+  'sb_publishable_f7q0PeemTaEwN9XFotSSEA_kA_rqtz7'
+);
+
 const DOLL_COLORS = ["#C24545","#4577C2","#45C27A","#C2A445","#9C45C2","#E8E8E8"];
 const LINE_COLORS = ["#E8C468","#C24545","#45C27A","#4577C2","#EDE6D8"];
 const LINE_WIDTHS = [2,4,7];
-
-const DEATHS_BASE = [
-  {id:"fuego",label:"Quemado",emoji:"🔥",unlocked:true},
-  {id:"agujas",label:"Acribillado",emoji:"📌",unlocked:true},
-  {id:"ahogo",label:"Ahogado",emoji:"💧",unlocked:false,streak:3},
-  {id:"rayo",label:"Electrocutado",emoji:"⚡",unlocked:false,streak:7},
-  {id:"aplastado",label:"Aplastado",emoji:"🪨",unlocked:false,streak:14},
-  {id:"fantasma",label:"Exorcizado",emoji:"👻",unlocked:false,streak:21},
+const DEATHS = [
+  {id:"fuego",label:"Quemado",emoji:"🔥",min:0},
+  {id:"agujas",label:"Acribillado",emoji:"📌",min:0},
+  {id:"ahogo",label:"Ahogado",emoji:"💧",min:3},
+  {id:"rayo",label:"Electrocutado",emoji:"⚡",min:7},
+  {id:"aplastado",label:"Aplastado",emoji:"🪨",min:14},
+  {id:"fantasma",label:"Exorcizado",emoji:"👻",min:21},
 ];
-
 const DEATH_LABELS = {
-  fuego:"Quemado 🔥", agujas:"Acribillado 📌", ahogo:"Ahogado 💧",
-  rayo:"Electrocutado ⚡", aplastado:"Aplastado 🪨", fantasma:"Exorcizado 👻",
+  fuego:"Quemado 🔥",agujas:"Acribillado 📌",ahogo:"Ahogado 💧",
+  rayo:"Electrocutado ⚡",aplastado:"Aplastado 🪨",fantasma:"Exorcizado 👻",
 };
 
-const MOCK_FEED = [
-  {name:"Alberto",color:"#4577C2",razon:"casi me despiden por dormirme en la reunión",muerte:"fuego",dep:12,hace:"hace 2h"},
-  {name:"Dani",color:"#45C27A",razon:"se me ha caído el café encima del teclado del curro",muerte:"agujas",dep:8,hace:"hace 4h"},
-  {name:"Kim",color:"#9C45C2",razon:"me han puesto una multa por el carril bus sin querer",muerte:"dibujo",
-    dibujoTrazos:[
-      {puntos:[{x:40,y:150},{x:110,y:150},{x:180,y:150}],color:"#E8C468",grosor:5},
-      {puntos:[{x:60,y:130},{x:60,y:170}],color:"#C24545",grosor:4},
-      {puntos:[{x:150,y:130},{x:150,y:170}],color:"#C24545",grosor:4},
-    ],
-    dep:21,hace:"hace 5h",dibujoNota:"le ha dibujado un coche encima"},
-  {name:"Javi",color:"#C2A445",razon:"se me ha roto el móvil en la calle, pantalla entera",muerte:"ahogo",dep:31,hace:"hace 7h"},
-];
-
-function loadState(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw) return JSON.parse(raw);
-  }catch(e){}
-  return { dollColor: DOLL_COLORS[0], todayPost: null, lastDate: null };
-}
-function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-
-let state = loadState();
-// resetear "hoy" si cambió el día
-const todayStr = new Date().toDateString();
-if(state.lastDate !== todayStr){ state.todayPost = null; state.lastDate = todayStr; saveState(); }
-
-let view = "home"; // home, razon, muerte, dibujo, posted, feed, ajustes
+let currentUser = null;
+let currentProfile = null;
+let view = "loading";
+let todayPost = null;
+let feedData = [];
+let myDeps = new Set();
+let authTab = "login";
 let draftRazon = "";
-let drawMethod = null; // método elegido temporalmente
 
-// ---------------- Render del muñeco (SVG, viewBox fijo 220x280) ----------------
-function dollSVG(color, death, opts){
-  opts = opts || {};
-  const dead = !!opts.dead; // ojos en X cuando le ha pasado la desgracia
-  const w = 220, h = 280;
-  const sw = 16; // grosor de trazo
+const todayStr = () => new Date().toISOString().split('T')[0];
+const yesterdayStr = () => new Date(Date.now()-86400000).toISOString().split('T')[0];
+const ge = id => document.getElementById(id);
 
-  let eyes;
-  if(dead){
-    eyes = `
-      <line x1="${w*0.42}" y1="${h*0.135}" x2="${w*0.48}" y2="${h*0.165}" stroke="${color==="#E8E8E8"?"#222":"#1A1A1A"}" stroke-width="3" stroke-linecap="round"/>
-      <line x1="${w*0.48}" y1="${h*0.135}" x2="${w*0.42}" y2="${h*0.165}" stroke="${color==="#E8E8E8"?"#222":"#1A1A1A"}" stroke-width="3" stroke-linecap="round"/>
-      <line x1="${w*0.52}" y1="${h*0.135}" x2="${w*0.58}" y2="${h*0.165}" stroke="${color==="#E8E8E8"?"#222":"#1A1A1A"}" stroke-width="3" stroke-linecap="round"/>
-      <line x1="${w*0.58}" y1="${h*0.135}" x2="${w*0.52}" y2="${h*0.165}" stroke="${color==="#E8E8E8"?"#222":"#1A1A1A"}" stroke-width="3" stroke-linecap="round"/>
-      <path d="M ${w*0.45} ${h*0.205} Q ${w/2} ${h*0.185} ${w*0.55} ${h*0.205}" stroke="#1A0F1F" stroke-width="3" fill="none" stroke-linecap="round"/>
-    `;
-  }else{
-    eyes = `
-      <circle cx="${w*0.45}" cy="${h*0.145}" r="3" fill="#140A17"/>
-      <circle cx="${w*0.55}" cy="${h*0.145}" r="3" fill="#140A17"/>
-      <path d="M ${w*0.45} ${h*0.19} Q ${w/2} ${h*0.215} ${w*0.55} ${h*0.19}" stroke="#140A17" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    `;
-  }
+function timeAgo(ts){
+  const m = Math.floor((Date.now()-new Date(ts))/60000);
+  if(m<1) return 'ahora';
+  if(m<60) return `hace ${m}m`;
+  const h = Math.floor(m/60);
+  if(h<24) return `hace ${h}h`;
+  return `hace ${Math.floor(h/24)}d`;
+}
 
-  let fx = "";
-  if(death==="fuego"){
-    fx += `<defs><radialGradient id="flame" cx="50%" cy="100%" r="80%">
-      <stop offset="0%" stop-color="#FFD86B"/><stop offset="60%" stop-color="#E8602C"/><stop offset="100%" stop-color="#7A1F2B"/>
-    </radialGradient></defs>`;
-    [0.3,0.5,0.7].forEach((x)=>{
-      fx += `<ellipse cx="${w*x}" cy="${h*0.85}" rx="18" ry="38" fill="url(#flame)" opacity="0.85"/>`;
-    });
-  }
-  if(death==="agujas"){
-    [[0.35,0.2],[0.62,0.28],[0.45,0.45],[0.7,0.55],[0.3,0.65]].forEach(([x,y])=>{
-      fx += `<line x1="${w*x}" y1="${h*y}" x2="${w*x+22}" y2="${h*y-12}" stroke="#EDE6D8" stroke-width="2.5"/>`;
-    });
-  }
-  if(death==="ahogo"){
-    fx += `<rect x="0" y="${h*0.4}" width="${w}" height="${h*0.6}" fill="#3A6FA8" opacity="0.35"/>`;
-  }
-  if(death==="rayo"){
-    fx += `<polyline points="${w*0.5},0 ${w*0.4},${h*0.3} ${w*0.58},${h*0.32} ${w*0.42},${h*0.62}" stroke="#FCEE6B" stroke-width="9" fill="none" stroke-linejoin="round"/>`;
-  }
-  if(death==="aplastado"){
-    fx += `<ellipse cx="${w/2}" cy="${h*0.1}" rx="76" ry="38" fill="#5C5C5C"/>`;
-  }
-  if(death==="fantasma"){
-    fx += `<text x="${w*0.55}" y="${h*0.1}" font-size="40">👻</text>`;
-  }
-
-  return `
-  <svg viewBox="0 0 ${w} ${h}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+// ---- SVG ----
+function dollSVG(color, death, dead){
+  const w=220,h=280,sw=16;
+  let eyes = dead ? `
+    <line x1="${w*.42}" y1="${h*.135}" x2="${w*.48}" y2="${h*.165}" stroke="${color==="#E8E8E8"?"#222":"#1A1A1A"}" stroke-width="3" stroke-linecap="round"/>
+    <line x1="${w*.48}" y1="${h*.135}" x2="${w*.42}" y2="${h*.165}" stroke="${color==="#E8E8E8"?"#222":"#1A1A1A"}" stroke-width="3" stroke-linecap="round"/>
+    <line x1="${w*.52}" y1="${h*.135}" x2="${w*.58}" y2="${h*.165}" stroke="${color==="#E8E8E8"?"#222":"#1A1A1A"}" stroke-width="3" stroke-linecap="round"/>
+    <line x1="${w*.58}" y1="${h*.135}" x2="${w*.52}" y2="${h*.165}" stroke="${color==="#E8E8E8"?"#222":"#1A1A1A"}" stroke-width="3" stroke-linecap="round"/>
+    <path d="M ${w*.45} ${h*.205} Q ${w/2} ${h*.185} ${w*.55} ${h*.205}" stroke="#1A0F1F" stroke-width="3" fill="none" stroke-linecap="round"/>
+  ` : `
+    <circle cx="${w*.45}" cy="${h*.145}" r="3" fill="#140A17"/>
+    <circle cx="${w*.55}" cy="${h*.145}" r="3" fill="#140A17"/>
+    <path d="M ${w*.45} ${h*.19} Q ${w/2} ${h*.215} ${w*.55} ${h*.19}" stroke="#140A17" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  `;
+  let fx="";
+  if(death==="fuego"){fx+=`<defs><radialGradient id="flame" cx="50%" cy="100%" r="80%"><stop offset="0%" stop-color="#FFD86B"/><stop offset="60%" stop-color="#E8602C"/><stop offset="100%" stop-color="#7A1F2B"/></radialGradient></defs>`;[.3,.5,.7].forEach(x=>{fx+=`<ellipse cx="${w*x}" cy="${h*.85}" rx="18" ry="38" fill="url(#flame)" opacity="0.85"/>`;});}
+  if(death==="agujas"){[[.35,.2],[.62,.28],[.45,.45],[.7,.55],[.3,.65]].forEach(([x,y])=>{fx+=`<line x1="${w*x}" y1="${h*y}" x2="${w*x+22}" y2="${h*y-12}" stroke="#EDE6D8" stroke-width="2.5"/>`;});}
+  if(death==="ahogo"){fx+=`<rect x="0" y="${h*.4}" width="${w}" height="${h*.6}" fill="#3A6FA8" opacity="0.35"/>`;}
+  if(death==="rayo"){fx+=`<polyline points="${w*.5},0 ${w*.4},${h*.3} ${w*.58},${h*.32} ${w*.42},${h*.62}" stroke="#FCEE6B" stroke-width="9" fill="none" stroke-linejoin="round"/>`;}
+  if(death==="aplastado"){fx+=`<ellipse cx="${w/2}" cy="${h*.1}" rx="76" ry="38" fill="#5C5C5C"/>`;}
+  if(death==="fantasma"){fx+=`<text x="${w*.55}" y="${h*.1}" font-size="40">👻</text>`;}
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
     ${fx}
     <g stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" fill="none">
-      <circle cx="${w/2}" cy="${h*0.16}" r="${w*0.16}" fill="${color}" stroke="none"/>
-      <path d="M ${w/2} ${h*0.3} Q ${w*0.46} ${h*0.46} ${w/2} ${h*0.62}"/>
-      <path d="M ${w/2} ${h*0.38} Q ${w*0.3} ${h*0.4} ${w*0.24} ${h*0.52}"/>
-      <path d="M ${w/2} ${h*0.38} Q ${w*0.7} ${h*0.4} ${w*0.76} ${h*0.52}"/>
-      <path d="M ${w/2} ${h*0.62} Q ${w*0.34} ${h*0.78} ${w*0.28} ${h*0.95}"/>
-      <path d="M ${w/2} ${h*0.62} Q ${w*0.66} ${h*0.78} ${w*0.72} ${h*0.95}"/>
-    </g>
-    ${eyes}
-  </svg>`;
+      <circle cx="${w/2}" cy="${h*.16}" r="${w*.16}" fill="${color}" stroke="none"/>
+      <path d="M ${w/2} ${h*.3} Q ${w*.46} ${h*.46} ${w/2} ${h*.62}"/>
+      <path d="M ${w/2} ${h*.38} Q ${w*.3} ${h*.4} ${w*.24} ${h*.52}"/>
+      <path d="M ${w/2} ${h*.38} Q ${w*.7} ${h*.4} ${w*.76} ${h*.52}"/>
+      <path d="M ${w/2} ${h*.62} Q ${w*.34} ${h*.78} ${w*.28} ${h*.95}"/>
+      <path d="M ${w/2} ${h*.62} Q ${w*.66} ${h*.78} ${w*.72} ${h*.95}"/>
+    </g>${eyes}</svg>`;
 }
 
 function strokesSVG(strokes){
-  if(!strokes || !strokes.length) return "";
-  const polylines = strokes.map(s=>{
-    const pts = s.puntos.map(p=>`${p.x},${p.y}`).join(" ");
-    return `<polyline points="${pts}" stroke="${s.color}" stroke-width="${s.grosor}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`;
-  }).join("");
-  return `<svg viewBox="0 0 220 280" width="100%" height="100%" style="position:absolute;top:0;left:0;">${polylines}</svg>`;
+  if(!strokes||!strokes.length) return "";
+  return `<svg viewBox="0 0 220 280" width="100%" height="100%" style="position:absolute;top:0;left:0;">${
+    strokes.map(s=>`<polyline points="${s.puntos.map(p=>`${p.x},${p.y}`).join(" ")}" stroke="${s.color}" stroke-width="${s.grosor}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`).join("")
+  }</svg>`;
 }
 
-function dollWithStrokes(color, death, strokes, dead, sizePx){
+function doll(color, death, strokes, dead, sizePx){
   return `<div class="doll-wrap" style="width:${sizePx}px;height:${sizePx*280/220}px;position:relative;">
-    ${dollSVG(color, death==="dibujo"?null:death, {dead})}
-    ${death==="dibujo" ? strokesSVG(strokes) : ""}
+    ${dollSVG(color, death==="dibujo"?null:death, dead)}
+    ${death==="dibujo"?strokesSVG(strokes):""}
   </div>`;
 }
 
-// ---------------- Pantallas ----------------
-function header(title, sub){
-  return `<h1 class="title">${title}</h1><p class="sub">${sub}</p>`;
+// ---- Data ----
+async function loadProfile(){
+  const {data} = await sb.from('profiles').select('*').eq('id',currentUser.id).maybeSingle();
+  currentProfile = data;
+}
+
+async function loadTodayPost(){
+  const {data} = await sb.from('posts').select('*').eq('user_id',currentUser.id).eq('post_date',todayStr()).maybeSingle();
+  todayPost = data;
+}
+
+async function loadFeed(){
+  const {data:posts} = await sb.from('posts').select('*').eq('post_date',todayStr()).order('created_at',{ascending:false});
+  feedData = posts||[];
+  const {data:deps} = await sb.from('deps').select('post_id').eq('user_id',currentUser.id);
+  myDeps = new Set((deps||[]).map(d=>d.post_id));
+}
+
+async function submitPost(postData){
+  const today = todayStr();
+  let newStreak = 1;
+  if(currentProfile.last_post_date === yesterdayStr()) newStreak = (currentProfile.streak||0)+1;
+
+  const {data,error} = await sb.from('posts').insert({
+    user_id: currentUser.id,
+    username: currentProfile.username,
+    razon: postData.razon,
+    castigo: postData.castigo,
+    dibujo_trazos: postData.dibujo ? postData.dibujo.trazos : null,
+    dibujo_descripcion: postData.dibujo ? postData.dibujo.descripcion : null,
+    doll_color: currentProfile.doll_color,
+    post_date: today,
+  }).select().single();
+
+  if(error){ alert('Error: '+error.message); return; }
+
+  await sb.from('profiles').update({streak:newStreak,last_post_date:today}).eq('id',currentUser.id);
+  currentProfile.streak = newStreak;
+  currentProfile.last_post_date = today;
+  todayPost = data;
+  view = "posted";
+  renderApp();
+}
+
+async function toggleDep(postId){
+  if(myDeps.has(postId)){
+    await sb.from('deps').delete().eq('post_id',postId).eq('user_id',currentUser.id);
+    myDeps.delete(postId);
+    const p = feedData.find(x=>x.id===postId);
+    if(p) p.dep_count = Math.max(0,(p.dep_count||0)-1);
+  } else {
+    await sb.from('deps').insert({post_id:postId,user_id:currentUser.id});
+    myDeps.add(postId);
+    const p = feedData.find(x=>x.id===postId);
+    if(p) p.dep_count = (p.dep_count||0)+1;
+  }
+  renderApp();
+}
+
+// ---- Auth ----
+async function doSignUp(email,pass,username){
+  const {data:ex} = await sb.from('profiles').select('id').eq('username',username).maybeSingle();
+  if(ex) return 'Ese nombre ya está en uso';
+  const {error} = await sb.auth.signUp({email,password:pass,options:{data:{username}}});
+  if(error) return error.message;
+  return null;
+}
+
+async function doSignIn(email,pass){
+  const {error} = await sb.auth.signInWithPassword({email,password:pass});
+  if(error) return error.message;
+  return null;
+}
+
+// ---- Renders ----
+function hdr(t,s){return `<h1 class="title">${t}</h1><p class="sub">${s}</p>`;}
+
+function renderLoading(){
+  ge('root').innerHTML=`<div class="loading-wrap"><div class="spinner"></div></div>`;
+}
+
+function renderAuth(){
+  const login = authTab==="login";
+  ge('root').innerHTML=`
+  <div class="auth-wrap">
+    <div class="auth-logo">VUDÚ<span>REAL</span></div>
+    <p class="auth-sub">Una desgracia al día,<br>un castigo para tu muñeco</p>
+    <div class="auth-tabs">
+      <button class="auth-tab ${login?'active':''}" id="tabLogin">Entrar</button>
+      <button class="auth-tab ${!login?'active':''}" id="tabReg">Registrarse</button>
+    </div>
+    ${!login?`<div class="auth-field"><label>Nombre de usuario</label><input type="text" id="aUser" placeholder="como quieres que te vean" maxlength="20"/></div>`:''}
+    <div class="auth-field"><label>Email</label><input type="email" id="aEmail" placeholder="tu@email.com"/></div>
+    <div class="auth-field"><label>Contraseña</label><input type="password" id="aPass" placeholder="mínimo 6 caracteres"/></div>
+    <div class="auth-err" id="aErr"></div>
+    <button class="btn-main" id="btnAuth">${login?'Entrar →':'Crear cuenta →'}</button>
+  </div>`;
+
+  ge('tabLogin').onclick=()=>{authTab='login';renderAuth();};
+  ge('tabReg').onclick=()=>{authTab='register';renderAuth();};
+  ge('btnAuth').onclick=async()=>{
+    const btn=ge('btnAuth'), err=ge('aErr');
+    const email=(ge('aEmail').value||'').trim();
+    const pass=ge('aPass').value||'';
+    btn.disabled=true; btn.textContent='...'; err.textContent='';
+    let e;
+    if(authTab==='login'){
+      e=await doSignIn(email,pass);
+    } else {
+      const u=(ge('aUser').value||'').trim();
+      if(!u){err.textContent='Pon un nombre de usuario';btn.disabled=false;btn.textContent='Crear cuenta →';return;}
+      e=await doSignUp(email,pass,u);
+    }
+    if(e){err.textContent=e;btn.disabled=false;btn.textContent=login?'Entrar →':'Crear cuenta →';}
+  };
+}
+
+function renderApp(){
+  const streak = currentProfile?.streak||0;
+  let content='';
+  if(view==='home') content=renderHome();
+  else if(view==='muerte') content=renderMuerte();
+  else if(view==='dibujo') content=renderDibujo();
+  else if(view==='posted') content=renderPosted();
+  else if(view==='feed') content=renderFeed();
+  else if(view==='ajustes') content=renderAjustes();
+
+  ge('root').innerHTML=`
+  <div class="topbar">
+    <span class="logo">VUDÚ<span>REAL</span></span>
+    <div style="display:flex;align-items:center;gap:10px;">
+      ${streak>0?`<span style="color:var(--wax);font-size:13px;font-weight:700;">🔥 ${streak}</span>`:''}
+      <button class="gear" id="btnAjustes">⚙️</button>
+    </div>
+  </div>
+  <div id="app">${content}</div>
+  <div class="bottomnav">
+    <button class="navbtn ${['home','muerte','dibujo','posted'].includes(view)?'active':''}" id="navHoy">🪦 Hoy</button>
+    <button class="navbtn ${view==='feed'?'active':''}" id="navFeed">🕯️ Feed</button>
+  </div>`;
+
+  ge('btnAjustes').onclick=()=>{view='ajustes';renderApp();};
+  ge('navHoy').onclick=()=>{view='home';renderApp();};
+  ge('navFeed').onclick=async()=>{await loadFeed();view='feed';renderApp();};
+  attachListeners();
+  if(view==='dibujo') setupCanvas();
 }
 
 function renderHome(){
-  if(state.todayPost){
-    const p = state.todayPost;
-    const castigoLabel = p.castigo==="dibujo" ? `✏️ ${p.dibujo.descripcion}` : DEATH_LABELS[p.castigo];
-    return `
-    <div class="screen" style="text-align:center;">
-      ${header("Hoy ya está hecho", `"${p.razon}"`)}
-      <div class="center" style="margin:24px 0;">
-        ${dollWithStrokes(state.dollColor, p.castigo, p.dibujo ? p.dibujo.trazos : null, true, 150)}
-      </div>
-      <p style="color:var(--wax);font-size:13px;font-weight:700;">${castigoLabel}</p>
+  if(todayPost){
+    const p=todayPost;
+    const lbl=p.castigo==='dibujo'?`✏️ ${p.dibujo_descripcion}`:DEATH_LABELS[p.castigo];
+    return `<div class="screen" style="text-align:center;">
+      ${hdr("Hoy ya está hecho",`"${p.razon}"`)}
+      <div class="center" style="margin:24px 0;">${doll(currentProfile.doll_color,p.castigo,p.dibujo_trazos,true,150)}</div>
+      <p style="color:var(--wax);font-size:13px;font-weight:700;">${lbl}</p>
       <p style="color:var(--smokeLight);font-size:13px;">Tus amigos ya pueden darle DEP 🕯️</p>
-      <button class="btn-wax" id="goFeedFromHome">Ver el feed</button>
+      <button class="btn-wax" id="goFeed">Ver el feed</button>
     </div>`;
   }
-  return `
-  <div class="screen">
-    ${header("¿Qué te ha pasado hoy?", "Solo puedes contar 1 desgracia al día")}
-    <div class="center" style="margin:18px 0;">${dollWithStrokes(state.dollColor, null, null, false, 100)}</div>
+  return `<div class="screen">
+    ${hdr("¿Qué te ha pasado hoy?","Solo puedes contar 1 desgracia al día")}
+    <div class="center" style="margin:18px 0;">${doll(currentProfile.doll_color,null,null,false,100)}</div>
     <button class="btn-main" id="empezar">Empezar →</button>
   </div>`;
 }
 
 function renderMuerte(){
-  let cards = DEATHS_BASE.map(d=>{
-    const cls = d.unlocked ? "death-card unlocked" : "death-card locked";
-    const dollMini = dollWithStrokes(state.dollColor, d.unlocked?d.id:null, null, false, 56);
-    return `<div class="${cls}" data-death="${d.unlocked?d.id:''}">
-      ${dollMini}
+  const streak=currentProfile?.streak||0;
+  const cards=DEATHS.map(d=>{
+    const ok=streak>=d.min;
+    return `<div class="${ok?'death-card unlocked':'death-card locked'}" data-death="${ok?d.id:''}">
+      ${doll(currentProfile.doll_color,ok?d.id:null,null,false,56)}
       <span class="label">${d.emoji} ${d.label}</span>
-      ${!d.unlocked?`<span class="streak">racha de ${d.streak} días</span>`:""}
+      ${!ok?`<span class="streak-req">racha de ${d.min} días</span>`:''}
     </div>`;
-  }).join("");
-
-  return `
-  <div class="screen">
-    ${header("Elige su castigo", "Vas desbloqueando formas con tu racha")}
+  }).join('');
+  return `<div class="screen">
+    ${hdr("Elige su castigo","Vas desbloqueando formas con tu racha")}
     <div class="grid2" id="deathGrid">
       ${cards}
       <div class="draw-card" id="drawCard">
@@ -300,331 +402,238 @@ function renderMuerte(){
 }
 
 function renderDibujo(){
-  return `
-  <div class="screen">
-    ${header("Modo libre", "Cuéntanos qué pasó y dibuja qué le haces")}
-    <textarea id="razonDibujo" placeholder="¿qué te ha pasado hoy? ej: se me ha caído el café al suelo..." maxlength="120">${draftRazon}</textarea>
+  return `<div class="screen">
+    ${hdr("Modo libre","Cuéntanos qué pasó y dibuja qué le haces")}
+    <textarea id="razonDibujo" placeholder="¿qué te ha pasado hoy?" maxlength="120">${draftRazon}</textarea>
     <div class="charcount" id="razonCount">${draftRazon.length}/120</div>
-
-    <div class="center" style="margin-top:14px;">
-      <canvas id="drawCanvas" width="220" height="280"></canvas>
-    </div>
-
-    <div class="swatches" id="swatches">
-      ${LINE_COLORS.map((c,i)=>`<button class="swatch ${i===0?'active':''}" data-color="${c}" style="background:${c};"></button>`).join("")}
-    </div>
-    <div class="widths" id="widths">
-      ${LINE_WIDTHS.map((wd,i)=>`<button class="width-btn ${i===1?'active':''}" data-width="${wd}"><span class="width-dot" style="width:${wd+4}px;height:${wd+4}px;"></span></button>`).join("")}
+    <div class="center" style="margin-top:14px;"><canvas id="drawCanvas" width="220" height="280"></canvas></div>
+    <div class="swatches">${LINE_COLORS.map((c,i)=>`<button class="swatch ${i===0?'active':''}" data-color="${c}" style="background:${c};"></button>`).join('')}</div>
+    <div class="widths">
+      ${LINE_WIDTHS.map((w,i)=>`<button class="width-btn ${i===1?'active':''}" data-width="${w}"><span class="width-dot" style="width:${w+4}px;height:${w+4}px;"></span></button>`).join('')}
       <button class="clearbtn" id="clearCanvas">limpiar</button>
     </div>
-
-    <input id="descDibujo" placeholder="¿qué le has hecho? ej: le he dibujado un coche encima" maxlength="80" style="margin-top:12px;" />
-
-    <div class="center" style="margin-top:14px;">
-      <button class="btn-wax" id="guardarDibujo" disabled>Publicar</button>
-    </div>
+    <input type="text" id="descDibujo" placeholder="¿qué le has hecho?" maxlength="80" style="margin-top:12px;"/>
+    <div class="center" style="margin-top:14px;"><button class="btn-wax" id="guardarDibujo" disabled>Publicar</button></div>
     <button class="backlink" id="volverFormas">← volver a las formas</button>
   </div>`;
 }
 
 function renderPosted(){
-  const p = state.todayPost;
-  const castigoLabel = p.castigo==="dibujo" ? `✏️ ${p.dibujo.descripcion}` : DEATH_LABELS[p.castigo];
-  return `
-  <div class="screen" style="text-align:center;">
-    ${header("Publicado", `Hoy le tocó: ${p.razon}`)}
-    <div class="center" style="margin:24px 0;">
-      ${dollWithStrokes(state.dollColor, p.castigo, p.dibujo?p.dibujo.trazos:null, true, 150)}
-    </div>
-    <p style="color:var(--wax);font-size:13px;font-weight:700;">${castigoLabel}</p>
+  const p=todayPost;
+  const lbl=p.castigo==='dibujo'?`✏️ ${p.dibujo_descripcion}`:DEATH_LABELS[p.castigo];
+  return `<div class="screen" style="text-align:center;">
+    ${hdr("Publicado",`Hoy le tocó: ${p.razon}`)}
+    <div class="center" style="margin:24px 0;">${doll(currentProfile.doll_color,p.castigo,p.dibujo_trazos,true,150)}</div>
+    <p style="color:var(--wax);font-size:13px;font-weight:700;">${lbl}</p>
     <p style="color:var(--smokeLight);font-size:13px;">Tus amigos ya pueden darle DEP 🕯️</p>
     <button class="btn-wax" id="irAlFeed">Ver el feed</button>
   </div>`;
 }
 
 function renderFeed(){
-  const cards = MOCK_FEED.map((item, idx)=>{
-    const castigoLabel = item.muerte==="dibujo" ? `✏️ ${item.dibujoNota}` : DEATH_LABELS[item.muerte];
-    return `
-    <div class="feed-card">
+  if(!feedData.length) return `<div class="screen">${hdr("Feed","Lo de hoy, de tu gente")}<p style="color:var(--smokeLight);text-align:center;margin-top:40px;">Nadie ha publicado hoy todavía 🕯️</p></div>`;
+  const cards=feedData.map(item=>{
+    const lbl=item.castigo==='dibujo'?`✏️ ${item.dibujo_descripcion}`:DEATH_LABELS[item.castigo];
+    const given=myDeps.has(item.id);
+    const own=item.user_id===currentUser.id;
+    return `<div class="feed-card">
       <div class="feed-head">
-        <div class="avatar" style="background:${item.color};"></div>
-        <div>
-          <div class="feed-name">${item.name}</div>
-          <div class="feed-time">${item.hace}</div>
-        </div>
+        <div class="avatar" style="background:${item.doll_color};"></div>
+        <div><div class="feed-name">${item.username}</div><div class="feed-time">${timeAgo(item.created_at)}</div></div>
       </div>
       <p class="feed-razon">"${item.razon}"</p>
-      <p class="feed-castigo">${castigoLabel}</p>
-      <div class="center" style="margin:10px 0;">
-        ${dollWithStrokes(item.color, item.muerte, item.dibujoTrazos, true, 80)}
-      </div>
-      <button class="dep-btn" data-idx="${idx}">🕯️ DEP <span class="dep-count">${item.dep}</span></button>
+      <p class="feed-castigo">${lbl}</p>
+      <div class="center" style="margin:10px 0;">${doll(item.doll_color,item.castigo,item.dibujo_trazos,true,80)}</div>
+      ${own
+        ? `<div style="text-align:center;color:var(--smokeLight);font-size:12px;">🕯️ ${item.dep_count||0} DEPs</div>`
+        : `<button class="dep-btn ${given?'given':''}" data-pid="${item.id}">🕯️ DEP <span class="dep-count">${item.dep_count||0}</span></button>`}
     </div>`;
-  }).join("");
-  return `<div class="screen">${header("Feed","Lo de hoy, de tu gente")}<div style="margin-top:16px;">${cards}</div></div>`;
+  }).join('');
+  return `<div class="screen">${hdr("Feed","Lo de hoy, de tu gente")}<div style="margin-top:16px;">${cards}</div></div>`;
 }
 
 function renderAjustes(){
-  return `
-  <div class="screen">
-    ${header("Ajustes", "El color de tu muñeco, para siempre")}
-    <div class="center" style="margin:20px 0;">${dollWithStrokes(state.dollColor, null, null, false, 110)}</div>
+  return `<div class="screen">
+    ${hdr("Ajustes",`@${currentProfile.username} · Racha: ${currentProfile.streak||0} días 🔥`)}
+    <div class="center" style="margin:20px 0;">${doll(currentProfile.doll_color,null,null,false,110)}</div>
     <div class="colorpick">
-      ${DOLL_COLORS.map(c=>`<button class="colorcircle ${c===state.dollColor?'active':''}" data-color="${c}" style="background:${c};"></button>`).join("")}
+      ${DOLL_COLORS.map(c=>`<button class="colorcircle ${c===currentProfile.doll_color?'active':''}" data-color="${c}" style="background:${c};"></button>`).join('')}
     </div>
+    <button class="btn-ghost" id="btnLogout">Cerrar sesión</button>
     <button class="backlink" id="volverAjustes">← volver</button>
   </div>`;
 }
 
-// ---------------- Render principal + listeners ----------------
-function render(){
-  const app = document.getElementById("app");
-  if(view==="home") app.innerHTML = renderHome();
-  else if(view==="muerte") app.innerHTML = renderMuerte();
-  else if(view==="dibujo") app.innerHTML = renderDibujo();
-  else if(view==="posted") app.innerHTML = renderPosted();
-  else if(view==="feed") app.innerHTML = renderFeed();
-  else if(view==="ajustes") app.innerHTML = renderAjustes();
-
-  updateNav();
-  attachListeners();
-}
-
-function updateNav(){
-  const navHoy = document.getElementById("navHoy");
-  const navFeed = document.getElementById("navFeed");
-  navHoy.className = "navbtn " + (view==="home" ? "active" : (state.todayPost?"disabled":""));
-  navFeed.className = "navbtn " + (view==="feed" ? "active" : "");
-}
-
 function attachListeners(){
-  const $ = (id)=>document.getElementById(id);
-
-  if(view==="home"){
-    if($("empezar")) $("empezar").onclick = ()=>{ view="muerte"; render(); };
-    if($("goFeedFromHome")) $("goFeedFromHome").onclick = ()=>{ view="feed"; render(); };
+  if(view==='home'){
+    if(ge('empezar')) ge('empezar').onclick=()=>{view='muerte';renderApp();};
+    if(ge('goFeed')) ge('goFeed').onclick=async()=>{await loadFeed();view='feed';renderApp();};
   }
-
-  if(view==="muerte"){
-    document.querySelectorAll(".death-card.unlocked").forEach(card=>{
-      card.onclick = ()=>{
-        const death = card.getAttribute("data-death");
-        promptRazonYPublicar(death);
+  if(view==='muerte'){
+    document.querySelectorAll('.death-card.unlocked').forEach(c=>{
+      c.onclick=()=>promptRazon(c.getAttribute('data-death'));
+    });
+    if(ge('drawCard')) ge('drawCard').onclick=()=>{view='dibujo';renderApp();};
+  }
+  if(view==='dibujo'){
+    ge('razonDibujo').oninput=e=>{draftRazon=e.target.value;ge('razonCount').textContent=`${draftRazon.length}/120`;checkDraw();};
+    ge('descDibujo').oninput=checkDraw;
+    ge('volverFormas').onclick=()=>{view='muerte';renderApp();};
+  }
+  if(view==='posted'){
+    if(ge('irAlFeed')) ge('irAlFeed').onclick=async()=>{await loadFeed();view='feed';renderApp();};
+  }
+  if(view==='feed'){
+    document.querySelectorAll('.dep-btn').forEach(b=>{
+      b.onclick=async()=>await toggleDep(b.getAttribute('data-pid'));
+    });
+  }
+  if(view==='ajustes'){
+    document.querySelectorAll('.colorcircle').forEach(c=>{
+      c.onclick=async()=>{
+        currentProfile.doll_color=c.getAttribute('data-color');
+        await sb.from('profiles').update({doll_color:currentProfile.doll_color}).eq('id',currentUser.id);
+        renderApp();
       };
     });
-    if($("drawCard")) $("drawCard").onclick = ()=>{ view="dibujo"; render(); };
-  }
-
-  if(view==="dibujo"){
-    setupDrawCanvas();
-    $("razonDibujo").oninput = (e)=>{
-      draftRazon = e.target.value;
-      $("razonCount").textContent = `${draftRazon.length}/120`;
-      checkDibujoReady();
+    if(ge('volverAjustes')) ge('volverAjustes').onclick=()=>{view=todayPost?'feed':'home';renderApp();};
+    if(ge('btnLogout')) ge('btnLogout').onclick=async()=>{
+      await sb.auth.signOut();
+      currentUser=null;currentProfile=null;todayPost=null;feedData=[];myDeps=new Set();
+      view='auth';renderAuth();
     };
-    $("descDibujo").oninput = checkDibujoReady;
-    $("volverFormas").onclick = ()=>{ view="muerte"; render(); };
-  }
-
-  if(view==="posted"){
-    $("irAlFeed").onclick = ()=>{ view="feed"; render(); };
-  }
-
-  if(view==="feed"){
-    document.querySelectorAll(".dep-btn").forEach(btn=>{
-      btn.onclick = ()=>{
-        if(btn.classList.contains("given")) return;
-        const idx = parseInt(btn.getAttribute("data-idx"));
-        MOCK_FEED[idx].dep += 1;
-        btn.classList.add("given");
-        btn.querySelector(".dep-count").textContent = MOCK_FEED[idx].dep;
-      };
-    });
-  }
-
-  if(view==="ajustes"){
-    document.querySelectorAll(".colorcircle").forEach(c=>{
-      c.onclick = ()=>{
-        state.dollColor = c.getAttribute("data-color");
-        saveState();
-        render();
-      };
-    });
-    $("volverAjustes").onclick = ()=>{ view = state.todayPost ? "feed" : "home"; render(); };
   }
 }
 
-// pequeño prompt inline para razón cuando es un castigo predefinido
-function promptRazonYPublicar(death){
-  const app = document.getElementById("app");
-  app.innerHTML = `
-    <div class="screen">
-      ${header("¿Qué te ha pasado hoy?", "Para acompañar el castigo elegido")}
-      <div class="center" style="margin:18px 0;">${dollWithStrokes(state.dollColor, death, null, false, 90)}</div>
-      <textarea id="razonFinal" placeholder="ej: se me ha caído el café al suelo..." maxlength="120"></textarea>
-      <div class="charcount" id="razonFinalCount">0/120</div>
-      <button class="btn-main" id="publicarFinal" disabled>Publicar →</button>
-    </div>`;
-  const ta = document.getElementById("razonFinal");
-  const btn = document.getElementById("publicarFinal");
-  ta.oninput = ()=>{
-    document.getElementById("razonFinalCount").textContent = `${ta.value.length}/120`;
-    btn.disabled = !ta.value.trim();
-  };
-  btn.onclick = ()=>{
-    publicar({ razon: ta.value.trim(), castigo: death, dibujo: null });
-  };
+function promptRazon(death){
+  ge('app').innerHTML=`<div class="screen">
+    ${hdr("¿Qué te ha pasado hoy?","Para acompañar el castigo elegido")}
+    <div class="center" style="margin:18px 0;">${doll(currentProfile.doll_color,death,null,false,90)}</div>
+    <textarea id="razonFinal" placeholder="ej: se me ha caído el café al suelo..." maxlength="120"></textarea>
+    <div class="charcount" id="razonFinalCount">0/120</div>
+    <button class="btn-main" id="publicarFinal" disabled>Publicar →</button>
+  </div>`;
+  const ta=ge('razonFinal'),btn=ge('publicarFinal'),cnt=ge('razonFinalCount');
+  ta.oninput=()=>{cnt.textContent=`${ta.value.length}/120`;btn.disabled=!ta.value.trim();};
+  btn.onclick=async()=>{btn.disabled=true;btn.textContent='...';await submitPost({razon:ta.value.trim(),castigo:death,dibujo:null});};
 }
 
-function checkDibujoReady(){
-  const razon = document.getElementById("razonDibujo").value.trim();
-  const desc = document.getElementById("descDibujo").value.trim();
-  const hasStrokes = window.__currentStrokes && window.__currentStrokes.length > 0;
-  document.getElementById("guardarDibujo").disabled = !(razon && desc && hasStrokes);
+function checkDraw(){
+  const r=ge('razonDibujo')?.value.trim();
+  const d=ge('descDibujo')?.value.trim();
+  const has=window.__strokes&&window.__strokes.length>0;
+  const b=ge('guardarDibujo');
+  if(b) b.disabled=!(r&&d&&has);
 }
 
-function publicar(post){
-  state.todayPost = post;
-  saveState();
-  view = "posted";
-  render();
-}
+function setupCanvas(){
+  const canvas=ge('drawCanvas');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  let drawing=false,curColor=LINE_COLORS[0],curWidth=LINE_WIDTHS[1],current=null;
+  window.__strokes=[];
 
-// ---------------- Canvas de dibujo ----------------
-function setupDrawCanvas(){
-  const canvas = document.getElementById("drawCanvas");
-  const ctx = canvas.getContext("2d");
-  let drawing = false;
-  let currentColor = LINE_COLORS[0];
-  let currentWidth = LINE_WIDTHS[1];
-  window.__currentStrokes = [];
-  let current = null;
-
-  function drawGuide(){
+  function guide(){
     ctx.clearRect(0,0,220,280);
-    ctx.save();
-    ctx.globalAlpha = 0.45;
-    ctx.strokeStyle = state.dollColor;
-    ctx.fillStyle = state.dollColor;
-    ctx.lineWidth = 14;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    const w=220, h=280;
+    ctx.save();ctx.globalAlpha=.45;ctx.strokeStyle=currentProfile.doll_color;ctx.fillStyle=currentProfile.doll_color;
+    ctx.lineWidth=14;ctx.lineCap='round';ctx.lineJoin='round';
+    const w=220,h=280;
+    ctx.beginPath();ctx.arc(w/2,h*.16,w*.16,0,Math.PI*2);ctx.fill();
     ctx.beginPath();
-    ctx.arc(w/2, h*0.16, w*0.16, 0, Math.PI*2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(w/2, h*0.3); ctx.quadraticCurveTo(w*0.46, h*0.46, w/2, h*0.62);
-    ctx.moveTo(w/2, h*0.38); ctx.quadraticCurveTo(w*0.3, h*0.4, w*0.24, h*0.52);
-    ctx.moveTo(w/2, h*0.38); ctx.quadraticCurveTo(w*0.7, h*0.4, w*0.76, h*0.52);
-    ctx.moveTo(w/2, h*0.62); ctx.quadraticCurveTo(w*0.34, h*0.78, w*0.28, h*0.95);
-    ctx.moveTo(w/2, h*0.62); ctx.quadraticCurveTo(w*0.66, h*0.78, w*0.72, h*0.95);
-    ctx.stroke();
-    ctx.restore();
+    ctx.moveTo(w/2,h*.3);ctx.quadraticCurveTo(w*.46,h*.46,w/2,h*.62);
+    ctx.moveTo(w/2,h*.38);ctx.quadraticCurveTo(w*.3,h*.4,w*.24,h*.52);
+    ctx.moveTo(w/2,h*.38);ctx.quadraticCurveTo(w*.7,h*.4,w*.76,h*.52);
+    ctx.moveTo(w/2,h*.62);ctx.quadraticCurveTo(w*.34,h*.78,w*.28,h*.95);
+    ctx.moveTo(w/2,h*.62);ctx.quadraticCurveTo(w*.66,h*.78,w*.72,h*.95);
+    ctx.stroke();ctx.restore();
   }
 
-  function redrawAll(){
-    drawGuide();
-    window.__currentStrokes.forEach(s=>{
-      ctx.strokeStyle = s.color;
-      ctx.lineWidth = s.grosor;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      ctx.beginPath();
-      s.puntos.forEach((p,i)=> i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y));
-      ctx.stroke();
+  function redraw(){
+    guide();
+    window.__strokes.forEach(s=>{
+      ctx.strokeStyle=s.color;ctx.lineWidth=s.grosor;ctx.lineCap='round';ctx.lineJoin='round';
+      ctx.beginPath();s.puntos.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));ctx.stroke();
     });
   }
 
-  function getPos(e){
-    // canvas con resolución interna = tamaño mostrado (220x280), sin reescalado, así no hay desplazamiento
-    const rect = canvas.getBoundingClientRect();
-    const t = e.touches ? e.touches[0] : e;
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    return { x: (t.clientX - rect.left) * scaleX, y: (t.clientY - rect.top) * scaleY };
+  function pos(e){
+    const r=canvas.getBoundingClientRect(),t=e.touches?e.touches[0]:e;
+    return{x:(t.clientX-r.left)*(canvas.width/r.width),y:(t.clientY-r.top)*(canvas.height/r.height)};
   }
 
-  function start(e){
-    e.preventDefault();
-    drawing = true;
-    const p = getPos(e);
-    current = { puntos:[p], color:currentColor, grosor:currentWidth };
-  }
-  function move(e){
-    if(!drawing) return;
-    e.preventDefault();
-    const p = getPos(e);
-    current.puntos.push(p);
-    ctx.strokeStyle = currentColor;
-    ctx.lineWidth = currentWidth;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    const pts = current.puntos;
-    ctx.beginPath();
-    ctx.moveTo(pts[pts.length-2].x, pts[pts.length-2].y);
-    ctx.lineTo(pts[pts.length-1].x, pts[pts.length-1].y);
-    ctx.stroke();
-  }
-  function end(){
-    if(drawing && current){
-      window.__currentStrokes.push(current);
-      current = null;
-      checkDibujoReady();
+  canvas.addEventListener('mousedown',e=>{e.preventDefault();drawing=true;current={puntos:[pos(e)],color:curColor,grosor:curWidth};});
+  canvas.addEventListener('mousemove',e=>{
+    if(!drawing)return;e.preventDefault();
+    const p=pos(e);current.puntos.push(p);
+    const pts=current.puntos;
+    ctx.strokeStyle=curColor;ctx.lineWidth=curWidth;ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.beginPath();ctx.moveTo(pts[pts.length-2].x,pts[pts.length-2].y);ctx.lineTo(pts[pts.length-1].x,pts[pts.length-1].y);ctx.stroke();
+  });
+  const endDraw=()=>{if(drawing&&current){window.__strokes.push(current);current=null;checkDraw();}drawing=false;};
+  canvas.addEventListener('mouseup',endDraw);canvas.addEventListener('mouseleave',endDraw);
+  canvas.addEventListener('touchstart',e=>{e.preventDefault();drawing=true;current={puntos:[pos(e)],color:curColor,grosor:curWidth};},{passive:false});
+  canvas.addEventListener('touchmove',e=>{
+    if(!drawing)return;e.preventDefault();
+    const p=pos(e);current.puntos.push(p);
+    const pts=current.puntos;
+    ctx.strokeStyle=curColor;ctx.lineWidth=curWidth;ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.beginPath();ctx.moveTo(pts[pts.length-2].x,pts[pts.length-2].y);ctx.lineTo(pts[pts.length-1].x,pts[pts.length-1].y);ctx.stroke();
+  },{passive:false});
+  canvas.addEventListener('touchend',endDraw);
+
+  document.querySelectorAll('.swatch').forEach(s=>{
+    s.onclick=()=>{curColor=s.getAttribute('data-color');document.querySelectorAll('.swatch').forEach(x=>x.classList.remove('active'));s.classList.add('active');};
+  });
+  document.querySelectorAll('.width-btn').forEach(b=>{
+    b.onclick=()=>{curWidth=parseInt(b.getAttribute('data-width'));document.querySelectorAll('.width-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');};
+  });
+  ge('clearCanvas').onclick=()=>{window.__strokes=[];redraw();checkDraw();};
+  ge('guardarDibujo').onclick=async()=>{
+    const r=ge('razonDibujo').value.trim(),d=ge('descDibujo').value.trim();
+    const btn=ge('guardarDibujo');btn.disabled=true;btn.textContent='...';
+    await submitPost({razon:r,castigo:'dibujo',dibujo:{trazos:window.__strokes,descripcion:d}});
+  };
+  guide();
+}
+
+// ---- Init ----
+async function init(){
+  sb.auth.onAuthStateChange(async(event,session)=>{
+    if(event==='SIGNED_IN'&&session?.user){
+      currentUser=session.user;
+      await loadProfile();
+      if(!currentProfile){
+        const u=currentUser.user_metadata?.username||currentUser.email.split('@')[0];
+        await sb.from('profiles').upsert({id:currentUser.id,username:u});
+        await loadProfile();
+      }
+      await loadTodayPost();
+      view='home';renderApp();
+    } else if(event==='SIGNED_OUT'){
+      currentUser=null;currentProfile=null;todayPost=null;
+      view='auth';renderAuth();
     }
-    drawing = false;
+  });
+
+  const {data:{session}} = await sb.auth.getSession();
+  if(session?.user){
+    currentUser=session.user;
+    await loadProfile();
+    if(!currentProfile){
+      const u=currentUser.user_metadata?.username||currentUser.email.split('@')[0];
+      await sb.from('profiles').upsert({id:currentUser.id,username:u});
+      await loadProfile();
+    }
+    await loadTodayPost();
+    view='home';renderApp();
+  } else {
+    view='auth';renderAuth();
   }
-
-  canvas.addEventListener("mousedown", start);
-  canvas.addEventListener("mousemove", move);
-  canvas.addEventListener("mouseup", end);
-  canvas.addEventListener("mouseleave", end);
-  canvas.addEventListener("touchstart", start, {passive:false});
-  canvas.addEventListener("touchmove", move, {passive:false});
-  canvas.addEventListener("touchend", end);
-
-  document.querySelectorAll(".swatch").forEach(s=>{
-    s.onclick = ()=>{
-      currentColor = s.getAttribute("data-color");
-      document.querySelectorAll(".swatch").forEach(x=>x.classList.remove("active"));
-      s.classList.add("active");
-    };
-  });
-  document.querySelectorAll(".width-btn").forEach(b=>{
-    b.onclick = ()=>{
-      currentWidth = parseInt(b.getAttribute("data-width"));
-      document.querySelectorAll(".width-btn").forEach(x=>x.classList.remove("active"));
-      b.classList.add("active");
-    };
-  });
-  document.getElementById("clearCanvas").onclick = ()=>{
-    window.__currentStrokes = [];
-    redrawAll();
-    checkDibujoReady();
-  };
-  document.getElementById("guardarDibujo").onclick = ()=>{
-    const razon = document.getElementById("razonDibujo").value.trim();
-    const desc = document.getElementById("descDibujo").value.trim();
-    publicar({ razon, castigo:"dibujo", dibujo:{ trazos: window.__currentStrokes, descripcion: desc } });
-  };
-
-  drawGuide();
 }
 
-// ---------------- Navegación global ----------------
-document.getElementById("btnAjustes").onclick = ()=>{ view="ajustes"; render(); };
-document.getElementById("navHoy").onclick = ()=>{ if(!state.todayPost){ view="home"; render(); } else { view="home"; render(); } };
-document.getElementById("navFeed").onclick = ()=>{ view="feed"; render(); };
+if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 
-// ---------------- Registro del service worker ----------------
-if("serviceWorker" in navigator){
-  window.addEventListener("load", ()=>{
-    navigator.serviceWorker.register("sw.js").catch(()=>{});
-  });
-}
-
-render();
+init();
 </script>
 </body>
 </html>

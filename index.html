@@ -20,58 +20,51 @@
   --border:#1C1C1C; --border2:#282828;
   --text:#DEDEDE; --text2:#A0A0A0;
   --muted:#3C3C3C; --muted2:#686868;
+  --green:#2E7D52; --blue:#2A5FA8; --purple:#6A3EA8;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0;}
 html{height:100%;background:var(--bg);}
-body{
-  font-family:-apple-system,system-ui,'Segoe UI',sans-serif;
-  background:var(--bg);color:var(--text);
-  min-height:100vh;max-width:520px;margin:0 auto;
-  font-size:clamp(14px,3.5vw,16px);
-}
+body{font-family:-apple-system,system-ui,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:520px;margin:0 auto;font-size:clamp(14px,3.5vw,16px);}
 .cinzel{font-family:'Cinzel',Georgia,serif;}
-::-webkit-scrollbar{width:3px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
-
+::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes breathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @keyframes floatSlow{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 @keyframes flicker{0%,100%{opacity:.9;transform:scaleY(1)}45%{opacity:1;transform:scaleY(1.1) scaleX(.95)}70%{opacity:.85;transform:scaleY(.95)}}
 @keyframes shockPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.5) saturate(1.3)}}
-@keyframes dropIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-
-/* ── Loading ── */
+@keyframes glow{0%,100%{opacity:.18}50%{opacity:.32}}
+/* Loading */
 .pg-load{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
 .pg-load .brand{font-family:'Cinzel',serif;font-size:clamp(20px,6vw,28px);font-weight:900;letter-spacing:4px;color:var(--text);opacity:0;animation:fadeUp .4s .15s forwards;}
 .pg-load .brand em{color:var(--red);font-style:normal;}
 .spin{width:20px;height:20px;border:1.5px solid var(--border2);border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite;}
-
-/* ── Auth ── */
+/* Auth */
 .auth-page{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:clamp(20px,5vw,40px) clamp(16px,4vw,24px);animation:fadeUp .3s ease;}
-.auth-brand{text-align:center;margin-bottom:28px;}
+.auth-brand{text-align:center;margin-bottom:24px;}
 .auth-brand h1{font-family:'Cinzel',serif;font-size:clamp(32px,8vw,44px);font-weight:900;letter-spacing:2px;color:var(--text);line-height:1;}
 .auth-brand h1 em{color:var(--red);font-style:normal;}
 .auth-brand p{color:var(--muted2);font-size:clamp(11px,2.5vw,13px);margin-top:10px;}
-.auth-doll-preview{display:flex;justify-content:center;margin-bottom:22px;}
+.auth-doll-preview{display:flex;justify-content:center;margin-bottom:20px;}
 .auth-card{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:clamp(18px,4.5vw,26px);}
-.auth-tabs{display:flex;background:var(--bg2);border-radius:7px;overflow:hidden;border:1px solid var(--border);margin-bottom:18px;}
+.auth-tabs{display:flex;background:var(--bg2);border-radius:7px;overflow:hidden;border:1px solid var(--border);margin-bottom:16px;}
 .auth-tab{flex:1;padding:10px;background:transparent;border:none;color:var(--muted2);font-weight:600;font-size:clamp(12px,3vw,13px);cursor:pointer;transition:all .18s;}
 .auth-tab.on{background:var(--surface2);color:var(--text);}
 .field{margin-bottom:12px;}
 .field label{display:block;font-size:clamp(9px,2vw,10px);color:var(--muted2);margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;}
 .field input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:clamp(10px,2.5vw,12px) 12px;font-size:clamp(14px,3.5vw,15px);font-family:inherit;transition:border-color .16s;outline:none;-webkit-appearance:none;}
 .field input:focus{border-color:var(--red);}
-.pass-hint{font-size:clamp(10px,2.5vw,11px);color:var(--text2);margin-top:8px;line-height:1.55;padding:8px 10px;background:rgba(192,57,43,.07);border-radius:6px;border-left:2px solid var(--red);}
-.pass-hint strong{color:var(--red);}
+.pass-reqs{margin-top:7px;display:flex;flex-wrap:wrap;gap:5px;}
+.req{font-size:clamp(9px,2.2vw,10px);padding:3px 7px;border-radius:4px;background:var(--surface2);color:var(--muted2);transition:all .2s;}
+.req.ok{background:rgba(46,125,82,.15);color:#4CAF82;}
+.pass-warning{font-size:clamp(10px,2.5vw,11px);color:var(--text2);margin-top:8px;line-height:1.5;padding:7px 10px;background:rgba(192,57,43,.07);border-radius:6px;border-left:2px solid var(--red);}
+.pass-warning strong{color:var(--red);}
 .auth-err{color:#E05040;font-size:clamp(11px,2.5vw,12px);min-height:16px;margin-bottom:8px;text-align:center;}
 .step-label{font-size:clamp(10px,2.5vw,11px);color:var(--muted2);text-align:center;margin-bottom:14px;text-transform:uppercase;letter-spacing:1px;}
 .onb-colors{display:flex;justify-content:center;gap:clamp(10px,3vw,14px);flex-wrap:wrap;margin:16px 0;}
 .onb-circle{width:clamp(36px,9vw,42px);height:clamp(36px,9vw,42px);border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;transition:all .16s;}
 .onb-circle.on{border-color:var(--text);transform:scale(1.15);}
-
-/* ── Buttons ── */
+/* Buttons */
 .btn{width:100%;border:none;border-radius:9px;padding:clamp(12px,3vw,14px);font-weight:700;font-size:clamp(13px,3.5vw,14px);cursor:pointer;letter-spacing:.3px;transition:all .15s;font-family:inherit;}
 .btn-red{background:var(--red);color:#fff;}
 .btn-red:hover{background:var(--red2);}
@@ -82,10 +75,9 @@ body{
 .btn-warm-sm:hover{background:var(--warm2);}
 .btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--muted2);border-radius:9px;padding:clamp(11px,2.5vw,13px);font-weight:600;font-size:clamp(12px,3vw,13px);cursor:pointer;width:100%;transition:all .16s;font-family:inherit;}
 .btn-ghost:hover{border-color:var(--muted);color:var(--text);}
-.btn-link{background:none;border:none;color:var(--muted2);font-size:clamp(12px,3vw,13px);cursor:pointer;text-align:center;width:100%;padding:12px;display:block;transition:color .16s;font-family:inherit;}
+.btn-link{background:none;border:none;color:var(--muted2);font-size:clamp(12px,3vw,13px);cursor:pointer;text-align:center;width:100%;padding:11px;display:block;transition:color .16s;font-family:inherit;}
 .btn-link:hover{color:var(--text2);}
-
-/* ── Layout ── */
+/* Layout */
 .topbar{display:flex;justify-content:space-between;align-items:center;padding:max(env(safe-area-inset-top),16px) clamp(14px,4vw,20px) 0;}
 .logo{font-family:'Cinzel',serif;font-weight:900;letter-spacing:3px;font-size:clamp(13px,3.5vw,16px);color:var(--text);}
 .logo em{color:var(--red);font-style:normal;}
@@ -94,51 +86,36 @@ body{
 .gear-btn{background:none;border:none;cursor:pointer;color:var(--muted2);display:flex;align-items:center;padding:4px;transition:color .16s;}
 .gear-btn:hover{color:var(--text);}
 .screen{padding:clamp(14px,3.5vw,20px);padding-bottom:clamp(88px,20vw,100px);animation:fadeUp .22s ease;}
-.bottomnav{
-  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  width:100%;max-width:520px;
-  background:rgba(8,8,8,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border-top:1px solid var(--border);
-  display:flex;padding:clamp(10px,3vw,14px) 0 max(calc(10px + env(safe-area-inset-bottom)),12px);
-}
+.bottomnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;background:rgba(8,8,8,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--border);display:flex;padding:clamp(10px,3vw,14px) 0 max(calc(10px + env(safe-area-inset-bottom)),12px);}
 .navbtn{flex:1;background:none;border:none;color:var(--muted2);font-weight:600;font-size:clamp(9px,2.5vw,10px);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:color .16s;letter-spacing:.4px;}
 .navbtn.on{color:var(--red);}
 .navbtn svg{transition:transform .16s;}
 .navbtn.on svg{transform:scale(1.1);}
-
-/* ── Page title ── */
+/* Page title */
 .ptitle{font-family:'Cinzel',serif;color:var(--text);font-size:clamp(16px,4.2vw,20px);font-weight:700;text-align:center;letter-spacing:.3px;line-height:1.3;}
 .psub{color:var(--muted2);font-size:clamp(11px,2.8vw,13px);text-align:center;margin-top:5px;line-height:1.5;}
 .rule{width:24px;height:1px;background:var(--border2);margin:12px auto;}
-
-/* ── Doll ── */
 .doll-wrap{position:relative;display:inline-flex;justify-content:center;}
-
-/* ── Death grid ── */
+/* Death grid */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:clamp(7px,2vw,10px);margin-top:14px;}
-.dcell{
-  background:var(--surface);border:1px solid var(--border);border-radius:10px;
-  padding:clamp(12px,3vw,16px) 8px;
-  display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;
-  transition:all .16s;overflow:hidden;
-}
+.dcell{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:clamp(10px,2.5vw,14px) 6px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:all .16s;overflow:hidden;position:relative;}
 .dcell.on{border-color:var(--warm);}
 .dcell.on:hover{background:var(--surface2);}
-.dcell.off{opacity:.25;cursor:default;}
-.dcell .dlabel{color:var(--text);font-size:clamp(11px,3vw,13px);font-weight:600;text-align:center;}
-.dcell .dreq{color:var(--muted2);font-size:clamp(9px,2.5vw,10px);}
-.draw-cell{
-  grid-column:span 2;background:var(--surface);border:1px dashed var(--border2);border-radius:10px;
-  padding:clamp(14px,3.5vw,18px);display:flex;align-items:center;justify-content:center;gap:12px;
-  cursor:pointer;transition:background .16s;
-}
+.dcell.off{opacity:.28;cursor:default;}
+.dcell.deps-lock{opacity:.45;cursor:default;border-color:var(--blue);}
+.dcell.deps-lock.on{border-color:var(--blue);}
+.dcell .dlabel{color:var(--text);font-size:clamp(11px,3vw,12px);font-weight:600;text-align:center;line-height:1.2;}
+.dcell .dreq{font-size:clamp(8px,2.2vw,9px);font-weight:600;text-align:center;letter-spacing:.3px;padding:2px 6px;border-radius:4px;}
+.dreq-streak{color:var(--warm);background:rgba(176,120,48,.12);}
+.dreq-deps{color:#5A8FD4;background:rgba(42,95,168,.12);}
+.draw-cell{grid-column:span 2;background:var(--surface);border:1px dashed var(--border2);border-radius:10px;padding:clamp(12px,3vw,16px);display:flex;align-items:center;justify-content:center;gap:12px;cursor:pointer;transition:background .16s;}
 .draw-cell:hover{background:var(--surface2);}
-.draw-cell .dlabel{color:var(--text);font-size:clamp(13px,3.5vw,15px);font-weight:600;}
+.draw-cell .dlabel{color:var(--text);font-size:clamp(13px,3.5vw,14px);font-weight:600;}
 .draw-cell .dsub{color:var(--muted2);font-size:clamp(10px,2.5vw,11px);margin-top:2px;}
-
-/* ── Feed ── */
+.unlock-bar{position:absolute;bottom:0;left:0;height:2px;background:var(--blue);border-radius:0 0 10px 10px;transition:width .3s;}
+/* Feed */
 .feed-list{margin-top:8px;}
-.feed-card{border-bottom:1px solid var(--border);padding:clamp(16px,4vw,20px) 0;animation:fadeUp .2s ease;}
+.feed-card{border-bottom:1px solid var(--border);padding:clamp(14px,3.5vw,18px) 0;animation:fadeUp .2s ease;}
 .feed-card:last-child{border-bottom:none;}
 .feed-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
 .avatar{width:clamp(26px,6.5vw,32px);height:clamp(26px,6.5vw,32px);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(9px,2.5vw,11px);color:rgba(0,0,0,.65);}
@@ -147,25 +124,15 @@ body{
 .feed-time{color:var(--muted2);font-size:clamp(10px,2.5vw,11px);}
 .friend-tag{border:1px solid var(--border2);border-radius:4px;padding:2px 6px;font-size:clamp(9px,2vw,10px);font-weight:700;color:var(--warm);letter-spacing:.5px;white-space:nowrap;}
 .feed-razon{color:var(--text2);font-size:clamp(13px,3.5vw,14px);margin:2px 0 8px;line-height:1.58;}
-.feed-castigo{display:inline-block;font-size:clamp(10px,2.5vw,11px);font-weight:700;color:var(--warm);margin-bottom:12px;letter-spacing:.5px;text-transform:uppercase;}
-.dep-btn{
-  width:100%;border-radius:7px;padding:clamp(8px,2.5vw,10px);color:var(--text2);
-  font-weight:600;font-size:clamp(12px,3vw,13px);
-  border:1px solid var(--border2);background:transparent;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:7px;transition:all .16s;
-}
+.feed-castigo{display:inline-block;font-size:clamp(10px,2.5vw,11px);font-weight:700;color:var(--warm);margin-bottom:10px;letter-spacing:.5px;text-transform:uppercase;}
+.dep-btn{width:100%;border-radius:7px;padding:clamp(8px,2.5vw,10px);color:var(--text2);font-weight:600;font-size:clamp(12px,3vw,13px);border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .16s;}
 .dep-btn.given{background:var(--surface2);border-color:var(--red);color:var(--text);}
 .dep-btn:not(.given):hover{background:var(--surface);}
 .dep-count{color:var(--warm);font-weight:800;}
-.follow-btn{
-  background:transparent;border:1px solid var(--border2);border-radius:6px;
-  padding:4px 10px;color:var(--muted2);font-size:clamp(10px,2.5vw,11px);font-weight:600;
-  cursor:pointer;transition:all .16s;white-space:nowrap;flex-shrink:0;font-family:inherit;
-}
+.follow-btn{background:transparent;border:1px solid var(--border2);border-radius:6px;padding:4px 10px;color:var(--muted2);font-size:clamp(10px,2.5vw,11px);font-weight:600;cursor:pointer;transition:all .16s;white-space:nowrap;flex-shrink:0;font-family:inherit;}
 .follow-btn.following{background:var(--surface2);border-color:var(--border2);color:var(--warm);}
 .own-dep{text-align:center;color:var(--muted2);font-size:clamp(11px,3vw,12px);padding:7px;display:flex;align-items:center;justify-content:center;gap:5px;}
-
-/* ── Canvas ── */
+/* Canvas */
 canvas{background:var(--surface2);border-radius:10px;border:1px solid var(--border2);touch-action:none;display:block;margin:0 auto;max-width:100%;}
 .swatches{display:flex;justify-content:center;gap:clamp(8px,2vw,11px);margin-top:12px;flex-wrap:wrap;}
 .swatch{width:clamp(20px,5vw,25px);height:clamp(20px,5vw,25px);border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;transition:transform .13s;}
@@ -176,31 +143,29 @@ canvas{background:var(--surface2);border-radius:10px;border:1px solid var(--bord
 .wdot{border-radius:50%;background:var(--text);}
 .clearbtn{background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted2);font-size:clamp(10px,2.5vw,11px);padding:5px 10px;cursor:pointer;transition:all .16s;font-family:inherit;}
 .clearbtn:hover{border-color:var(--muted);}
-
-/* ── Settings ── */
+/* Settings */
 .colorpick{display:flex;justify-content:center;gap:clamp(10px,3vw,14px);flex-wrap:wrap;margin-top:18px;}
 .ccircle{width:clamp(32px,8vw,40px);height:clamp(32px,8vw,40px);border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;transition:all .16s;}
 .ccircle.on{border-color:var(--text);transform:scale(1.14);}
-.stat-block{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:clamp(16px,4vw,20px);text-align:center;margin-top:18px;}
-.stat-num{font-family:'Cinzel',serif;font-size:clamp(30px,8vw,40px);font-weight:900;color:var(--warm);line-height:1;}
-.stat-label{color:var(--muted2);font-size:clamp(10px,2.5vw,11px);text-transform:uppercase;letter-spacing:1px;margin-top:4px;}
-
-/* ── Forms ── */
-textarea,input[type=text],input[type=email],input[type=password]{
-  width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:7px;
-  color:var(--text);padding:clamp(10px,2.5vw,12px) 12px;
-  font-size:clamp(14px,3.5vw,15px);font-family:inherit;outline:none;transition:border-color .16s;-webkit-appearance:none;
-}
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;}
+.stat-block{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:clamp(14px,3.5vw,18px);text-align:center;}
+.stat-num{font-family:'Cinzel',serif;font-size:clamp(26px,7vw,36px);font-weight:900;color:var(--warm);line-height:1;}
+.stat-num.blue{color:#5A8FD4;}
+.stat-label{color:var(--muted2);font-size:clamp(9px,2.5vw,10px);text-transform:uppercase;letter-spacing:.8px;margin-top:4px;}
+.next-unlock{background:var(--surface);border:1px solid var(--blue);border-radius:10px;padding:12px 14px;margin-top:12px;display:flex;align-items:center;gap:10px;}
+.next-unlock-bar{flex:1;height:4px;background:var(--border2);border-radius:2px;overflow:hidden;}
+.next-unlock-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .4s;}
+.next-unlock-label{font-size:clamp(10px,2.5vw,11px);color:var(--text2);white-space:nowrap;}
+/* Forms */
+textarea,input[type=text],input[type=email],input[type=password]{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:7px;color:var(--text);padding:clamp(10px,2.5vw,12px) 12px;font-size:clamp(14px,3.5vw,15px);font-family:inherit;outline:none;transition:border-color .16s;-webkit-appearance:none;}
 textarea{min-height:76px;resize:none;}
 textarea:focus,input:focus{border-color:var(--red);}
 .charcount{text-align:right;font-size:clamp(10px,2.5vw,11px);color:var(--muted);margin-top:3px;}
-
-/* ── Card done ── */
+/* Done card */
 .done-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:clamp(14px,3.5vw,18px);text-align:center;margin-top:14px;}
 .done-razon{color:var(--text2);font-size:clamp(13px,3.5vw,14px);line-height:1.58;margin-bottom:8px;}
 .done-castigo{color:var(--warm);font-weight:700;font-size:clamp(13px,3.5vw,14px);letter-spacing:.5px;text-transform:uppercase;}
-
-/* ── Peor/anterior ── */
+/* Peor/anterior */
 .peor-btn{margin-top:12px;background:none;border:1px dashed var(--border2);border-radius:8px;padding:10px 16px;color:var(--muted2);font-size:clamp(12px,3vw,13px);font-weight:600;cursor:pointer;width:100%;transition:all .16s;font-family:inherit;}
 .peor-btn:hover{border-color:var(--muted);color:var(--text);}
 .prev-toggle{background:none;border:none;width:100%;display:flex;align-items:center;justify-content:center;gap:5px;color:var(--muted);font-size:clamp(10px,2.5vw,11px);cursor:pointer;padding:10px 0 0;transition:color .16s;font-family:inherit;letter-spacing:.3px;}
@@ -213,19 +178,12 @@ textarea:focus,input:focus{border-color:var(--red);}
 .prev-label{font-size:clamp(9px,2.5vw,10px);text-transform:uppercase;letter-spacing:1px;color:var(--muted);text-align:center;margin-bottom:7px;}
 .prev-razon{color:var(--muted2);font-size:clamp(11px,3vw,12px);text-align:center;margin-top:5px;line-height:1.5;}
 .prev-castigo{color:var(--muted2);font-size:clamp(10px,2.5vw,11px);font-weight:600;text-align:center;margin-top:3px;letter-spacing:.4px;text-transform:uppercase;}
-
-/* ── Responsive ── */
-@media(min-width:560px){
-  .auth-page{padding-top:60px;padding-bottom:60px;}
-}
-@media(min-width:768px){
-  .screen{padding-left:clamp(22px,5vw,32px);padding-right:clamp(22px,5vw,32px);}
-}
+@media(min-width:560px){.auth-page{padding-top:60px;padding-bottom:60px;}}
+@media(min-width:768px){.screen{padding-left:clamp(22px,5vw,32px);padding-right:clamp(22px,5vw,32px);}}
 </style>
 </head>
 <body>
 <div id="root"><div class="pg-load"><div class="brand cinzel">kill<em>.me</em></div><div class="spin"></div></div></div>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 const {createClient}=supabase;
@@ -235,23 +193,26 @@ const sb=createClient('https://vknwuevlvnavkgvtguku.supabase.co','sb_publishable
 const DOLL_COLORS=["#C24545","#4577C2","#45A87A","#B87830","#8845C2","#D0C8B8"];
 const LINE_COLORS=["#E8C468","#C24545","#45A87A","#4577C2","#EDE6D8","#C890D0"];
 const LINE_WIDTHS=[2,4,8];
+
+// min=streak required, deps=total DEPs required, depIcon used in grid
 const DEATHS=[
-  {id:"fuego",   label:"Quemado",       min:0,  pose:"scared"},
-  {id:"agujas",  label:"Acribillado",   min:0,  pose:"cowering"},
-  {id:"ahogo",   label:"Ahogado",       min:3,  pose:"begging"},
-  {id:"rayo",    label:"Electrocutado", min:7,  pose:"dramatic"},
-  {id:"aplastado",label:"Aplastado",    min:14, pose:"squish"},
-  {id:"fantasma",label:"Exorcizado",    min:21, pose:"ghost"},
+  {id:"fuego",     label:"Quemado",       min:0,  deps:0,  pose:"scared",   unlock:'free'},
+  {id:"agujas",    label:"Acribillado",   min:0,  deps:0,  pose:"cowering", unlock:'free'},
+  {id:"ahogo",     label:"Ahogado",       min:3,  deps:0,  pose:"begging",  unlock:'streak'},
+  {id:"rayo",      label:"Electrocutado", min:7,  deps:0,  pose:"dramatic", unlock:'streak'},
+  {id:"hielo",     label:"Congelado",     min:0,  deps:5,  pose:"cowering", unlock:'deps'},
+  {id:"aplastado", label:"Aplastado",     min:14, deps:0,  pose:"squish",   unlock:'streak'},
+  {id:"guillotina",label:"Guillotina",    min:0,  deps:15, pose:"scared",   unlock:'deps'},
+  {id:"fantasma",  label:"Exorcizado",    min:21, deps:0,  pose:"ghost",    unlock:'streak'},
+  {id:"zombi",     label:"Zombificado",   min:0,  deps:30, pose:"dramatic", unlock:'deps'},
 ];
-const DEATH_LABELS={
-  fuego:"Quemado",agujas:"Acribillado",ahogo:"Ahogado",
-  rayo:"Electrocutado",aplastado:"Aplastado",fantasma:"Exorcizado",
-};
+const DEATH_LABELS=Object.fromEntries(DEATHS.map(d=>[d.id,d.label]));
+
 const SB_ERRORS={
   "Invalid login credentials":"Email o contraseña incorrectos",
   "Email not confirmed":"Confirma tu email antes de entrar",
   "User already registered":"Ya existe una cuenta con ese email",
-  "Password should be at least 6 characters":"La contraseña debe tener al menos 6 caracteres",
+  "Password should be at least 6 characters":"La contraseña es demasiado corta",
 };
 
 // ── SVG Icons ──────────────────────────────────────────
@@ -264,6 +225,7 @@ const ICO={
   pencil:`<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M13 2L16 5L6 15L2 16L3 12L13 2Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
   plus:`<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
   check:`<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  lock:`<svg width="14" height="16" viewBox="0 0 14 16" fill="none"><rect x="2" y="7" width="10" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M4 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
 };
 
 // ── State ──────────────────────────────────────────────
@@ -272,7 +234,7 @@ let feedData=[],myDeps=new Set(),myFollowing=new Set();
 let todayPrevPost=null,expandedPrev=new Set();
 let authTab="login",authStep="form";
 let pendingSignup={username:"",email:"",pass:"",color:DOLL_COLORS[0]};
-let draftRazon="";
+let draftRazon="",totalDeps=0,navigating=false;
 
 const todayS=()=>new Date().toISOString().split('T')[0];
 const yesterS=()=>new Date(Date.now()-86400000).toISOString().split('T')[0];
@@ -285,6 +247,23 @@ const timeAgo=ts=>{
   if(m<1)return'ahora';if(m<60)return`hace ${m}m`;
   const h=Math.floor(m/60);if(h<24)return`hace ${h}h`;return`hace ${Math.floor(h/24)}d`;
 };
+function validatePass(p){
+  const errs=[];
+  if(p.length<8)errs.push('8 caracteres');
+  if(!/[A-Z]/.test(p))errs.push('mayúscula');
+  if(!/[0-9]/.test(p))errs.push('número');
+  if(!/[!@#$%^&*()\-_=+\[\]{}|;:,.<>?]/.test(p))errs.push('carácter especial');
+  return errs;
+}
+function passReqsHTML(pass){
+  const reqs=[
+    {label:'8+ caracteres',ok:pass.length>=8},
+    {label:'Mayúscula',ok:/[A-Z]/.test(pass)},
+    {label:'Número',ok:/[0-9]/.test(pass)},
+    {label:'Especial (!@#…)',ok:/[!@#$%^&*()\-_=+\[\]{}|;:,.<>?]/.test(pass)},
+  ];
+  return `<div class="pass-reqs">${reqs.map(r=>`<span class="req${r.ok?' ok':''}">${r.ok?'✓':''} ${r.label}</span>`).join('')}</div>`;
+}
 
 // ── Poses ──────────────────────────────────────────────
 function getPose(name,w,h){
@@ -306,9 +285,8 @@ function dollSVG(color,death,dead,poseName,px){
   px=px||110;
   const pose=getPose(poseName||'idle',w,h);
   const dark=color==="#D0C8B8"||color==="#E8E8E8";
-  const ec=dark?"#2A1E38":"#0B0910";
+  const ec=dark?"#2A1E38":"#080808";
   const ec2=dark?"rgba(0,0,0,.5)":"rgba(255,255,255,.55)";
-
   const face=dead?`
     <line x1="${w*.41}" y1="${h*.15}" x2="${w*.47}" y2="${h*.17}" stroke="${ec}" stroke-width="2.8" stroke-linecap="round"/>
     <line x1="${w*.47}" y1="${h*.15}" x2="${w*.41}" y2="${h*.17}" stroke="${ec}" stroke-width="2.8" stroke-linecap="round"/>
@@ -322,42 +300,91 @@ function dollSVG(color,death,dead,poseName,px){
     <circle cx="${w*.572}" cy="${h*.151}" r="1.1" fill="${ec2}"/>
     <path d="M ${w*.41} ${h*.199} Q ${w/2} ${h*.224} ${w*.59} ${h*.199}" stroke="${ec}" stroke-width="2.3" fill="none" stroke-linecap="round"/>
   `;
-
   let fx="";
   if(death==="fuego"){
-    fx+=`<defs><radialGradient id="fl${px}" cx="50%" cy="100%" r="80%"><stop offset="0%" stop-color="#FFD86B"/><stop offset="55%" stop-color="#E8602C"/><stop offset="100%" stop-color="#7A1F2B"/></radialGradient></defs>`;
-    [[.27,.9,19,44],[.5,.85,16,48],[.73,.9,19,44]].forEach(([x,y,rx,ry])=>{
-      fx+=`<ellipse class="fl" cx="${w*x}" cy="${h*y}" rx="${rx}" ry="${ry}" fill="url(#fl${px})" opacity=".9" style="animation:flicker ${1+Math.random()*.4}s ease-in-out infinite"/>`;
+    fx=`<defs><radialGradient id="fl${px}" cx="50%" cy="100%" r="80%"><stop offset="0%" stop-color="#FFE08A"/><stop offset="50%" stop-color="#E8602C"/><stop offset="100%" stop-color="#7A1F2B"/></radialGradient></defs>`;
+    [[.22,.92,18,46],[.5,.87,15,52],[.78,.92,18,46],[.35,.96,9,22],[.65,.96,9,22]].forEach(([x,y,rx,ry],i)=>{
+      fx+=`<ellipse cx="${w*x}" cy="${h*y}" rx="${rx}" ry="${ry}" fill="url(#fl${px})" opacity=".88" style="animation:flicker ${.9+i*.15}s ease-in-out infinite ${i*.1}s"/>`;
     });
   }
   if(death==="agujas"){
-    [[.32,.23,.29,.11],[.6,.31,.67,.17],[.42,.48,.49,.33],[.72,.58,.79,.43],[.27,.68,.34,.53],[.55,.8,.62,.65]].forEach(([x1,y1,x2,y2])=>{
-      fx+=`<line x1="${w*x1}" y1="${h*y1}" x2="${w*x2}" y2="${h*y2}" stroke="#D8D0C0" stroke-width="2.2"/>
-      <circle cx="${w*x2}" cy="${h*y2}" r="2.5" fill="#B8A898"/>`;
+    [[.3,.22,.27,.08],[.62,.3,.68,.14],[.4,.47,.46,.3],[.74,.57,.81,.4],[.24,.7,.31,.52],[.57,.82,.63,.65],[.45,.2,.38,.07],[.68,.72,.74,.57]].forEach(([x1,y1,x2,y2])=>{
+      fx+=`<line x1="${w*x1}" y1="${h*y1}" x2="${w*x2}" y2="${h*y2}" stroke="#D4CCB8" stroke-width="2"/>
+           <circle cx="${w*x2}" cy="${h*y2}" r="2.8" fill="#AEA090"/>`;
     });
   }
   if(death==="ahogo"){
-    fx+=`<defs><linearGradient id="wt${px}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3A6FA8" stop-opacity=".45"/><stop offset="100%" stop-color="#1A3F6A" stop-opacity=".72"/></linearGradient></defs>
-    <rect x="0" y="${h*.43}" width="${w}" height="${h*.57}" fill="url(#wt${px})"/>
-    <path d="M-5 ${h*.43} Q ${w*.25} ${h*.4} ${w*.5} ${h*.43} Q ${w*.75} ${h*.46} ${w+5} ${h*.43}" stroke="#7AAFD8" stroke-width="2.5" fill="none" opacity=".6"/>`;
+    fx=`<defs><linearGradient id="wt${px}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2A5FA8" stop-opacity=".4"/><stop offset="100%" stop-color="#0E2A50" stop-opacity=".75"/></linearGradient></defs>
+    <rect x="0" y="${h*.4}" width="${w}" height="${h*.6}" fill="url(#wt${px})"/>
+    <path d="M-5 ${h*.4} Q${w*.2} ${h*.37} ${w*.5} ${h*.4} Q${w*.8} ${h*.43} ${w+5} ${h*.4}" stroke="#7AAFD8" stroke-width="2.5" fill="none" opacity=".65"/>
+    <circle cx="${w*.25}" cy="${h*.55}" r="4" stroke="#7AAFD8" stroke-width="1.5" fill="none" opacity=".4"/>
+    <circle cx="${w*.7}" cy="${h*.62}" r="3" stroke="#7AAFD8" stroke-width="1.5" fill="none" opacity=".4"/>
+    <circle cx="${w*.4}" cy="${h*.72}" r="2" stroke="#7AAFD8" stroke-width="1" fill="none" opacity=".4"/>`;
   }
   if(death==="rayo"){
-    fx+=`<defs><filter id="gl${px}"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-    <polyline filter="url(#gl${px})" points="${w*.52},${h*.02} ${w*.38},${h*.31} ${w*.58},${h*.33} ${w*.4},${h*.66}" stroke="#F0E060" stroke-width="9" fill="none" stroke-linejoin="round" opacity=".95" style="animation:shockPulse 1.6s ease-in-out infinite"/>
-    <polyline points="${w*.52},${h*.02} ${w*.38},${h*.31} ${w*.58},${h*.33} ${w*.4},${h*.66}" stroke="white" stroke-width="2.5" fill="none" stroke-linejoin="round" opacity=".5"/>`;
+    fx=`<defs><filter id="gl${px}"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <polyline filter="url(#gl${px})" points="${w*.53},${h*.01} ${w*.37},${h*.29} ${w*.57},${h*.32} ${w*.39},${h*.65}" stroke="#F5E44A" stroke-width="10" fill="none" stroke-linejoin="round" opacity=".9" style="animation:shockPulse 1.4s ease-in-out infinite"/>
+    <polyline points="${w*.53},${h*.01} ${w*.37},${h*.29} ${w*.57},${h*.32} ${w*.39},${h*.65}" stroke="#FFF8A0" stroke-width="2.5" fill="none" stroke-linejoin="round" opacity=".7"/>
+    <ellipse cx="${w/2}" cy="${h*.5}" rx="${w*.45}" ry="${h*.42}" fill="#F5E44A" opacity=".04" style="animation:shockPulse 1.4s ease-in-out infinite"/>`;
   }
   if(death==="aplastado"){
-    fx+=`<defs><linearGradient id="rk${px}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8A8A8A"/><stop offset="100%" stop-color="#3A3838"/></linearGradient></defs>
-    <ellipse cx="${w/2}" cy="${h*.095}" rx="84" ry="44" fill="url(#rk${px})"/>
-    <ellipse cx="${w/2}" cy="${h*.095}" rx="84" ry="44" fill="none" stroke="#555" stroke-width="1.5"/>`;
+    fx=`<defs><linearGradient id="rk${px}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#9A9A9A"/><stop offset="100%" stop-color="#3A3838"/></linearGradient></defs>
+    <ellipse cx="${w/2}" cy="${h*.09}" rx="86" ry="46" fill="url(#rk${px})"/>
+    <ellipse cx="${w/2}" cy="${h*.09}" rx="86" ry="46" fill="none" stroke="#5A5858" stroke-width="1.5"/>
+    <path d="M${w*.25} ${h*.14} L${w*.22} ${h*.28}" stroke="#3A3838" stroke-width="2" stroke-linecap="round"/>
+    <path d="M${w*.75} ${h*.14} L${w*.78} ${h*.3}" stroke="#3A3838" stroke-width="2" stroke-linecap="round"/>
+    <path d="M${w*.38} ${h*.17} Q${w*.45} ${h*.2} ${w*.52} ${h*.16}" stroke="#5A5858" stroke-width="1" opacity=".5"/>`;
   }
-  if(death==="fantasma"){
-    fx+=`<g style="animation:floatSlow 3s ease-in-out infinite">
-      <ellipse cx="${w*.62}" cy="${h*.14}" rx="28" ry="20" fill="white" opacity=".08"/>
-      <text x="${w*.53}" y="${h*.08}" font-size="46" opacity=".8">👻</text>
+  if(death==="hielo"){
+    fx=`<defs><linearGradient id="ice${px}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#B8E8FF" stop-opacity=".3"/><stop offset="100%" stop-color="#2A5090" stop-opacity=".5"/></linearGradient></defs>
+    <rect x="0" y="0" width="${w}" height="${h}" fill="url(#ice${px})"/>
+    <g stroke="#D8F4FF" stroke-width="1.5" opacity=".75">
+      <line x1="${w*.18}" y1="${h*.06}" x2="${w*.18}" y2="${h*.18}"/>
+      <line x1="${w*.12}" y1="${h*.09}" x2="${w*.24}" y2="${h*.09}"/>
+      <line x1="${w*.12}" y1="${h*.07}" x2="${w*.18}" y2="${h*.12}"/>
+      <line x1="${w*.24}" y1="${h*.07}" x2="${w*.18}" y2="${h*.12}"/>
+      <line x1="${w*.12}" y1="${h*.11}" x2="${w*.18}" y2="${h*.06}"/>
+      <line x1="${w*.24}" y1="${h*.11}" x2="${w*.18}" y2="${h*.06}"/>
+      <line x1="${w*.77}" y1="${h*.68}" x2="${w*.77}" y2="${h*.8}"/>
+      <line x1="${w*.71}" y1="${h*.71}" x2="${w*.83}" y2="${h*.71}"/>
+      <line x1="${w*.71}" y1="${h*.69}" x2="${w*.77}" y2="${h*.74}"/>
+      <line x1="${w*.83}" y1="${h*.69}" x2="${w*.77}" y2="${h*.74}"/>
+      <line x1="${w*.71}" y1="${h*.73}" x2="${w*.77}" y2="${h*.68}"/>
+      <line x1="${w*.83}" y1="${h*.73}" x2="${w*.77}" y2="${h*.68}"/>
+      <line x1="${w*.55}" y1="${h*.88}" x2="${w*.55}" y2="${h*.96}"/>
+      <line x1="${w*.51}" y1="${h*.91}" x2="${w*.59}" y2="${h*.91}"/>
     </g>`;
   }
-
+  if(death==="guillotina"){
+    fx=`<defs><linearGradient id="bl${px}" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#888"/><stop offset="50%" stop-color="#DDD"/><stop offset="100%" stop-color="#888"/></linearGradient></defs>
+    <rect x="${w*.13}" y="0" width="7" height="${h*.5}" fill="#4A3A2A"/>
+    <rect x="${w*.8}" y="0" width="7" height="${h*.5}" fill="#4A3A2A"/>
+    <rect x="${w*.1}" y="0" width="${w*.82}" height="9" fill="#4A3A2A"/>
+    <rect x="${w*.12}" y="${h*.14}" width="${w*.78}" height="6" fill="#3A2A1A"/>
+    <polygon points="${w*.22},${h*.36} ${w*.78},${h*.38} ${w*.78},${h*.46} ${w*.22},${h*.44}" fill="url(#bl${px})" opacity=".95"/>
+    <line x1="${w*.24}" y1="${h*.39}" x2="${w*.7}" y2="${h*.41}" stroke="rgba(255,255,255,.4)" stroke-width="1.5"/>
+    <rect x="${w*.38}" y="${h*.43}" width="${w*.24}" height="${h*.02}" fill="#8B0000" opacity=".5"/>`;
+  }
+  if(death==="fantasma"){
+    fx=`<defs><filter id="fg${px}"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <g style="animation:floatSlow 3s ease-in-out infinite">
+      <ellipse cx="${w*.6}" cy="${h*.13}" rx="30" ry="22" fill="white" opacity=".07" filter="url(#fg${px})"/>
+      <ellipse cx="${w*.6}" cy="${h*.13}" rx="18" ry="13" fill="white" opacity=".12"/>
+      <circle cx="${w*.55}" cy="${h*.1}" r="5" fill="white" opacity=".25"/>
+      <circle cx="${w*.67}" cy="${h*.12}" r="3.5" fill="white" opacity=".2"/>
+      <circle cx="${w*.62}" cy="${h*.18}" r="4" fill="white" opacity=".18"/>
+    </g>`;
+  }
+  if(death==="zombi"){
+    fx=`<defs><filter id="zg${px}"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <ellipse cx="${w/2}" cy="${h*.5}" rx="${w*.52}" ry="${h*.46}" fill="#1A5020" opacity=".2" filter="url(#zg${px})" style="animation:glow 2.5s ease-in-out infinite"/>
+    <path d="M${w*.36} ${h*.33} Q${w*.35} ${h*.44} ${w*.37} ${h*.52}" stroke="#2E8A3E" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".7"/>
+    <path d="M${w*.6} ${h*.25} Q${w*.59} ${h*.36} ${w*.61} ${h*.43}" stroke="#2E8A3E" stroke-width="3" fill="none" stroke-linecap="round" opacity=".7"/>
+    <path d="M${w*.5} ${h*.65} Q${w*.49} ${h*.73} ${w*.51} ${h*.79}" stroke="#2E8A3E" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".6"/>
+    <circle cx="${w*.37}" cy="${h*.53}" r="3.5" fill="#2E8A3E" opacity=".8"/>
+    <circle cx="${w*.61}" cy="${h*.44}" r="3" fill="#2E8A3E" opacity=".8"/>
+    <circle cx="${w*.51}" cy="${h*.8}" r="2.5" fill="#2E8A3E" opacity=".7"/>`;
+  }
   const anim=poseName==='ghost'?'style="animation:floatSlow 3.5s ease-in-out infinite"':'';
   const ht=Math.round(px*280/220);
   return `<div class="doll-wrap" style="width:${px}px;height:${ht}px;">
@@ -386,12 +413,44 @@ function dollWithDraw(color,death,strokes,dead,poseName,px){
   </div>`;
 }
 
+// ── Session (never hangs) ──────────────────────────────
+async function safeGetSession(){
+  return new Promise(resolve=>{
+    let done=false;
+    const timer=setTimeout(()=>{
+      if(done)return;done=true;
+      Object.keys(localStorage).filter(k=>k.includes('supabase')||k.includes('sb-')).forEach(k=>localStorage.removeItem(k));
+      console.warn('getSession timeout — cleared stale auth');
+      resolve({data:{session:null}});
+    },5000);
+    sb.auth.getSession().then(res=>{
+      if(done)return;done=true;
+      clearTimeout(timer);resolve(res);
+    }).catch(()=>{
+      if(done)return;done=true;
+      clearTimeout(timer);
+      Object.keys(localStorage).filter(k=>k.includes('supabase')||k.includes('sb-')).forEach(k=>localStorage.removeItem(k));
+      resolve({data:{session:null}});
+    });
+  });
+}
+
 // ── Data ──────────────────────────────────────────────
 async function loadProfile(){
-  const timeout=new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),8000));
+  const timeout=new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),7000));
   const query=sb.from('profiles').select('*').eq('id',user.id).maybeSingle().then(r=>r);
   const {data}=await Promise.race([query,timeout]);
   profile=data;
+  // load total DEPs received
+  try{
+    const {data:posts}=await sb.from('posts').select('dep_count').eq('user_id',user.id);
+    totalDeps=(posts||[]).reduce((s,p)=>s+(p.dep_count||0),0);
+  }catch(e){totalDeps=0;}
+  // store email in profile for username-based login
+  if(profile&&user.email&&!profile.email){
+    await sb.from('profiles').update({email:user.email}).eq('id',user.id).catch(()=>{});
+    profile.email=user.email;
+  }
 }
 async function loadTodayPost(){
   const {data}=await sb.from('posts').select('*').eq('user_id',user.id).eq('post_date',todayS()).order('created_at',{ascending:false});
@@ -415,10 +474,7 @@ async function loadFeed(){
     (prevPosts||[]).forEach(p=>{prevMap[p.id]=p;});
   }
   feedData=primary.map(p=>({...p,_prev:p.previous_post_id?prevMap[p.previous_post_id]||null:null}))
-    .sort((a,b)=>{
-      const af=myFollowing.has(a.user_id)?0:1,bf=myFollowing.has(b.user_id)?0:1;
-      return af-bf||(new Date(b.created_at)-new Date(a.created_at));
-    });
+    .sort((a,b)=>{const af=myFollowing.has(a.user_id)?0:1,bf=myFollowing.has(b.user_id)?0:1;return af-bf||(new Date(b.created_at)-new Date(a.created_at));});
 }
 async function submitPost(pd){
   const t=todayS(),y=yesterS();
@@ -427,8 +483,7 @@ async function submitPost(pd){
   const {data,error}=await sb.from('posts').insert({
     user_id:user.id,username:profile.username,razon:pd.razon,castigo:pd.castigo,
     dibujo_trazos:pd.dibujo?.trazos||null,dibujo_descripcion:pd.dibujo?.descripcion||null,
-    doll_color:profile.doll_color,post_date:t,is_primary:true,
-    previous_post_id:prevId,
+    doll_color:profile.doll_color,post_date:t,is_primary:true,previous_post_id:prevId,
   }).select().single();
   if(error){alert('Error: '+error.message);return;}
   if(!profile.last_post_date||profile.last_post_date!==t){
@@ -458,10 +513,7 @@ async function toggleFollow(uid){
     await sb.from('follows').insert({follower_id:user.id,following_id:uid});
     myFollowing.add(uid);
   }
-  feedData.sort((a,b)=>{
-    const af=myFollowing.has(a.user_id)?0:1,bf=myFollowing.has(b.user_id)?0:1;
-    return af-bf||(new Date(b.created_at)-new Date(a.created_at));
-  });
+  feedData.sort((a,b)=>{const af=myFollowing.has(a.user_id)?0:1,bf=myFollowing.has(b.user_id)?0:1;return af-bf||(new Date(b.created_at)-new Date(a.created_at));});
   paint();
 }
 
@@ -473,19 +525,45 @@ async function doSignUp(email,pass,uname,color){
   if(error)return sbErr(error.message);
   if(data.user){
     await new Promise(r=>setTimeout(r,600));
-    await sb.from('profiles').upsert({id:data.user.id,username:uname,doll_color:color});
+    await sb.from('profiles').upsert({id:data.user.id,username:uname,doll_color:color,email:email});
   }
   return null;
 }
 async function doSignIn(emailOrUser,pass){
-  if(!emailOrUser.includes('@')) return 'Introduce tu email para entrar (no el nombre de usuario)';
-  const {error}=await sb.auth.signInWithPassword({email:emailOrUser,password:pass});
+  let email=emailOrUser;
+  if(!emailOrUser.includes('@')){
+    // username login — look up email in profiles
+    const {data:prof}=await sb.from('profiles').select('email').eq('username',emailOrUser).maybeSingle();
+    if(!prof?.email) return 'Usuario no encontrado o no tiene email guardado. Usa tu email para entrar la primera vez.';
+    email=prof.email;
+  }
+  const {error}=await sb.auth.signInWithPassword({email,password:pass});
   if(error)return sbErr(error.message);return null;
 }
 async function doResetPassword(email){
-  if(!email)return'Escribe tu email primero';
+  if(!email||!email.includes('@'))return'Introduce tu email primero';
   const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://guyfroms.github.io/vudu-real/'});
   if(error)return sbErr(error.message);return null;
+}
+
+// ── Session navigation (shared) ────────────────────────
+async function loadAndGoHome(errEl,btn,btnLabel){
+  try{
+    const res=await safeGetSession();
+    const s=res?.data?.session;
+    if(s?.user){
+      user=s.user;await loadProfile();
+      if(!profile){const u=user.user_metadata?.username||user.email.split('@')[0];await sb.from('profiles').upsert({id:user.id,username:u,doll_color:DOLL_COLORS[0],email:user.email});await loadProfile();}
+      await loadTodayPost();view='home';paint();
+    }else{
+      if(errEl)errEl.textContent='No se pudo iniciar sesión. Inténtalo de nuevo.';
+      if(btn){btn.disabled=false;btn.textContent=btnLabel;}
+    }
+  }catch(ex){
+    console.error('loadAndGoHome error',ex);
+    if(errEl)errEl.textContent='Error al cargar. Recarga la página.';
+    if(btn){btn.disabled=false;btn.textContent=btnLabel;}
+  }finally{navigating=false;}
 }
 
 // ── Renders ───────────────────────────────────────────
@@ -521,6 +599,11 @@ function renderAuth(){
       btn.disabled=true;btn.textContent='...';err.textContent='';
       const e=await doSignUp(pendingSignup.email,pendingSignup.pass,pendingSignup.username,pendingSignup.color);
       if(e){err.textContent=e;btn.disabled=false;btn.textContent='Crear cuenta';}
+      else{
+        // After signup, sign in automatically
+        await doSignIn(pendingSignup.email,pendingSignup.pass);
+        if(!navigating){navigating=true;await loadAndGoHome(err,btn,'Crear cuenta');}
+      }
     };
     return;
   }
@@ -537,53 +620,52 @@ function renderAuth(){
         <button class="auth-tab ${!login?'on':''}" id="tReg">Registrarse</button>
       </div>
       ${!login?`<div class="field"><label>Nombre de usuario</label><input type="text" id="aUser" placeholder="como quieres que te vean" maxlength="20"/></div>`:''}
-      <div class="field"><label>Email</label><input type="email" id="aEmail" placeholder="tu@email.com" autocomplete="email"/></div>
+      <div class="field"><label>${login?'Email o usuario':'Email'}</label><input type="${login?'text':'email'}" id="aEmail" placeholder="${login?'email o nombre de usuario':'tu@email.com'}" autocomplete="${login?'username':'email'}"/></div>
       <div class="field">
         <label>Contraseña</label>
-        <input type="password" id="aPass" placeholder="mínimo 6 caracteres" autocomplete="${login?'current-password':'new-password'}"/>
-        ${!login?`<div class="pass-hint"><strong>Usa una contraseña única.</strong> Si alguien accede a este servicio, no queremos que pueda entrar al resto de tus cuentas.</div>`:''}
+        <input type="password" id="aPass" placeholder="${login?'tu contraseña':'mín. 8 · mayúscula · número · especial'}" autocomplete="${login?'current-password':'new-password'}"/>
+        ${!login?`<div id="passReqs" style="margin-top:6px;"></div><div class="pass-warning" style="margin-top:8px;"><strong>Usa una contraseña única.</strong> Si alguien accede a este servicio, no queremos que afecte al resto de tus cuentas.</div>`:''}
       </div>
       <div class="auth-err" id="aErr"></div>
       <button class="btn btn-red" id="btnAuth">${login?'Entrar':'Siguiente →'}</button>
-      ${login?`<button class="btn-link" id="btnForgot" style="margin-top:4px;font-size:clamp(11px,2.5vw,12px);">¿Olvidaste tu contraseña?</button>`:''}
+      ${login?`<button class="btn-link" id="btnForgot" style="margin-top:2px;font-size:clamp(11px,2.5vw,12px);">¿Olvidaste tu contraseña?</button>`:''}
     </div>
   </div>`;
   ge('tLogin').onclick=()=>{authTab='login';renderAuth();};
   ge('tReg').onclick=()=>{authTab='register';renderAuth();};
+  if(!login&&ge('aPass')){
+    ge('aPass').oninput=()=>{
+      const pr=ge('passReqs');if(pr)pr.innerHTML=passReqsHTML(ge('aPass').value);
+    };
+  }
   if(ge('btnForgot')){
     ge('btnForgot').onclick=async()=>{
       const email=(ge('aEmail').value||'').trim();
-      const err=ge('aErr');
+      const err=ge('aErr');err.style.color='';
       const e=await doResetPassword(email);
-      if(e){err.textContent=e;}else{err.style.color='#5A9A5A';err.textContent='Email de recuperación enviado — revisa tu bandeja.';}
+      if(e){err.textContent=e;}else{err.style.color='#4CAF82';err.textContent='Email de recuperación enviado — revisa tu bandeja.';}
     };
   }
   ge('btnAuth').onclick=async()=>{
     const btn=ge('btnAuth'),err=ge('aErr');
-    const email=(ge('aEmail').value||'').trim(),pass=ge('aPass').value||'';
+    const emailOrUser=(ge('aEmail').value||'').trim(),pass=ge('aPass').value||'';
     err.textContent='';err.style.color='';
     if(authTab==='login'){
+      if(!emailOrUser){err.textContent='Introduce tu email o usuario';return;}
+      if(!pass){err.textContent='Introduce tu contraseña';return;}
       btn.disabled=true;btn.textContent='...';
-      const e=await doSignIn(email,pass);
-      if(e){err.textContent=e;btn.disabled=false;btn.textContent='Entrar';}
-      else{
-        try{
-          const res=await sb.auth.getSession();
-          const s=res?.data?.session;
-          if(s?.user){
-            user=s.user;await loadProfile();
-            if(!profile){const u=user.user_metadata?.username||user.email.split('@')[0];await sb.from('profiles').upsert({id:user.id,username:u,doll_color:DOLL_COLORS[0]});await loadProfile();}
-            await loadTodayPost();view='home';paint();
-          }
-        }catch(ex){console.error('login nav error',ex);err.textContent='Error al cargar, recarga la página';btn.disabled=false;btn.textContent='Entrar';}
-      }
+      const e=await doSignIn(emailOrUser,pass);
+      if(e){err.textContent=e;btn.disabled=false;btn.textContent='Entrar';return;}
+      if(!navigating){navigating=true;await loadAndGoHome(err,btn,'Entrar');}
     }else{
       const uname=(ge('aUser').value||'').trim();
+      const email=emailOrUser;
       if(!uname){err.textContent='Pon un nombre de usuario';return;}
-      if(uname.length<2){err.textContent='El nombre debe tener al menos 2 caracteres';return;}
+      if(uname.length<2){err.textContent='Mínimo 2 caracteres';return;}
       if(!/^[a-zA-Z0-9_.-]+$/.test(uname)){err.textContent='Solo letras, números, puntos, guiones y _';return;}
-      if(!email){err.textContent='Pon tu email';return;}
-      if(pass.length<6){err.textContent='La contraseña debe tener al menos 6 caracteres';return;}
+      if(!email||!email.includes('@')){err.textContent='Introduce un email válido';return;}
+      const passErrs=validatePass(pass);
+      if(passErrs.length){err.textContent='Contraseña débil: falta '+passErrs.join(', ');return;}
       pendingSignup={username:uname,email,pass,color:DOLL_COLORS[0]};
       authStep='color';renderAuth();
     }
@@ -632,7 +714,7 @@ function prevPostHTML(p,size){
   const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):DEATH_LABELS[p.castigo]||p.castigo;
   return `<div class="prev-inner">
     <div class="prev-label">Lo de antes</div>
-    <div style="display:flex;justify-content:center;opacity:.55;">
+    <div style="display:flex;justify-content:center;opacity:.5;">
       ${dollWithDraw(p.doll_color,p.castigo,p.dibujo_trazos,true,d?.pose||'idle',size||60)}
     </div>
     <div class="prev-razon">"${esc(p.razon)}"</div>
@@ -645,24 +727,21 @@ function renderHome(){
   if(todayPost){
     const p=todayPost,d=DEATHS.find(x=>x.id===p.castigo);
     const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):DEATH_LABELS[p.castigo]||p.castigo;
-    const hasPrev=!!todayPrevPost;
-    const isOpen=expandedPrev.has('home');
+    const hasPrev=!!todayPrevPost,isOpen=expandedPrev.has('home');
     return `<div class="screen" style="text-align:center;">
       ${hdr("Hoy ya está hecho",`"${esc(p.razon)}"`)}
-      <div style="display:flex;justify-content:center;margin:28px 0;">
+      <div style="display:flex;justify-content:center;margin:26px 0;">
         ${dollWithDraw(dc,p.castigo,p.dibujo_trazos,true,d?.pose||'idle',150)}
       </div>
       <div class="done-card">
         <div class="done-castigo">${lbl}</div>
-        <div style="color:var(--muted2);font-size:clamp(11px,3vw,12px);margin-top:5px;">Tus amigos pueden darle DEP</div>
+        <div style="color:var(--muted2);font-size:clamp(11px,3vw,12px);margin-top:5px;">${ICO.candle} ${totalDeps} DEPs totales recibidos</div>
         ${hasPrev?`
           <button class="prev-toggle ${isOpen?'open':''}" id="btnTogglePrev">
             <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
             Antes había pasado algo
           </button>
-          <div class="prev-panel ${isOpen?'open':''}" id="prevPanel">
-            ${prevPostHTML(todayPrevPost,64)}
-          </div>
+          <div class="prev-panel ${isOpen?'open':''}" id="prevPanel">${prevPostHTML(todayPrevPost,64)}</div>
         `:''}
       </div>
       <button class="peor-btn" id="btnPeor">Ha ido a peor — contar algo nuevo</button>
@@ -673,25 +752,38 @@ function renderHome(){
   }
   return `<div class="screen" style="text-align:center;">
     ${hdr("¿Qué te ha pasado hoy?","Una desgracia al día")}
-    <div class="doll-wrap" style="display:flex;justify-content:center;margin:30px 0;animation:breathe 3.5s ease-in-out infinite;">
+    <div class="doll-wrap" style="display:flex;justify-content:center;margin:28px 0;animation:breathe 3.5s ease-in-out infinite;">
       ${dollSVG(dc,null,false,'idle',140)}
     </div>
     <button class="btn btn-red" id="empezar">Empezar</button>
   </div>`;
 }
 
+function clamp(a,b){return Math.min(b,Math.max(a,Math.round(window.innerWidth/480*b)));}
+
 function renderMuerte(){
   const streak=profile?.streak||0;
   const cells=DEATHS.map(d=>{
-    const ok=streak>=d.min;
-    return `<div class="dcell ${ok?'on':'off'}" data-death="${ok?d.id:''}">
-      ${dollSVG(profile.doll_color,ok?d.id:null,ok,ok?d.pose:'idle',clamp(56,70))}
+    const streakOk=streak>=d.min,depsOk=totalDeps>=d.deps,ok=streakOk&&depsOk;
+    let cls='dcell '+(ok?'on':'off');
+    let reqHtml='';
+    if(!ok){
+      if(!streakOk) reqHtml=`<span class="dreq dreq-streak">${ICO.flame} ${d.min}d racha</span>`;
+      else if(!depsOk){
+        cls='dcell deps-lock';
+        const pct=Math.min(100,Math.round(totalDeps/d.deps*100));
+        reqHtml=`<span class="dreq dreq-deps">${ICO.candle} ${d.deps} DEPs</span>
+                 <div class="unlock-bar" style="width:${pct}%"></div>`;
+      }
+    }
+    return `<div class="${cls}" data-death="${ok?d.id:''}">
+      ${ok?dollSVG(profile.doll_color,d.id,true,d.pose,clamp(52,64)):`<div style="opacity:.4;padding:4px 0;">${ICO.lock}</div>`}
       <span class="dlabel">${d.label}</span>
-      ${!ok?`<span class="dreq">racha ${d.min}d</span>`:''}
+      ${reqHtml}
     </div>`;
   }).join('');
   return `<div class="screen">
-    ${hdr("Elige su castigo","Los nuevos castigos se desbloquean con racha")}
+    ${hdr("Elige su castigo","Desbloquea más con racha y DEPs")}
     <div class="grid2">
       ${cells}
       <div class="draw-cell" id="drawCard">
@@ -701,8 +793,6 @@ function renderMuerte(){
     </div>
   </div>`;
 }
-
-function clamp(a,b){return Math.min(b,Math.max(a,Math.round(window.innerWidth/480*b)));}
 
 function renderDibujo(){
   return `<div class="screen">
@@ -726,7 +816,7 @@ function renderPosted(){
   const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):DEATH_LABELS[p.castigo]||p.castigo;
   return `<div class="screen" style="text-align:center;">
     ${hdr("Publicado")}
-    <div style="display:flex;justify-content:center;margin:28px 0;">
+    <div style="display:flex;justify-content:center;margin:26px 0;">
       ${dollWithDraw(profile.doll_color,p.castigo,p.dibujo_trazos,true,d?.pose||'idle',150)}
     </div>
     <div class="done-card">
@@ -740,14 +830,13 @@ function renderPosted(){
 }
 
 function renderFeed(){
-  if(!feedData.length)return`<div class="screen">${hdr("Feed","Lo de hoy")}<div style="text-align:center;color:var(--muted2);margin-top:60px;font-size:clamp(13px,3.5vw,15px);">Nadie ha publicado hoy<br><span style="font-size:clamp(11px,3vw,12px);opacity:.5;display:block;margin-top:6px;">sé el primero</span></div></div>`;
+  if(!feedData.length)return`<div class="screen">${hdr("Feed","Lo de hoy")}<div style="text-align:center;color:var(--muted2);margin-top:60px;font-size:clamp(13px,3.5vw,15px);">Nadie ha publicado hoy<br><span style="font-size:clamp(11px,3vw,12px);opacity:.45;display:block;margin-top:6px;">sé el primero</span></div></div>`;
   const cards=feedData.map(item=>{
     const lbl=item.castigo==='dibujo'?esc(item.dibujo_descripcion):DEATH_LABELS[item.castigo]||item.castigo;
     const given=myDeps.has(item.id),own=item.user_id===user.id;
     const friend=myFollowing.has(item.user_id);
     const d=DEATHS.find(x=>x.id===item.castigo);
-    const hasPrev=!!item.previous_post_id&&!!item._prev;
-    const isOpen=expandedPrev.has(item.id);
+    const hasPrev=!!item.previous_post_id&&!!item._prev,isOpen=expandedPrev.has(item.id);
     return `<div class="feed-card">
       <div class="feed-head">
         <div class="avatar" style="background:${item.doll_color};">${initials(item.username)}</div>
@@ -760,7 +849,7 @@ function renderFeed(){
       </div>
       <p class="feed-razon">${esc(item.razon)}</p>
       <span class="feed-castigo">${lbl}</span>
-      <div style="display:flex;justify-content:center;margin:10px 0;">
+      <div style="display:flex;justify-content:center;margin:8px 0 10px;">
         ${dollWithDraw(item.doll_color,item.castigo,item.dibujo_trazos,true,d?.pose||'idle',80)}
       </div>
       ${own
@@ -771,9 +860,7 @@ function renderFeed(){
           <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           Antes había pasado algo
         </button>
-        <div class="prev-panel ${isOpen?'open':''}">
-          ${prevPostHTML(item._prev,54)}
-        </div>
+        <div class="prev-panel ${isOpen?'open':''}">${prevPostHTML(item._prev,54)}</div>
       `:''}
     </div>`;
   }).join('');
@@ -781,20 +868,39 @@ function renderFeed(){
 }
 
 function renderAjustes(){
+  const streak=profile?.streak||0;
+  const nextStreak=DEATHS.filter(d=>d.min>streak&&d.deps===0).sort((a,b)=>a.min-b.min)[0];
+  const nextDeps=DEATHS.filter(d=>d.deps>totalDeps&&d.min<=streak).sort((a,b)=>a.deps-b.deps)[0];
+  const streakPct=nextStreak?Math.min(100,Math.round(streak/nextStreak.min*100)):100;
+  const depsPct=nextDeps?Math.min(100,Math.round(totalDeps/nextDeps.deps*100)):100;
   return `<div class="screen">
     ${hdr("Ajustes",`@${esc(profile.username)}`)}
-    <div style="display:flex;justify-content:center;margin:24px 0;">
+    <div style="display:flex;justify-content:center;margin:22px 0;">
       ${dollSVG(profile.doll_color,null,false,'idle',120)}
     </div>
     <div style="text-align:center;color:var(--muted2);font-size:clamp(9px,2.5vw,10px);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Color del muñeco</div>
     <div class="colorpick">
       ${DOLL_COLORS.map(c=>`<button class="ccircle ${c===profile.doll_color?'on':''}" data-color="${c}" style="background:${c};"></button>`).join('')}
     </div>
-    <div class="stat-block">
-      <div class="stat-num">${profile.streak||0}</div>
-      <div class="stat-label">${ICO.flame} días de racha</div>
+    <div class="stat-row">
+      <div class="stat-block">
+        <div class="stat-num">${streak}</div>
+        <div class="stat-label">${ICO.flame} racha</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-num blue">${totalDeps}</div>
+        <div class="stat-label">${ICO.candle} DEPs totales</div>
+      </div>
     </div>
-    <div style="height:1px;background:var(--border);margin:clamp(20px,5vw,28px) 0;"></div>
+    ${nextStreak?`<div class="next-unlock">
+      <div style="flex:1;"><div style="font-size:clamp(10px,2.5vw,11px);color:var(--text2);margin-bottom:5px;">${nextStreak.min-streak}d para <strong>${nextStreak.label}</strong></div>
+      <div class="next-unlock-bar"><div class="next-unlock-fill" style="width:${streakPct}%;background:var(--warm);"></div></div></div>
+    </div>`:''}
+    ${nextDeps?`<div class="next-unlock" style="margin-top:8px;">
+      <div style="flex:1;"><div style="font-size:clamp(10px,2.5vw,11px);color:var(--text2);margin-bottom:5px;">${nextDeps.deps-totalDeps} DEPs para <strong>${nextDeps.label}</strong></div>
+      <div class="next-unlock-bar"><div class="next-unlock-fill" style="width:${depsPct}%;"></div></div></div>
+    </div>`:''}
+    <div style="height:1px;background:var(--border);margin:clamp(20px,5vw,26px) 0;"></div>
     <button class="btn-ghost" id="btnLogout">Cerrar sesión</button>
     <button class="btn-link" id="volverAjustes">← volver</button>
   </div>`;
@@ -847,10 +953,10 @@ function attachListeners(){
     });
     if(ge('volverAjustes'))ge('volverAjustes').onclick=()=>{view=todayPost?'feed':'home';paint();};
     if(ge('btnLogout'))ge('btnLogout').onclick=async()=>{
-      await sb.auth.signOut();
+      await sb.auth.signOut().catch(()=>{});
       user=null;profile=null;todayPost=null;todayPrevPost=null;
       feedData=[];myDeps=new Set();myFollowing=new Set();expandedPrev=new Set();
-      authStep='form';view='auth';paint();
+      navigating=false;authStep='form';view='auth';paint();
     };
   }
 }
@@ -859,7 +965,7 @@ function promptRazon(death){
   const d=DEATHS.find(x=>x.id===death);
   ge('app').innerHTML=`<div class="screen" style="text-align:center;">
     ${hdr("¿Qué te ha pasado hoy?")}
-    <div style="display:flex;justify-content:center;margin:22px 0;">
+    <div style="display:flex;justify-content:center;margin:20px 0;">
       ${dollSVG(profile.doll_color,death,true,d?.pose||'idle',110)}
     </div>
     <textarea id="razonFinal" placeholder="ej: se me ha caído el café al suelo..." maxlength="120" style="text-align:left;"></textarea>
@@ -916,22 +1022,26 @@ function setupCanvas(){
 
 // ── Init ──────────────────────────────────────────────
 async function init(){
-  sb.auth.onAuthStateChange(async(event,session)=>{
-    try{
-      if(event==='SIGNED_IN'&&session?.user){
-        user=session.user;await loadProfile();
-        if(!profile){const u=user.user_metadata?.username||user.email.split('@')[0];await sb.from('profiles').upsert({id:user.id,username:u,doll_color:pendingSignup.color||DOLL_COLORS[0]});await loadProfile();}
-        await loadTodayPost();view='home';paint();
-      }else if(event==='SIGNED_OUT'){user=null;profile=null;todayPost=null;authStep='form';view='auth';paint();}
-    }catch(e){console.error('auth change error',e);view='auth';paint();}
+  // Only handle sign-out in onAuthStateChange to avoid double-navigation race
+  sb.auth.onAuthStateChange((event,session)=>{
+    if(event==='SIGNED_OUT'){
+      user=null;profile=null;todayPost=null;navigating=false;
+      authStep='form';view='auth';paint();
+    }
   });
   try{
-    const res=await sb.auth.getSession();
+    const res=await safeGetSession();
     const session=res?.data?.session;
     if(session?.user){
-      user=session.user;await loadProfile();
-      if(!profile){const u=user.user_metadata?.username||user.email.split('@')[0];await sb.from('profiles').upsert({id:user.id,username:u,doll_color:DOLL_COLORS[0]});await loadProfile();}
-      await loadTodayPost();view='home';
+      user=session.user;
+      await loadProfile();
+      if(!profile){
+        const u=user.user_metadata?.username||user.email.split('@')[0];
+        await sb.from('profiles').upsert({id:user.id,username:u,doll_color:DOLL_COLORS[0],email:user.email}).catch(()=>{});
+        await loadProfile();
+      }
+      await loadTodayPost();
+      view='home';
     }else{view='auth';}
   }catch(e){console.error('init error',e);view='auth';}
   paint();

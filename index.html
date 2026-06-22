@@ -480,7 +480,7 @@ const STRINGS={
     vis_label:'Visibilidad',vis_public:'Público — aparece en el funeral global',vis_friends:'Amigos — solo tus seguidores',vis_private:'Privado — solo tú',
     cemetery_title:'Cementerio',cemetery_sub:'$n desgracias enterradas',cemetery_empty:'Aún no tienes ninguna desgracia enterrada.',cemetery_loading:'Cargando...',btn_cemetery:'Ver cementerio',
     following_tab:'Siguiendo',followers_tab:'Seguidores',no_followers:'Todavía nadie te sigue.',
-    logros_title:'Logros',castigos_tab:'Almacén',logros_tab:'Logros',
+    logros_title:'Logros',castigos_tab:'Castigos',logros_tab:'Logros',
     lbl_birthday:'Fecha de nacimiento',btn_save_birthday:'Guardar',
     btn_share:'Compartir ruina',
     feed_yesterday:'Anteriores · ya enterradas',feed_tomb_hide:'ocultar',
@@ -491,7 +491,7 @@ const STRINGS={
     nav_hoy:'Today',nav_feed:'Funeral',nav_senales:'Activity',nav_muertes:'Collection',
     login_tab:'Log in',register_tab:'Sign up',
     auth_tagline:'"ugh, kill me."',auth_sub:'Some days just wreck you.',
-    auth_beat1:'Share your daily disaster',auth_beat2:'Choose how your doll dies',auth_beat3:'Get DEPs from your friends',
+    auth_beat1:'Share your daily disaster',auth_beat2:'Choose how your figure dies',auth_beat3:'Get DEPs from your friends',
     lbl_username:'Username',lbl_email_or_user:'Email or username',lbl_email:'Email',lbl_password:'Password',
     ph_username:'how you want to be seen',ph_email_or_user:'email or username',ph_email:'you@email.com',
     ph_pass_login:'your password',ph_pass_new:'at least 6 characters',
@@ -503,7 +503,7 @@ const STRINGS={
     err_username_chars:'Only letters, numbers, dots and dashes allowed',
     err_invalid_email:'Enter a valid email address',err_pass_short:'Password too short — ',
     err_username_taken:'That username is already taken',
-    auth_step2:'Step 2 of 2 · Your doll',auth_choose_color:'Choose your doll color',
+    auth_step2:'Step 2 of 2 · Your figure',auth_choose_color:'Choose your figure color',
     btn_create:'Create account',checking:'Checking...',creating:'Creating...',sending:'Sending...',saving:'Saving...',
     verify_title:'Confirm your email',verify_sub1:'We sent a link to',verify_sub2:'Open it to activate your account. You can close this tab.',
     btn_resend:'Resend email',msg_sent:'Sent',
@@ -525,7 +525,7 @@ const STRINGS={
     btn_publish_ruina:'Post ruina',
     muertes_unlocked:'unlocked',muertes_free:'Always available',muertes_streak:'By daily streak',muertes_deps:'By DEPs received',
     death_ok:' unlocked',streak_left:' more days',deps_left:' more DEPs',days_lbl:'days',
-    ajustes_color:'Doll color',streak_lbl:'streak',deps_lbl:'total DEPs',
+    ajustes_color:'Figure color',streak_lbl:'streak',deps_lbl:'total DEPs',
     btn_change_pass:'Change password',btn_what_is:'What is kill.me?',btn_logout:'Log out',
     pass_email_sent:'We sent you an email to change your password.',
     lang_btn:'Español',
@@ -537,9 +537,9 @@ const STRINGS={
     err_load:'Could not sign in. Please try again.',err_load2:'Error loading. Reload the page.',
     pass_req:'6+ characters',
     ob_skip:'Skip',ob_next:'Next →',ob_start:"Let's go!",
-    ob1_title:'kill.me',ob1_body:`Ever said <em>"ugh, kill me"</em> after a terrible day?\n\nThis app is exactly that. Vent your daily <em>ruina</em>, kill your doll, and move on.`,
+    ob1_title:'kill.me',ob1_body:`Ever said <em>"ugh, kill me"</em> after a terrible day?\n\nThis app is exactly that. Vent your daily <em>ruina</em>, kill your figure, and move on.`,
     ob2_title:'What is a DEP?',ob2_body:`Your friends see your ruina in the feed and send you a <em>DEP</em> — Descanse En Paz (Rest in Peace).\n\nLike a like, but for the worst part of your day. More DEPs = more solidarity.`,
-    ob3_title:'Deaths',ob3_body:`Every day you post your ruina, you unlock new ways to kill your doll: burned, needled, electrocuted...\n\nKeep your <em>streak</em> and collect DEPs to unlock them all.`,
+    ob3_title:'Deaths',ob3_body:`Every day you post your ruina, you unlock new ways to kill your figure: burned, needled, electrocuted...\n\nKeep your <em>streak</em> and collect DEPs to unlock them all.`,
     ob4_title:'Once a day',ob4_body:`You can only post <em>one ruina a day</em>. If things get better (or worse), you can update it.\n\nRemember: life fits exactly one "kill me" a day — no more.`,
     ajustes_title:'Settings',
     safety_note:'This is dramatic humor, not literal. If something feels real,',safety_link:'help is available',
@@ -548,7 +548,7 @@ const STRINGS={
     vis_label:'Visibility',vis_public:'Public — appears in the global funeral',vis_friends:'Friends — only your followers',vis_private:'Private — only you',
     cemetery_title:'Cemetery',cemetery_sub:'$n ruinas buried',cemetery_empty:"You don't have any buried ruinas yet.",cemetery_loading:'Loading...',btn_cemetery:'View cemetery',
     following_tab:'Following',followers_tab:'Followers',no_followers:"Nobody is following you yet.",
-    logros_title:'Achievements',castigos_tab:'Collection',logros_tab:'Achievements',
+    logros_title:'Achievements',castigos_tab:'Punishments',logros_tab:'Achievements',
     lbl_birthday:'Date of birth',btn_save_birthday:'Save',
     btn_share:'Share ruina',
     feed_yesterday:'Previous · already buried',feed_tomb_hide:'hide',
@@ -715,15 +715,43 @@ function passReqsHTML(pass){
 
 // ── Poses ──────────────────────────────────────────────
 function getPose(name,w,h){
-  // Body starts at h*0.42 (below bigger head), arms at h*0.50, body end/legs start h*0.68
+  // Big head (r≈h*.225, bottom≈h*.495). Body h*.52→h*.67 (short). Arms near-horizontal. Legs nearly vertical.
   const P={
-    idle:    {body:`M${w/2} ${h*.42}Q${w*.46} ${h*.55} ${w/2} ${h*.68}`,aL:`M${w/2} ${h*.50}Q${w*.28} ${h*.53} ${w*.18} ${h*.62}`,aR:`M${w/2} ${h*.50}Q${w*.72} ${h*.53} ${w*.82} ${h*.62}`,lL:`M${w/2} ${h*.68}Q${w*.40} ${h*.82} ${w*.36} ${h*.97}`,lR:`M${w/2} ${h*.68}Q${w*.60} ${h*.82} ${w*.64} ${h*.97}`},
-    scared:  {body:`M${w/2} ${h*.42}Q${w*.46} ${h*.55} ${w/2} ${h*.68}`,aL:`M${w/2} ${h*.50}Q${w*.28} ${h*.36} ${w*.20} ${h*.20}`,aR:`M${w/2} ${h*.50}Q${w*.72} ${h*.36} ${w*.80} ${h*.20}`,lL:`M${w/2} ${h*.68}Q${w*.40} ${h*.82} ${w*.36} ${h*.97}`,lR:`M${w/2} ${h*.68}Q${w*.60} ${h*.82} ${w*.64} ${h*.97}`},
-    cowering:{body:`M${w/2} ${h*.42}Q${w*.47} ${h*.53} ${w*.5} ${h*.65}`,aL:`M${w/2} ${h*.49}Q${w*.33} ${h*.40} ${w*.27} ${h*.28}`,aR:`M${w/2} ${h*.49}Q${w*.67} ${h*.40} ${w*.73} ${h*.28}`,lL:`M${w*.5} ${h*.65}Q${w*.38} ${h*.80} ${w*.32} ${h*.96}`,lR:`M${w*.5} ${h*.65}Q${w*.62} ${h*.80} ${w*.68} ${h*.96}`},
-    begging: {body:`M${w/2} ${h*.42}Q${w*.46} ${h*.55} ${w/2} ${h*.68}`,aL:`M${w/2} ${h*.50}Q${w*.30} ${h*.57} ${w*.15} ${h*.62}`,aR:`M${w/2} ${h*.50}Q${w*.70} ${h*.57} ${w*.85} ${h*.62}`,lL:`M${w/2} ${h*.68}Q${w*.40} ${h*.82} ${w*.36} ${h*.97}`,lR:`M${w/2} ${h*.68}Q${w*.60} ${h*.82} ${w*.64} ${h*.97}`},
-    dramatic:{body:`M${w/2} ${h*.42}Q${w*.46} ${h*.55} ${w/2} ${h*.68}`,aL:`M${w/2} ${h*.50}Q${w*.66} ${h*.44} ${w*.85} ${h*.38}`,aR:`M${w/2} ${h*.50}Q${w*.26} ${h*.57} ${w*.10} ${h*.65}`,lL:`M${w/2} ${h*.68}Q${w*.38} ${h*.82} ${w*.30} ${h*.97}`,lR:`M${w/2} ${h*.68}Q${w*.62} ${h*.82} ${w*.70} ${h*.97}`},
-    squish:  {body:`M${w/2} ${h*.42}Q${w*.46} ${h*.50} ${w*.5} ${h*.59}`,aL:`M${w/2} ${h*.48}Q${w*.22} ${h*.49} ${w*.06} ${h*.52}`,aR:`M${w/2} ${h*.48}Q${w*.78} ${h*.49} ${w*.94} ${h*.52}`,lL:`M${w*.5} ${h*.59}Q${w*.32} ${h*.67} ${w*.18} ${h*.73}`,lR:`M${w*.5} ${h*.59}Q${w*.68} ${h*.67} ${w*.82} ${h*.73}`},
-    ghost:   {body:`M${w/2} ${h*.42}Q${w*.44} ${h*.56} ${w*.5} ${h*.72}`,aL:`M${w/2} ${h*.50}Q${w*.27} ${h*.43} ${w*.15} ${h*.32}`,aR:`M${w/2} ${h*.50}Q${w*.73} ${h*.43} ${w*.85} ${h*.32}`,lL:`M${w*.5} ${h*.72}Q${w*.38} ${h*.84} ${w*.34} ${h*.97}`,lR:`M${w*.5} ${h*.72}Q${w*.62} ${h*.84} ${w*.66} ${h*.97}`},
+    idle:    {body:`M${w/2} ${h*.52}Q${w*.46} ${h*.60} ${w/2} ${h*.67}`,
+              aL:`M${w/2} ${h*.54}Q${w*.25} ${h*.59} ${w*.11} ${h*.67}`,
+              aR:`M${w/2} ${h*.54}Q${w*.75} ${h*.59} ${w*.89} ${h*.67}`,
+              lL:`M${w/2} ${h*.67}Q${w*.42} ${h*.82} ${w*.40} ${h*.97}`,
+              lR:`M${w/2} ${h*.67}Q${w*.58} ${h*.82} ${w*.60} ${h*.97}`},
+    scared:  {body:`M${w/2} ${h*.52}Q${w*.46} ${h*.60} ${w/2} ${h*.67}`,
+              aL:`M${w/2} ${h*.54}Q${w*.28} ${h*.38} ${w*.20} ${h*.22}`,
+              aR:`M${w/2} ${h*.54}Q${w*.72} ${h*.38} ${w*.80} ${h*.22}`,
+              lL:`M${w/2} ${h*.67}Q${w*.42} ${h*.82} ${w*.40} ${h*.97}`,
+              lR:`M${w/2} ${h*.67}Q${w*.58} ${h*.82} ${w*.60} ${h*.97}`},
+    cowering:{body:`M${w/2} ${h*.52}Q${w*.47} ${h*.59} ${w*.5} ${h*.67}`,
+              aL:`M${w/2} ${h*.54}Q${w*.33} ${h*.42} ${w*.28} ${h*.30}`,
+              aR:`M${w/2} ${h*.54}Q${w*.67} ${h*.42} ${w*.72} ${h*.30}`,
+              lL:`M${w*.5} ${h*.67}Q${w*.38} ${h*.82} ${w*.35} ${h*.97}`,
+              lR:`M${w*.5} ${h*.67}Q${w*.62} ${h*.82} ${w*.65} ${h*.97}`},
+    begging: {body:`M${w/2} ${h*.52}Q${w*.46} ${h*.60} ${w/2} ${h*.67}`,
+              aL:`M${w/2} ${h*.54}Q${w*.27} ${h*.62} ${w*.10} ${h*.67}`,
+              aR:`M${w/2} ${h*.54}Q${w*.73} ${h*.62} ${w*.90} ${h*.67}`,
+              lL:`M${w/2} ${h*.67}Q${w*.42} ${h*.82} ${w*.40} ${h*.97}`,
+              lR:`M${w/2} ${h*.67}Q${w*.58} ${h*.82} ${w*.60} ${h*.97}`},
+    dramatic:{body:`M${w/2} ${h*.52}Q${w*.46} ${h*.60} ${w/2} ${h*.67}`,
+              aL:`M${w/2} ${h*.54}Q${w*.68} ${h*.46} ${w*.88} ${h*.38}`,
+              aR:`M${w/2} ${h*.54}Q${w*.26} ${h*.60} ${w*.10} ${h*.68}`,
+              lL:`M${w/2} ${h*.67}Q${w*.40} ${h*.82} ${w*.36} ${h*.97}`,
+              lR:`M${w/2} ${h*.67}Q${w*.62} ${h*.82} ${w*.66} ${h*.97}`},
+    squish:  {body:`M${w/2} ${h*.52}Q${w*.46} ${h*.57} ${w*.5} ${h*.62}`,
+              aL:`M${w/2} ${h*.54}Q${w*.20} ${h*.55} ${w*.04} ${h*.58}`,
+              aR:`M${w/2} ${h*.54}Q${w*.80} ${h*.55} ${w*.96} ${h*.58}`,
+              lL:`M${w*.5} ${h*.62}Q${w*.32} ${h*.69} ${w*.18} ${h*.76}`,
+              lR:`M${w*.5} ${h*.62}Q${w*.68} ${h*.69} ${w*.82} ${h*.76}`},
+    ghost:   {body:`M${w/2} ${h*.52}Q${w*.44} ${h*.61} ${w*.5} ${h*.70}`,
+              aL:`M${w/2} ${h*.54}Q${w*.25} ${h*.44} ${w*.12} ${h*.34}`,
+              aR:`M${w/2} ${h*.54}Q${w*.75} ${h*.44} ${w*.88} ${h*.34}`,
+              lL:`M${w*.5} ${h*.70}Q${w*.40} ${h*.83} ${w*.38} ${h*.97}`,
+              lR:`M${w*.5} ${h*.70}Q${w*.60} ${h*.83} ${w*.62} ${h*.97}`},
   };
   return P[name]||P.idle;
 }
@@ -736,8 +764,8 @@ function dollSVG(color,death,dead,poseName,px){
   const dark=color==="#C0B898"||color==="#D0C8B8"||color==="#E8E8E8";
   const ec=dark?"#2A1E38":"#080808";
   const ec2=dark?"rgba(0,0,0,.5)":"rgba(255,255,255,.55)";
-  // Head: cy=h*0.22, r=w*0.22. Eyes at ±25% of r from center, 15% above center.
-  const hr=w*.22,hcy=h*.22;
+  // Head: cy=h*0.27, r=h*0.225 (big head). Eyes at ±55% r from center, 15% above center.
+  const hr=h*.225,hcy=h*.27;
   const lx=w/2-hr*.55,rx=w/2+hr*.55,ey=hcy-hr*.15,ex=hr*.22,eo=hr*.18;
   const er=Math.max(2.2,hr*.075);
   const face=dead?`
@@ -885,7 +913,7 @@ function dollSVG(color,death,dead,poseName,px){
     // Zombie bite on the neck/shoulder + dark infection spreading through body
     const bc='#1A0E08'; // very dark sepia
     // Bite wound: two arcs of teeth on the neck/shoulder area
-    const bx=w*.64, by=h*.26, br=w*.1;
+    const bx=w*.64, by=h*.50, br=w*.1;
     // Wound base — dark irregular pool
     fx=`<ellipse cx="${bx}" cy="${by}" rx="${w*.1}" ry="${h*.06}" fill="${bc}" opacity=".75"/>`;
     // Upper teeth arc (bite mark)
@@ -915,14 +943,16 @@ function dollSVG(color,death,dead,poseName,px){
   return `<div class="doll-wrap" style="width:${px}px;height:${ht}px;">
   <svg viewBox="0 0 ${w} ${h}" width="${px}" height="${ht}" xmlns="http://www.w3.org/2000/svg" style="overflow:visible;display:block;" ${anim}>
     ${fx}
+    <circle cx="${w/2+hr*.11}" cy="${hcy+hr*.16}" r="${hr}" fill="rgba(0,0,0,.2)"/>
     <g stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" fill="none">
-      <circle cx="${w/2}" cy="${h*.22}" r="${w*.22}" fill="${color}" stroke="none"/>
+      <circle cx="${w/2}" cy="${hcy}" r="${hr}" fill="${color}" stroke="none"/>
       <path d="${pose.body}"/>
       <path d="${pose.aL}"/>
       <path d="${pose.aR}"/>
       <path d="${pose.lL}"/>
       <path d="${pose.lR}"/>
     </g>
+    <path d="M${w/2-hr*.15} ${hcy-hr*.88} Q${w/2-hr*.48} ${hcy-hr*1.30} ${w/2-hr*.06} ${hcy-hr*1.08}" stroke="${color}" stroke-width="${sw*.55}" fill="none" stroke-linecap="round"/>
     ${face}
   </svg></div>`;
 }
@@ -1103,7 +1133,7 @@ function dollPureSVG(color,death,strokes,dead,poseName,svgW,svgH){
   const dark=color==="#C0B898"||color==="#D0C8B8"||color==="#E8E8E8";
   const ec=dark?"#2A1E38":"#080808";
   const ec2=dark?"rgba(0,0,0,.5)":"rgba(255,255,255,.55)";
-  const hr=w*.22,hcy=h*.22;
+  const hr=h*.225,hcy=h*.27;
   const lx=w/2-hr*.55,rx=w/2+hr*.55,ey=hcy-hr*.15,ex=hr*.22,eo=hr*.18;
   const er=Math.max(2.2,hr*.075);
   const face=dead?`
@@ -1117,10 +1147,12 @@ function dollPureSVG(color,death,strokes,dead,poseName,svgW,svgH){
     <path d="M ${w/2-hr*.28} ${hcy+hr*.30} Q ${w/2} ${hcy+hr*.42} ${w/2+hr*.28} ${hcy+hr*.30}" stroke="${ec}" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
   const drawLayer=strokes&&death==='dibujo'?strokes.map(s=>`<polyline points="${s.puntos.map(pt=>`${pt.x},${pt.y}`).join(' ')}" stroke="${s.color}" stroke-width="${s.grosor}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`).join(''):'';
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">
+    <circle cx="${w/2+hr*.11}" cy="${hcy+hr*.16}" r="${hr}" fill="rgba(0,0,0,.2)"/>
     <g stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" fill="none">
-      <circle cx="${w/2}" cy="${h*.22}" r="${w*.22}" fill="${color}" stroke="none"/>
+      <circle cx="${w/2}" cy="${hcy}" r="${hr}" fill="${color}" stroke="none"/>
       <path d="${pose.body}"/><path d="${pose.aL}"/><path d="${pose.aR}"/><path d="${pose.lL}"/><path d="${pose.lR}"/>
     </g>
+    <path d="M${w/2-hr*.15} ${hcy-hr*.88} Q${w/2-hr*.48} ${hcy-hr*1.30} ${w/2-hr*.06} ${hcy-hr*1.08}" stroke="${color}" stroke-width="${sw*.55}" fill="none" stroke-linecap="round"/>
     ${face}${drawLayer}
   </svg>`;
 }

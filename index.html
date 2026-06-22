@@ -250,12 +250,11 @@ textarea:focus,input:focus{border-color:var(--red);}
 
 /* ── Auth tagline slides ── */
 .auth-hero{margin-bottom:8px;}
-.auth-pitch{margin-top:18px;text-align:center;}
-.auth-tagline{font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(22px,5.8vw,28px);font-weight:700;color:var(--text);line-height:1.2;margin-bottom:10px;letter-spacing:.2px;}
-.auth-sub{color:var(--muted2);font-size:clamp(12px,3vw,13px);margin-bottom:18px;letter-spacing:.2px;}
-.auth-beats{display:flex;flex-direction:column;gap:7px;text-align:left;max-width:260px;margin:0 auto;}
-.auth-beats span{color:var(--bone2);font-size:clamp(12px,3vw,13px);line-height:1.4;padding-left:16px;position:relative;}
-.auth-beats span::before{content:'—';position:absolute;left:0;color:var(--red);font-style:normal;}
+.auth-pitch{margin-top:20px;text-align:center;}
+.auth-quote{margin-bottom:10px;line-height:1.3;}
+.auth-quote-who{font-size:clamp(11px,2.8vw,13px);color:var(--muted2);font-weight:600;letter-spacing:.5px;margin-right:5px;}
+.auth-quote-text{font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(20px,5.2vw,26px);font-weight:700;color:var(--text);}
+.auth-tagline{color:var(--muted2);font-size:clamp(11px,2.8vw,13px);letter-spacing:.3px;}
 
 /* ── Notif banner ── */
 .notif-banner{background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
@@ -994,16 +993,13 @@ function renderAuth(){
     <div class="auth-brand auth-hero">
       <h1 class="cinzel">kill<em>.me</em></h1>
       ${!login?'':` <div class="auth-pitch">
-        <div class="auth-tagline">"pues me mato."</div>
-        <div class="auth-sub">La app para los días que merecen un castigo.</div>
-        <div class="auth-beats">
-          <span>Cuenta tu ruina del día</span>
-          <span>Elige cómo muere tu muñeco</span>
-          <span>Recibe DEPs de tus amigos</span>
+        <div class="auth-quote">
+          <span class="auth-quote-who">Yo:</span><span class="auth-quote-text">"pues me mato."</span>
         </div>
+        <div class="auth-tagline">La app donde desahogar tus desgracias.</div>
       </div>`}
     </div>
-    <div class="auth-doll-preview">${dollSVG(DOLL_COLORS[0],null,false,'idle',120)}</div>
+    <div class="auth-doll-preview">${dollSVG(DOLL_COLORS[0],null,true,'idle',120)}</div>
     <div class="auth-card">
       <div class="auth-tabs">
         <button class="auth-tab ${login?'on':''}" id="tLogin">Entrar</button>

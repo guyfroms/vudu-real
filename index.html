@@ -909,7 +909,7 @@ async function loadProfile(){
     totalDeps=(posts||[]).reduce((s,p)=>s+(p.dep_count||0),0);
   }catch(e){totalDeps=0;}
   if(profile&&user.email&&!profile.email){
-    await sb.from('profiles').update({email:user.email}).eq('id',user.id).catch(()=>{});
+    try{await sb.from('profiles').update({email:user.email}).eq('id',user.id);}catch(e){}
     profile.email=user.email;
   }
 }
@@ -1078,7 +1078,7 @@ async function loadSeñales(){
   // Fetch new items since last check
   const lastCheck=parseInt(localStorage.getItem('señalesCheck')||'0');
   const since=new Date(lastCheck||Date.now()-86400000*7).toISOString();
-  const {data:myPosts}=await sb.from('posts').select('id').eq('user_id',user.id).gte('post_date',new Date(Date.now()-86400000*30).toISOString().slice(0,10)).catch(()=>({data:[]}));
+  let myPosts;try{({data:myPosts}=await sb.from('posts').select('id').eq('user_id',user.id).gte('post_date',new Date(Date.now()-86400000*30).toISOString().slice(0,10)));}catch(e){myPosts=[];}
   const myPostIds=(myPosts||[]).map(p=>p.id);
   const queries=[
     sb.from('follows').select('created_at,follower_id,profiles!follower_id(username)').eq('following_id',user.id).gt('created_at',since).order('created_at',{ascending:false}),
@@ -1120,7 +1120,7 @@ async function doSignUp(email,pass,uname,color){
   const {data,error}=await sb.auth.signUp({email,password:pass,options:{data:{username:uname}}});
   if(error)return sbErr(error.message);
   if(data.user){
-    await sb.from('profiles').upsert({id:data.user.id,username:uname,doll_color:color,email:email}).catch(()=>{});
+    try{await sb.from('profiles').upsert({id:data.user.id,username:uname,doll_color:color,email:email});}catch(e){}
   }
   return{user:data.user,session:data.session};
 }
@@ -1156,7 +1156,7 @@ async function navToHome(errEl,btn,btnLabel){
       user=s.user;
     }
     await loadProfile();
-    if(!profile){const u=user.user_metadata?.username||user.email.split('@')[0];await sb.from('profiles').upsert({id:user.id,username:u,doll_color:DOLL_COLORS[0],email:user.email}).catch(()=>{});await loadProfile();}
+    if(!profile){const u=user.user_metadata?.username||user.email.split('@')[0];try{await sb.from('profiles').upsert({id:user.id,username:u,doll_color:DOLL_COLORS[0],email:user.email});}catch(e){}await loadProfile();}
     await loadTodayPost();
     await loadFollows();
     if(todayPost){await loadFeed();view='feed';}else{view='home';}
@@ -1356,7 +1356,7 @@ function shell(content){
   ge('btnAmigos').onclick=async()=>{view='amigos';paint();};
   ge('navHoy').onclick=()=>{view='home';paint();};
   ge('navFeed').onclick=async()=>{await loadFeed();view='feed';paint();};
-  ge('navSeñales').onclick=async()=>{señalesBadge=false;window._señalesItems=await loadSeñales();view='señales';paint();};
+  ge('navSeñales').onclick=async()=>{señalesBadge=false;try{window._señalesItems=await loadSeñales();}catch(e){window._señalesItems=[];}view='señales';paint();};
   ge('navMuertes').onclick=()=>{view='muertes';paint()};
   ge('logoBtn').onclick=async()=>{await loadFeed();view='feed';paint();};
   attachListeners();
@@ -1421,7 +1421,7 @@ async function loadProfileData(uid){
     sb.from('deps').select('dep_count:post_id.count()').eq('user_id',uid),
   ]).catch(()=>[{data:null},{data:[]},{data:[]}]);
   // total deps = sum of dep_count across their posts
-  const {data:depSum}=await sb.from('posts').select('dep_count').eq('user_id',uid).catch(()=>({data:[]}));
+  let depSum;try{({data:depSum}=await sb.from('posts').select('dep_count').eq('user_id',uid));}catch(e){depSum=[];}
   const totalD=(depSum||[]).reduce((s,p)=>s+(p.dep_count||0),0);
   return {prof:prof||{}, posts:posts||[], totalDeps:totalD};
 }
@@ -1793,7 +1793,7 @@ function feedCardHTML(item,older=false){
 function renderCemetery(){
   if(!cemeteryPosts){
     (async()=>{
-      const {data}=await sb.from('posts').select('*').eq('user_id',user.id).eq('is_primary',true).order('created_at',{ascending:false}).limit(50).catch(()=>({data:[]}));
+      let data;try{({data}=await sb.from('posts').select('*').eq('user_id',user.id).eq('is_primary',true).order('created_at',{ascending:false}).limit(50));}catch(e){data=[];}
       cemeteryPosts=data||[];
       paint();
     })();
@@ -1959,14 +1959,14 @@ function attachListeners(){
     if(ge('btnDeletePost'))ge('btnDeletePost').onclick=async()=>{
       if(!confirm(t('confirm_delete')))return;
       await sb.from('posts').delete().eq('id',todayPost.id).eq('user_id',user.id);
-      await sb.from('profiles').update({streak:Math.max(0,(profile.streak||1)-1),last_post_date:null}).eq('id',user.id).catch(()=>{});
+      try{await sb.from('profiles').update({streak:Math.max(0,(profile.streak||1)-1),last_post_date:null}).eq('id',user.id);}catch(e){}
       profile.streak=Math.max(0,(profile.streak||1)-1);
       todayPost=null;todayPrevPost=null;cemeteryPosts=null;view='home';paint();
     };
     if(ge('btnCemetery'))ge('btnCemetery').onclick=()=>{view='cementerio';paint();};
     if(ge('cemeteryCount')){
       (async()=>{
-        const {count}=await sb.from('posts').select('id',{count:'exact',head:true}).eq('user_id',user.id).eq('is_primary',true).catch(()=>({count:0}));
+        let count=0;try{({count}=await sb.from('posts').select('id',{count:'exact',head:true}).eq('user_id',user.id).eq('is_primary',true));}catch(e){}
         const el=ge('cemeteryCount');
         if(el)el.textContent=t('cemetery_sub').replace('$n',count||0);
       })();
@@ -2027,7 +2027,7 @@ function attachListeners(){
         clearTimeout(debounce);
         if(!searchQuery){searchResults=null;paint();return;}
         debounce=setTimeout(async()=>{
-          const {data}=await sb.from('profiles').select('*').ilike('username','%'+searchQuery+'%').limit(20).catch(()=>({data:[]}));
+          let data;try{({data}=await sb.from('profiles').select('*').ilike('username','%'+searchQuery+'%').limit(20));}catch(e){data=[];}
           searchResults=data||[];
           paint();
         },300);
@@ -2065,7 +2065,7 @@ function attachListeners(){
     if(ge('btnSaveBirthday'))ge('btnSaveBirthday').onclick=async()=>{
       const val=ge('birthdayInput').value;
       if(!val)return;
-      await sb.from('profiles').update({birth_date:val}).eq('id',user.id).catch(()=>{});
+      try{await sb.from('profiles').update({birth_date:val}).eq('id',user.id);}catch(e){}
       profile.birth_date=val;
       const btn=ge('btnSaveBirthday');if(btn){btn.textContent='✓';setTimeout(()=>{if(btn)btn.textContent=t('btn_save_birthday');},2000);}
     };
@@ -2084,7 +2084,7 @@ function attachListeners(){
       amigosTab='followers';
       if(followersList===null){
         (async()=>{
-          const {data}=await sb.from('follows').select('follower_id,profiles!follower_id(*)').eq('following_id',user.id).catch(()=>({data:[]}));
+          let data;try{({data}=await sb.from('follows').select('follower_id,profiles!follower_id(*)').eq('following_id',user.id));}catch(e){data=[];}
           followersList=(data||[]).map(r=>r['profiles!follower_id']||r.profiles||{}).filter(Boolean);
           paint();
         })();
@@ -2095,7 +2095,7 @@ function attachListeners(){
       (async()=>{
         const ids=[...myFollowing];
         if(!ids.length){friendsList=[];paint();return;}
-        const {data}=await sb.from('profiles').select('*').in('id',ids).catch(()=>({data:[]}));
+        let data;try{({data}=await sb.from('profiles').select('*').in('id',ids));}catch(e){data=[];}
         friendsList=data||[];
         paint();
       })();
@@ -2114,7 +2114,7 @@ function attachListeners(){
       muertesTab='logros';
       if(!cemeteryPosts){
         (async()=>{
-          const {data}=await sb.from('posts').select('*').eq('user_id',user.id).eq('is_primary',true).order('created_at',{ascending:false}).limit(200).catch(()=>({data:[]}));
+          let data;try{({data}=await sb.from('posts').select('*').eq('user_id',user.id).eq('is_primary',true).order('created_at',{ascending:false}).limit(200));}catch(e){data=[];}
           cemeteryPosts=data||[];paint();
         })();
       }
@@ -2261,7 +2261,7 @@ async function init(){
       authStep='form';view='auth';paint();
     } else if(event==='PASSWORD_RECOVERY'){
       view='recovery';paint();
-    } else if((event==='SIGNED_IN'||event==='USER_UPDATED')&&session?.user&&!navigating){
+    } else if((event==='SIGNED_IN'||event==='USER_UPDATED')&&session?.user&&!navigating&&view!=='recovery'){
       if(view==='loading'||view==='verify'||view==='auth'){
         navigating=true;user=session.user;
         await navToHome();
@@ -2276,7 +2276,7 @@ async function init(){
       await loadProfile();
       if(!profile){
         const u=user.user_metadata?.username||user.email.split('@')[0];
-        await sb.from('profiles').upsert({id:user.id,username:u,doll_color:DOLL_COLORS[0],email:user.email}).catch(()=>{});
+        try{await sb.from('profiles').upsert({id:user.id,username:u,doll_color:DOLL_COLORS[0],email:user.email});}catch(e){}
         await loadProfile();
       }
       await loadTodayPost();

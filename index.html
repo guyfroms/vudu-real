@@ -448,6 +448,13 @@ const ICO={
   question:`<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7.5" stroke="currentColor" stroke-width="1.6"/><path d="M7 7c0-1.1.9-2 2-2s2 .9 2 2c0 .8-.5 1.4-1.2 1.7C9.3 9 9 9.5 9 10v.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="9" cy="13" r=".8" fill="currentColor"/></svg>`,
 };
 
+function icoStat(svg,targetH=20){
+  const m=svg.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/);
+  if(!m)return svg;
+  const nw=Math.round(targetH*(+m[1])/(+m[2]));
+  return svg.replace(/width="\d+"/, `width="${nw}"`).replace(/height="\d+"/, `height="${targetH}"`);
+}
+
 // ── State ──────────────────────────────────────────────
 let user=null,profile=null,view="loading",todayPost=null;
 let feedData=[],myDeps=new Set(),myFollowing=new Set();
@@ -809,10 +816,10 @@ async function toggleFollow(uid){
 
 // ── Onboarding ────────────────────────────────────────
 const SLIDES=[
-  {icon:'💀',title:'kill.me',body:`¿Alguna vez has dicho <em>"pues me mato"</em> después de un día de mierda?\n\nEsta app es exactamente eso. Un sitio para soltar tu <em>ruina del día</em>, matar a tu muñeco por lo que te ha pasado, y seguir adelante sin idealizarlo.`},
-  {icon:'🕯️',title:'¿Qué es un DEP?',body:`Tus amigos ven tu ruina en el feed y te mandan un <em>DEP</em> — Descanse En Paz.\n\nComo un like, pero para lo peor de tu día. Cuantos más DEPs, más se solidarizan con tu tragedia.`},
-  {icon:'🔓',title:'Las muertes',body:`Cada día que publicas tu ruina, desbloqueas nuevas formas de matar a tu muñeco: quemado, acribillado, electrocutado...\n\nMantén la <em>racha</em> y acumula DEPs para desbloquearlas todas.`},
-  {icon:'📅',title:'Una al día',body:`Solo puedes publicar <em>una ruina al día</em>. Si el día mejora (o empeora), puedes actualizarla.\n\nLa app te recuerda que la vida da para un "pues me mato" al día — no más.`},
+  {icon:()=>icoStat(ICO.skull,48),title:'kill.me',body:`¿Alguna vez has dicho <em>"pues me mato"</em> después de un día de mierda?\n\nEsta app es exactamente eso. Suelta tu <em>ruina del día</em>, mata a tu muñeco, y sigue adelante.`},
+  {icon:()=>icoStat(ICO.candle,48),title:'¿Qué es un DEP?',body:`Tus amigos ven tu ruina en el feed y te mandan un <em>DEP</em> — Descanse En Paz.\n\nComo un like, pero para lo peor de tu día. Cuantos más DEPs, más se solidarizan con tu tragedia.`},
+  {icon:()=>icoStat(ICO.skull,48),title:'Las muertes',body:`Cada día que publicas tu ruina, desbloqueas nuevas formas de matar a tu muñeco: quemado, acribillado, electrocutado...\n\nMantén la <em>racha</em> y acumula DEPs para desbloquearlas todas.`},
+  {icon:()=>icoStat(ICO.flame,48),title:'Una al día',body:`Solo puedes publicar <em>una ruina al día</em>. Si el día mejora (o empeora), puedes actualizarla.\n\nRecuerda que la vida da para un "pues me mato" al día — no más.`},
 ];
 function showOnboarding(){
   if(document.getElementById('onboarding'))return;
@@ -823,7 +830,7 @@ function showOnboarding(){
     const s=SLIDES[cur];
     el.innerHTML=`<div class="modal-card">
       <div class="modal-slide on">
-        <div class="modal-slide-icon">${s.icon}</div>
+        <div class="modal-slide-icon" style="color:var(--warm)">${typeof s.icon==='function'?s.icon():s.icon}</div>
         <h2>${s.title}</h2>
         <p>${s.body.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p>
       </div>
@@ -1277,7 +1284,7 @@ function renderHome(){
       </div>
       <div class="done-card">
         <div class="done-castigo">${lbl}</div>
-        <div style="color:var(--muted);font-size:clamp(11px,2.8vw,12px);margin-top:8px;letter-spacing:.3px;">${ICO.candle} ${totalDeps} DEPs totales recibidos</div>
+        <div style="color:var(--muted);font-size:clamp(11px,2.8vw,12px);margin-top:8px;letter-spacing:.3px;display:flex;align-items:center;justify-content:center;gap:5px;">${icoStat(ICO.candle,'14px')} ${p.dep_count||0} DEPs recibidos</div>
         ${hasPrev?`
           <button class="prev-toggle ${isOpen?'open':''}" id="btnTogglePrev">
             <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -1502,12 +1509,12 @@ function renderAjustes(){
     </div>
     <div class="stat-row">
       <div class="stat-block">
-        <div class="stat-num">${streak}</div>
-        <div class="stat-label">${ICO.flame} racha</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px;">${icoStat(ICO.flame)}<div class="stat-num">${streak}</div></div>
+        <div class="stat-label">racha del día</div>
       </div>
       <div class="stat-block">
-        <div class="stat-num blue">${totalDeps}</div>
-        <div class="stat-label">${ICO.candle} DEPs totales</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px;">${icoStat(ICO.candle)}<div class="stat-num blue">${totalDeps}</div></div>
+        <div class="stat-label">DEPs totales</div>
       </div>
     </div>
     <div style="height:1px;background:var(--border);margin:clamp(20px,5vw,26px) 0;"></div>

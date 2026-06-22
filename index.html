@@ -392,7 +392,7 @@ body::before{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;
 .action-btn.warm:hover{border-color:rgba(176,120,48,.45);background:rgba(176,120,48,.04);}
 
 /* ── Cemetery clickable rows ── */
-.cemetery-row{display:flex;gap:12px;align-items:flex-start;padding:clamp(12px,3vw,16px) 0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .13s;border-radius:6px;}
+.cemetery-row{display:flex;gap:12px;align-items:flex-start;padding:clamp(12px,3vw,16px) 0;border-bottom:1px solid var(--border);border-radius:6px;}
 .cemetery-row:last-child{border-bottom:none;}
 .cemetery-row:active{opacity:.7;}
 .cemetery-expanded{margin-top:10px;padding:12px;background:var(--bg2);border-radius:8px;animation:fadeUp .18s ease;}
@@ -419,7 +419,7 @@ const LINE_WIDTHS=[2,4,8];
 let lang=localStorage.getItem('kill_lang')||(navigator.language.startsWith('es')?'es':'en');
 const STRINGS={
   es:{
-    nav_hoy:'Hoy',nav_feed:'Funeral',nav_senales:'Actividad',nav_muertes:'Castigos',
+    nav_hoy:'Hoy',nav_feed:'Funeral',nav_senales:'Actividad',nav_muertes:'Almacén',
     login_tab:'Entrar',register_tab:'Registrarse',
     auth_tagline:'"pues me mato."',auth_sub:'Hay desgracias que acaban contigo.',
     auth_beat1:'Cuenta tu ruina del día',auth_beat2:'Elige cómo muere tu muñeco',auth_beat3:'Recibe DEPs de tus amigos',
@@ -479,7 +479,7 @@ const STRINGS={
     vis_label:'Visibilidad',vis_public:'🌍 Público · aparece en el feed global',vis_friends:'👥 Amigos · solo lo ven tus amigos',vis_private:'🔒 Privado · solo lo ves tú',
     cemetery_title:'Cementerio',cemetery_sub:'$n desgracias enterradas',cemetery_empty:'Aún no tienes ninguna desgracia enterrada.',cemetery_loading:'Cargando...',btn_cemetery:'Ver cementerio',
     following_tab:'Siguiendo',followers_tab:'Seguidores',no_followers:'Todavía nadie te sigue.',
-    logros_title:'Logros',castigos_tab:'Castigos',logros_tab:'Logros',
+    logros_title:'Logros',castigos_tab:'Almacén',logros_tab:'Logros',
     lbl_birthday:'Fecha de nacimiento',btn_save_birthday:'Guardar',
     btn_share:'Compartir ruina',
     feed_yesterday:'Anteriores · ya enterradas',feed_tomb_hide:'ocultar',
@@ -487,7 +487,7 @@ const STRINGS={
     btn_load_more:'Ver más →',btn_worse_short:'Ha ido a peor',btn_share_short:'Compartir',
   },
   en:{
-    nav_hoy:'Today',nav_feed:'Funeral',nav_senales:'Activity',nav_muertes:'Punishments',
+    nav_hoy:'Today',nav_feed:'Funeral',nav_senales:'Activity',nav_muertes:'Collection',
     login_tab:'Log in',register_tab:'Sign up',
     auth_tagline:'"ugh, kill me."',auth_sub:'Some days just wreck you.',
     auth_beat1:'Share your daily disaster',auth_beat2:'Choose how your doll dies',auth_beat3:'Get DEPs from your friends',
@@ -547,7 +547,7 @@ const STRINGS={
     vis_label:'Visibility',vis_public:'🌍 Public · appears in the global feed',vis_friends:'👥 Friends · only your friends see it',vis_private:'🔒 Private · only you see it',
     cemetery_title:'Cemetery',cemetery_sub:'$n ruinas buried',cemetery_empty:"You don't have any buried ruinas yet.",cemetery_loading:'Loading...',btn_cemetery:'View cemetery',
     following_tab:'Following',followers_tab:'Followers',no_followers:"Nobody is following you yet.",
-    logros_title:'Achievements',castigos_tab:'Punishments',logros_tab:'Achievements',
+    logros_title:'Achievements',castigos_tab:'Collection',logros_tab:'Achievements',
     lbl_birthday:'Date of birth',btn_save_birthday:'Save',
     btn_share:'Share ruina',
     feed_yesterday:'Previous · already buried',feed_tomb_hide:'hide',
@@ -571,25 +571,45 @@ const DEATHS=[
 const DEATH_LABELS=Object.fromEntries(DEATHS.map(d=>[d.id,d.label]));
 function dl(id){const d=DEATHS.find(x=>x.id===id);if(!d)return id;return(lang==='en'&&d.en)?d.en:d.label;}
 
+// Mercury retrograde periods (start, end inclusive)
+const MERCURY_RX=[['2023-12-13','2024-01-01'],['2024-04-01','2024-04-25'],['2024-08-05','2024-08-28'],['2024-11-26','2024-12-15'],['2025-03-15','2025-04-07'],['2025-07-18','2025-08-11'],['2025-11-09','2025-11-29'],['2026-03-03','2026-03-25'],['2026-06-29','2026-07-22'],['2026-10-16','2026-11-08']];
+function inMercuryRx(dateStr){return MERCURY_RX.some(([s,e])=>dateStr>=s&&dateStr<=e);}
+function getZodiacSign(bdate){const m=bdate.getMonth()+1,d=bdate.getDate();if((m===3&&d>=21)||(m===4&&d<=19))return'aries';if((m===4&&d>=20)||(m===5&&d<=20))return'tauro';if((m===5&&d>=21)||(m===6&&d<=20))return'géminis';if((m===6&&d>=21)||(m===7&&d<=22))return'cáncer';if((m===7&&d>=23)||(m===8&&d<=22))return'leo';if((m===8&&d>=23)||(m===9&&d<=22))return'virgo';if((m===9&&d>=23)||(m===10&&d<=22))return'libra';if((m===10&&d>=23)||(m===11&&d<=21))return'escorpio';if((m===11&&d>=22)||(m===12&&d<=21))return'sagitario';if((m===12&&d>=22)||(m===1&&d<=19))return'capricornio';if((m===1&&d>=20)||(m===2&&d<=18))return'acuario';return'piscis';}
+
+// SVG icons for achievements (consistent with app icon language)
+const AI={
+  candle:`<svg width="18" height="22" viewBox="0 0 18 22" fill="none"><path d="M9 1C9 1 11.5 4.5 11.5 6.5C11.5 8.1 10.4 9 9 9C7.6 9 6.5 8.1 6.5 6.5C6.5 5 7.5 3.5 7.5 3.5S7.8 5 8.5 5C8.5 5 8.2 2.8 9 1Z" fill="currentColor"/><line x1="9" y1="9" x2="9" y2="12" stroke="currentColor" stroke-width="1.5"/><rect x="5" y="12" width="8" height="9" rx="2" fill="currentColor" opacity=".7"/></svg>`,
+  flame:`<svg width="14" height="18" viewBox="0 0 13 17" fill="currentColor"><path d="M6.5 0C6.5 0 11 5.5 11 9.5C11 12.5 9.1 15 6.5 15C3.9 15 2 12.5 2 9.5C2 7.5 3 6 3 6C3 6 4 8 5.5 8C5.5 8 4.5 4.5 6.5 0Z"/></svg>`,
+  skull:`<svg width="20" height="22" viewBox="0 0 20 22" fill="none"><path d="M10 2C5.58 2 2 5.36 2 9.5c0 2.5 1.28 4.7 3.2 6.1V18a1 1 0 0 0 1 1h7.6a1 1 0 0 0 1-1v-2.4C16.72 14.2 18 12 18 9.5 18 5.36 14.42 2 10 2Z" stroke="currentColor" stroke-width="1.7"/><circle cx="7" cy="10" r="1.6" fill="currentColor"/><circle cx="13" cy="10" r="1.6" fill="currentColor"/><path d="M7 19v2M10 19v2M13 19v2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`,
+  tomb:`<svg width="16" height="22" viewBox="0 0 16 22" fill="none"><path d="M1 9C1 4.58 4.13 1 8 1C11.87 1 15 4.58 15 9V21H1V9Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 5v5M5.5 7.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+  star:`<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2l2.4 4.9L18 8l-4 3.9.9 5.6L10 15 5.1 17.4 6 11.9 2 8l5.6-1.1L10 2z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>`,
+  clock:`<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v4.5l3 1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  cake:`<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="10" width="16" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 10V8M10 10V8M15 10V8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M5 8C5 6.5 6 5.5 6 4.5C6 5.5 7 6.5 7 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 8C10 6.5 11 5.5 11 4.5C11 5.5 12 6.5 12 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  planet:`<svg width="22" height="20" viewBox="0 0 22 20" fill="none"><circle cx="11" cy="10" r="4.5" stroke="currentColor" stroke-width="1.6"/><path d="M1.5 14C4 11 7.5 9 11 10C14.5 11 18 13.5 20.5 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+  snow:`<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2v16M2 10h16M4.2 4.2l11.6 11.6M15.8 4.2L4.2 15.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="10" r="2" fill="currentColor"/></svg>`,
+  moon:`<svg width="18" height="20" viewBox="0 0 18 20" fill="none"><path d="M15 11A7 7 0 0 1 7 3a7 7 0 1 0 8 8z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>`,
+};
+
 const ACHIEVEMENTS=[
-  {id:'dep1',  cat:'dep',    icon:'🕯', title_es:'Primera vela',    title_en:'First candle',   desc_es:'Recibe tu primer DEP',        desc_en:'Receive your first DEP',    check:s=>s.totalDeps>=1},
-  {id:'dep10', cat:'dep',    icon:'🕯', title_es:'10 velas',        title_en:'10 candles',     desc_es:'Acumula 10 DEPs',             desc_en:'Collect 10 DEPs',           check:s=>s.totalDeps>=10},
-  {id:'dep100',cat:'dep',    icon:'🕯', title_es:'100 velas',       title_en:'100 candles',    desc_es:'Acumula 100 DEPs',            desc_en:'Collect 100 DEPs',          check:s=>s.totalDeps>=100},
-  {id:'dep500',cat:'dep',    icon:'🕯', title_es:'500 velas',       title_en:'500 candles',    desc_es:'Acumula 500 DEPs',            desc_en:'Collect 500 DEPs',          check:s=>s.totalDeps>=500},
-  {id:'dep1k', cat:'dep',    icon:'🕯', title_es:'1000 velas',      title_en:'1000 candles',   desc_es:'Acumula 1000 DEPs',           desc_en:'Collect 1000 DEPs',         check:s=>s.totalDeps>=1000},
-  {id:'s7',    cat:'racha',  icon:'🔥', title_es:'Primera semana',  title_en:'First week',     desc_es:'7 días de racha',             desc_en:'7-day streak',              check:s=>s.streak>=7},
-  {id:'s30',   cat:'racha',  icon:'🔥', title_es:'Primer mes',      title_en:'First month',    desc_es:'30 días de racha',            desc_en:'30-day streak',             check:s=>s.streak>=30},
-  {id:'s100',  cat:'racha',  icon:'🔥', title_es:'Centenario',      title_en:'Centenarian',    desc_es:'100 días de racha',           desc_en:'100-day streak',            check:s=>s.streak>=100},
-  {id:'p1',    cat:'ruinas', icon:'⚰️', title_es:'Primera desgracia',title_en:'First ruina',  desc_es:'Publica tu primera desgracia',desc_en:'Publish your first ruina',  check:s=>s.postCount>=1},
-  {id:'p10',   cat:'ruinas', icon:'⚰️', title_es:'Decena',          title_en:'Ten down',       desc_es:'10 desgracias publicadas',    desc_en:'10 ruinas published',       check:s=>s.postCount>=10},
-  {id:'p50',   cat:'ruinas', icon:'⚰️', title_es:'Cincuentena',     title_en:'Fifty',          desc_es:'50 desgracias publicadas',    desc_en:'50 ruinas published',       check:s=>s.postCount>=50},
-  {id:'p100',  cat:'ruinas', icon:'⚰️', title_es:'El centenar',     title_en:'The century',    desc_es:'100 desgracias publicadas',   desc_en:'100 ruinas published',      check:s=>s.postCount>=100},
-  {id:'vr13',  cat:'special',icon:'🪦', title_es:'Viernes 13',      title_en:'Friday the 13th',desc_es:'Publica una desgracia en viernes 13',desc_en:'Post a ruina on Friday the 13th',check:s=>(s.posts||[]).some(p=>{const d=new Date(p.post_date||p.created_at);return d.getDay()===5&&d.getDate()===13;})},
-  {id:'xmas',  cat:'special',icon:'🎄', title_es:'Navidad en familia',title_en:'Xmas family',  desc_es:'Publica entre el 24 y el 25 de diciembre',desc_en:'Post on Dec 24th or 25th',check:s=>(s.posts||[]).some(p=>{const d=new Date(p.post_date||p.created_at);return d.getMonth()===11&&(d.getDate()===24||d.getDate()===25);})},
-  {id:'ny',    cat:'special',icon:'🎆', title_es:'Feliz año nuevo',  title_en:'Happy New Year', desc_es:'Publica el 1 de enero',       desc_en:'Post on January 1st',       check:s=>(s.posts||[]).some(p=>{const d=new Date(p.post_date||p.created_at);return d.getMonth()===0&&d.getDate()===1;})},
-  {id:'late',  cat:'special',icon:'😩', title_es:'La gota que colmó el vaso',title_en:'The last straw',desc_es:'Publica una desgracia a las 23:xx',desc_en:'Post a ruina at 23:xx',check:s=>(s.posts||[]).some(p=>{const d=new Date(p.created_at);return d.getHours()===23;})},
-  {id:'wknd',  cat:'special',icon:'🥴', title_es:'Resaca emocional', title_en:'Emotional hangover',desc_es:'Publica sábado y domingo consecutivos',desc_en:'Post on consecutive Saturday and Sunday',check:s=>{const dates=(s.posts||[]).map(p=>p.post_date||p.created_at.slice(0,10));for(let i=0;i<dates.length;i++){const d=new Date(dates[i]);if(d.getDay()===0){const sat=new Date(d);sat.setDate(sat.getDate()-1);const satStr=sat.toISOString().slice(0,10);if(dates.includes(satStr))return true;}}return false;}},
-  {id:'bday',  cat:'special',icon:'🎂', title_es:"No era tu día",   title_en:'Not your day',   desc_es:'Publica una desgracia en tu cumpleaños',desc_en:'Post on your birthday', check:s=>{if(!s.birthDate)return false;const b=new Date(s.birthDate);return(s.posts||[]).some(p=>{const d=new Date(p.post_date||p.created_at);return d.getMonth()===b.getMonth()&&d.getDate()===b.getDate();});}},
+  {id:'dep1',  cat:'dep',    icon:AI.candle,secret:false,title_es:'Primera vela',    title_en:'First candle',   desc_es:'Recibe tu primer DEP',        desc_en:'Receive your first DEP',    check:s=>s.totalDeps>=1},
+  {id:'dep10', cat:'dep',    icon:AI.candle,secret:false,title_es:'10 velas',        title_en:'10 candles',     desc_es:'Acumula 10 DEPs',             desc_en:'Collect 10 DEPs',           check:s=>s.totalDeps>=10},
+  {id:'dep100',cat:'dep',    icon:AI.candle,secret:false,title_es:'100 velas',       title_en:'100 candles',    desc_es:'Acumula 100 DEPs',            desc_en:'Collect 100 DEPs',          check:s=>s.totalDeps>=100},
+  {id:'dep500',cat:'dep',    icon:AI.candle,secret:false,title_es:'500 velas',       title_en:'500 candles',    desc_es:'Acumula 500 DEPs',            desc_en:'Collect 500 DEPs',          check:s=>s.totalDeps>=500},
+  {id:'dep1k', cat:'dep',    icon:AI.candle,secret:false,title_es:'1000 velas',      title_en:'1000 candles',   desc_es:'Acumula 1000 DEPs',           desc_en:'Collect 1000 DEPs',         check:s=>s.totalDeps>=1000},
+  {id:'s7',    cat:'racha',  icon:AI.flame, secret:false,title_es:'Primera semana',  title_en:'First week',     desc_es:'7 días de racha',             desc_en:'7-day streak',              check:s=>s.streak>=7},
+  {id:'s30',   cat:'racha',  icon:AI.flame, secret:false,title_es:'Primer mes',      title_en:'First month',    desc_es:'30 días de racha',            desc_en:'30-day streak',             check:s=>s.streak>=30},
+  {id:'s100',  cat:'racha',  icon:AI.flame, secret:false,title_es:'Centenario',      title_en:'Centenarian',    desc_es:'100 días de racha',           desc_en:'100-day streak',            check:s=>s.streak>=100},
+  {id:'p1',    cat:'ruinas', icon:AI.skull, secret:false,title_es:'Primera desgracia',title_en:'First ruina',  desc_es:'Publica tu primera desgracia',desc_en:'Publish your first ruina',  check:s=>s.postCount>=1},
+  {id:'p10',   cat:'ruinas', icon:AI.skull, secret:false,title_es:'Decena',          title_en:'Ten down',       desc_es:'10 desgracias publicadas',    desc_en:'10 ruinas published',       check:s=>s.postCount>=10},
+  {id:'p50',   cat:'ruinas', icon:AI.skull, secret:false,title_es:'Cincuentena',     title_en:'Fifty',          desc_es:'50 desgracias publicadas',    desc_en:'50 ruinas published',       check:s=>s.postCount>=50},
+  {id:'p100',  cat:'ruinas', icon:AI.skull, secret:false,title_es:'El centenar',     title_en:'The century',    desc_es:'100 desgracias publicadas',   desc_en:'100 ruinas published',      check:s=>s.postCount>=100},
+  {id:'vr13',  cat:'special',icon:AI.tomb,  secret:true, title_es:'Viernes 13',      title_en:'Friday the 13th',desc_es:'Publica una desgracia en viernes 13',desc_en:'Post a ruina on Friday the 13th',check:s=>(s.posts||[]).some(p=>{const d=new Date(p.post_date||p.created_at);return d.getDay()===5&&d.getDate()===13;})},
+  {id:'xmas',  cat:'special',icon:AI.snow,  secret:true, title_es:'Navidad en familia',title_en:'Xmas family', desc_es:'Publica entre el 24 y el 25 de diciembre',desc_en:'Post on Dec 24th or 25th',check:s=>(s.posts||[]).some(p=>{const d=new Date(p.post_date||p.created_at);return d.getMonth()===11&&(d.getDate()===24||d.getDate()===25);})},
+  {id:'ny',    cat:'special',icon:AI.star,  secret:true, title_es:'Feliz año nuevo',  title_en:'Happy New Year',desc_es:'Publica el 1 de enero',        desc_en:'Post on January 1st',       check:s=>(s.posts||[]).some(p=>{const d=new Date(p.post_date||p.created_at);return d.getMonth()===0&&d.getDate()===1;})},
+  {id:'late',  cat:'special',icon:AI.clock, secret:true, title_es:'La gota que colmó el vaso',title_en:'The last straw',desc_es:'Publica una desgracia a las 23:59',desc_en:'Post a ruina at 23:59',check:s=>(s.posts||[]).some(p=>{const d=new Date(p.created_at);return d.getHours()===23;})},
+  {id:'wknd',  cat:'special',icon:AI.moon,  secret:true, title_es:'Resaca emocional', title_en:'Emotional hangover',desc_es:'Publica sábado y domingo consecutivos',desc_en:'Post on consecutive Saturday and Sunday',check:s=>{const dates=(s.posts||[]).map(p=>p.post_date||p.created_at.slice(0,10));for(let i=0;i<dates.length;i++){const d=new Date(dates[i]);if(d.getDay()===0){const sat=new Date(d);sat.setDate(sat.getDate()-1);const satStr=sat.toISOString().slice(0,10);if(dates.includes(satStr))return true;}}return false;}},
+  {id:'bday',  cat:'special',icon:AI.cake,  secret:false,title_es:"No era tu día",   title_en:'Not your day',  desc_es:'Publica una desgracia en tu cumpleaños',desc_en:'Post on your birthday', check:s=>{if(!s.birthDate)return false;const b=new Date(s.birthDate);return(s.posts||[]).some(p=>{const d=new Date(p.post_date||p.created_at);return d.getMonth()===b.getMonth()&&d.getDate()===b.getDate();});}},
+  {id:'mercury',cat:'special',icon:AI.planet,secret:true,title_es:'Mercurio retrógrado',title_en:'Mercury retrograde',desc_es:'Publica durante Mercurio retrógrado',desc_en:'Post during Mercury retrograde',check:s=>{if(!s.birthDate)return false;return(s.posts||[]).some(p=>inMercuryRx(p.post_date||p.created_at.slice(0,10)));}}
 ];
 
 function computeAchievements(posts){
@@ -637,7 +657,7 @@ const ICO={
   people:`<svg width="22" height="20" viewBox="0 0 22 20" fill="none"><circle cx="8" cy="5" r="3.2" stroke="currentColor" stroke-width="1.7"/><path d="M1 19c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="17" cy="5" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M20 19c0-2.8-1.6-5.2-4-6.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
   question:`<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7.5" stroke="currentColor" stroke-width="1.6"/><path d="M7 7c0-1.1.9-2 2-2s2 .9 2 2c0 .8-.5 1.4-1.2 1.7C9.3 9 9 9.5 9 10v.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="9" cy="13" r=".8" fill="currentColor"/></svg>`,
   search:`<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>`,
-  tombstone:`<svg width="18" height="22" viewBox="0 0 18 22" fill="none"><rect x="2" y="4" width="14" height="14" rx="7" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="4" y="14" width="10" height="6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6 8.5h6M9 7v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+  tombstone:`<svg width="16" height="22" viewBox="0 0 16 22" fill="none"><path d="M1 9C1 4.58 4.13 1 8 1C11.87 1 15 4.58 15 9V21H1V9Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 5v5M5.5 7.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
 };
 
 function icoStat(svg,targetH=20){
@@ -1881,10 +1901,9 @@ function renderCemetery(){
       </div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">${lbl} <span style="opacity:.5;font-weight:400;text-transform:none;">· ${dateStr}</span></div>
-        <div style="font-size:clamp(13px,3.5vw,14px);color:var(--text2);font-style:italic;${isOpen?'':'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'}">"${esc(p.razon)}"</div>
-        ${isOpen?`<div style="margin-top:6px;font-size:clamp(10px,2.5vw,11px);color:var(--muted2);">${ICO.candle} ${p.dep_count||0} DEPs</div>`:`<div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-top:3px;">${ICO.candle} ${p.dep_count||0} DEPs</div>`}
+        <div style="font-size:clamp(13px,3.5vw,14px);color:var(--text2);font-style:italic;line-height:1.5;">"${esc(p.razon)}"</div>
+        <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-top:4px;">${ICO.candle} ${p.dep_count||0} DEPs</div>
       </div>
-      <div style="flex-shrink:0;color:var(--muted);font-size:18px;transition:transform .2s;${isOpen?'transform:rotate(90deg)':''}">›</div>
     </div>`;
   }).join('');
   return `<div class="screen">
@@ -1898,15 +1917,18 @@ function renderLogros(){
   const posts=cemeteryPosts||[];
   const list=computeAchievements(posts);
   const unlocked=list.filter(a=>a.unlocked).length;
-  const rows=list.map(a=>`
-    <div style="display:flex;gap:12px;align-items:center;padding:clamp(10px,2.5vw,12px) 0;border-bottom:1px solid var(--border);opacity:${a.unlocked?1:.4};">
-      <div style="font-size:clamp(22px,5vw,26px);flex-shrink:0;width:36px;text-align:center;">${a.icon}</div>
+  const lockICO=`<svg width="18" height="20" viewBox="0 0 18 20" fill="none"><rect x="2" y="9" width="14" height="10" rx="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M5 9V6a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+  const rows=list.map(a=>{
+    const hidden=a.secret&&!a.unlocked;
+    return`<div style="display:flex;gap:12px;align-items:center;padding:clamp(10px,2.5vw,12px) 0;border-bottom:1px solid var(--border);opacity:${a.unlocked?1:hidden?.3:.45};">
+      <div style="flex-shrink:0;width:36px;display:flex;align-items:center;justify-content:center;color:${a.unlocked?'var(--warm)':'var(--muted2)'};">${hidden?lockICO:a.icon}</div>
       <div style="flex:1;">
-        <div style="font-size:clamp(13px,3.5vw,14px);font-weight:700;color:${a.unlocked?'var(--text)':'var(--muted2)'};">${lang==='en'?a.title_en:a.title_es}</div>
-        <div style="font-size:clamp(11px,2.8vw,12px);color:var(--muted2);margin-top:2px;">${lang==='en'?a.desc_en:a.desc_es}</div>
+        <div style="font-size:clamp(13px,3.5vw,14px);font-weight:700;color:${a.unlocked?'var(--text)':'var(--muted2)'};">${hidden?'???':lang==='en'?a.title_en:a.title_es}</div>
+        <div style="font-size:clamp(11px,2.8vw,12px);color:var(--muted2);margin-top:2px;">${hidden?'…':lang==='en'?a.desc_en:a.desc_es}</div>
       </div>
-      ${a.unlocked?`<div style="color:var(--warm);font-size:16px;">✓</div>`:''}
-    </div>`).join('');
+      ${a.unlocked?`<div style="color:var(--warm);">${ICO.check}</div>`:''}
+    </div>`;
+  }).join('');
   return `<div class="screen">
     ${hdr(t('logros_title'),`${unlocked}/${list.length}`)}
     ${!cemeteryPosts?`<p style="text-align:center;color:var(--muted2);">${t('amigos_loading')}</p>`:rows}
@@ -1926,13 +1948,15 @@ function tombstoneCardHTML(item){
       </button>
       <div style="flex:1;min-width:0;">
         <div style="font-size:clamp(12px,3vw,13px);color:var(--text2);font-weight:600;">@${esc(item.username)}</div>
-        <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">"${esc(item.razon)}"</div>
+        <div style="font-size:clamp(13px,3.5vw,14px);font-weight:700;color:var(--warm);letter-spacing:.5px;text-transform:uppercase;margin-top:2px;">${lbl}</div>
+        <div style="font-size:clamp(11px,2.8vw,12px);color:var(--text2);font-style:italic;margin-top:3px;line-height:1.5;">"${esc(item.razon)}"</div>
+        <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-top:4px;">${ICO.candle} ${item.dep_count||0} DEPs</div>
       </div>
       <button class="tombstone-toggle ${isOpen?'open':''}" data-tomb="${item.id}" style="flex-shrink:0;background:none;border:1px solid var(--border2);border-radius:7px;padding:5px 8px;cursor:pointer;display:flex;align-items:center;gap:5px;color:var(--muted2);font-size:clamp(10px,2.5vw,11px);">
         ${ICO.tombstone} <span>${isOpen?t('feed_tomb_hide'):lbl}</span>
       </button>
     </div>
-    ${isOpen?`<div style="margin-top:10px;padding:12px;background:var(--bg2);border-radius:8px;animation:fadeUp .18s ease;"><div style="display:flex;gap:12px;align-items:flex-start;"><div style="flex-shrink:0;">${dollWithDraw(item.doll_color,item.castigo,item.dibujo_trazos,true,d?.pose||'idle',clamp(56,68))}</div><div style="flex:1;min-width:0;"><div style="font-size:clamp(13px,3.5vw,14px);font-weight:700;color:var(--warm);letter-spacing:.5px;text-transform:uppercase;">${lbl}</div><p style="font-size:clamp(13px,3.5vw,14px);color:var(--text2);font-style:italic;line-height:1.6;margin:6px 0 8px;">"${esc(item.razon)}"</p><div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);">${ICO.candle} ${item.dep_count||0} DEPs</div></div></div></div>`:''}
+    ${isOpen?`<div style="margin-top:10px;padding:12px;background:var(--bg2);border-radius:8px;animation:fadeUp .18s ease;text-align:center;">${dollWithDraw(item.doll_color,item.castigo,item.dibujo_trazos,true,d?.pose||'idle',clamp(80,100))}</div>`:''}
   </div>`;
 }
 
@@ -1971,10 +1995,15 @@ function renderAjustes(){
     <div style="height:1px;background:var(--border);margin:clamp(14px,3.5vw,18px) 0;"></div>
     <div style="margin-bottom:16px;">
       <div style="font-size:clamp(9px,2.5vw,10px);color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">${t('lbl_birthday')}</div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <input type="date" id="birthdayInput" value="${profile.birth_date||''}" style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:10px 12px;font-size:clamp(13px,3.5vw,14px);font-family:inherit;outline:none;" max="${new Date().toISOString().slice(0,10)}"/>
-        <button class="btn-warm-sm" id="btnSaveBirthday">${t('btn_save_birthday')}</button>
-      </div>
+      ${profile.birth_date
+        ?`<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:7px;font-size:clamp(13px,3.5vw,14px);">
+            <span style="flex:1;color:var(--text);">${new Date(profile.birth_date+'T12:00:00').toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'long',year:'numeric'})}</span>
+            <span style="font-size:clamp(11px,2.8vw,12px);color:var(--muted2);">${getZodiacSign(new Date(profile.birth_date+'T12:00:00'))}</span>
+          </div>`
+        :`<div style="display:flex;gap:8px;align-items:center;">
+            <input type="date" id="birthdayInput" value="" style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:10px 12px;font-size:clamp(13px,3.5vw,14px);font-family:inherit;outline:none;" max="${new Date().toISOString().slice(0,10)}"/>
+            <button class="btn-warm-sm" id="btnSaveBirthday">${t('btn_save_birthday')}</button>
+          </div>`}
     </div>
     <div style="height:1px;background:var(--border);margin:clamp(20px,5vw,26px) 0;"></div>
     <button class="btn-ghost" id="btnChangePass" style="margin-bottom:10px;">${t('btn_change_pass')}</button>
@@ -2205,13 +2234,6 @@ function attachListeners(){
   }
   if(view==='cementerio'){
     if(ge('volverCemetery'))ge('volverCemetery').onclick=()=>{view='home';paint();};
-    document.querySelectorAll('.cemetery-row').forEach(row=>{
-      row.onclick=()=>{
-        const id=row.getAttribute('data-cemid');
-        if(expandedCemetery.has(id))expandedCemetery.delete(id);else expandedCemetery.add(id);
-        paint();
-      };
-    });
   }
   if(view==='logros'){
     if(ge('volverLogros'))ge('volverLogros').onclick=()=>{view='muertes';muertesTab='castigos';paint();};

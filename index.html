@@ -394,23 +394,140 @@ const DOLL_COLORS=["#BF3F3F","#4870A8","#4A8A68","#B07030","#7850A8","#C0B898"];
 const LINE_COLORS=["#E8C468","#BF3F3F","#4A8A68","#4870A8","#EDE6D8","#C890D0"];
 const LINE_WIDTHS=[2,4,8];
 
+// ── i18n ──────────────────────────────────────────────
+let lang=localStorage.getItem('kill_lang')||(navigator.language.startsWith('es')?'es':'en');
+const STRINGS={
+  es:{
+    nav_hoy:'Hoy',nav_feed:'Feed',nav_senales:'Señales',nav_muertes:'Muertes',
+    login_tab:'Entrar',register_tab:'Registrarse',
+    auth_tagline:'"pues me mato."',auth_sub:'La app para los días que merecen un castigo.',
+    auth_beat1:'Cuenta tu ruina del día',auth_beat2:'Elige cómo muere tu muñeco',auth_beat3:'Recibe DEPs de tus amigos',
+    lbl_username:'Nombre de usuario',lbl_email_or_user:'Email o usuario',lbl_email:'Email',lbl_password:'Contraseña',
+    ph_username:'como quieres que te vean',ph_email_or_user:'email o nombre de usuario',ph_email:'tu@email.com',
+    ph_pass_login:'tu contraseña',ph_pass_new:'mínimo 6 caracteres',
+    pass_tip:'Usa una contraseña nueva, no la de otro sitio.',
+    btn_login:'Entrar',btn_next:'Siguiente →',btn_forgot:'¿Olvidaste tu contraseña?',
+    btn_back:'← volver',btn_back_login:'← Volver al login',
+    err_no_user:'Introduce tu email o usuario',err_no_pass:'Introduce tu contraseña',
+    err_no_username:'Pon un nombre de usuario',err_username_short:'El nombre debe tener mínimo 2 caracteres',
+    err_username_chars:'El nombre solo puede tener letras, números, puntos y guiones',
+    err_invalid_email:'Introduce un email válido',err_pass_short:'Contraseña demasiado corta — ',
+    err_username_taken:'Ese nombre de usuario ya está en uso',
+    auth_step2:'Paso 2 de 2 · Tu muñeco',auth_choose_color:'Elige el color de tu muñeco',
+    btn_create:'Crear cuenta',checking:'Comprobando...',creating:'Creando...',sending:'Enviando...',saving:'Guardando...',
+    verify_title:'Confirma tu email',verify_sub1:'Te hemos enviado un enlace a',verify_sub2:'Ábrelo para activar tu cuenta. Puedes cerrar esta pestaña.',
+    btn_resend:'Reenviar email',msg_sent:'Enviado',
+    recovery_title:'Elige una nueva contraseña',lbl_new_pass:'Nueva contraseña',btn_save_pass:'Guardar contraseña',err_weak_pass:'Contraseña débil: falta ',
+    home_done:'Hoy ya está hecho',home_empty:'Una ruina al día',
+    btn_start:'¿Cuál es tu ruina de hoy?',btn_whats_this:'¿qué es esto?',
+    btn_worse:'Ha ido a peor — contar algo nuevo',btn_feed:'Ver el feed',prev_btn:'Antes había pasado algo',deps_received:'DEPs recibidos',
+    razon_title:'¿Cuál es tu ruina de hoy?',ph_razon:'ej: se me ha caído el café al suelo...',btn_castigo:'Elegir castigo →',
+    muerte_title:'Elige su castigo',muerte_sub:'Desbloquea más con racha y DEPs',btn_back_muerte:'← cambiar lo que pasó',
+    draw_label:'Modo libre',draw_sub:'Dibuja el castigo tú mismo',
+    confirm_title:'¿Así muere?',btn_publish:'Publicar',btn_back_castigo:'← cambiar castigo',
+    posted_label:'Publicado',
+    dibujo_title:'Modo libre',dibujo_sub:'Escribe qué pasó y dibuja qué le haces',
+    ph_razon_draw:'¿qué te ha pasado hoy?',ph_desc_draw:'¿qué le has hecho?',btn_clear:'limpiar',btn_back_draw:'← volver a los castigos',
+    feed_sub:'Lo de hoy',feed_empty:'Nadie ha publicado hoy',feed_empty_sub:'sé el primero',feed_older:'Días anteriores',
+    btn_follow:' seguir',btn_following:' siguiendo',prev_label:'Lo de antes',
+    senales_title:'Señales',sig_dep:'te ha mandado un DEP',sig_follow:'ha empezado a seguirte',
+    senales_empty_post:'No hay señales nuevas desde tu última visita',senales_empty_no_post:'Publica tu ruina de hoy para recibir señales',
+    btn_publish_ruina:'Publicar ruina',
+    muertes_unlocked:'desbloqueadas',muertes_free:'Siempre disponibles',muertes_streak:'Por racha diaria',muertes_deps:'Por DEPs recibidos',
+    death_ok:' desbloqueada',streak_left:'d más de racha',deps_left:' DEPs más',days_lbl:'días',
+    ajustes_color:'Color del muñeco',streak_lbl:'racha del día',deps_lbl:'DEPs totales',
+    btn_change_pass:'Cambiar contraseña',btn_what_is:'¿Qué es kill.me?',btn_logout:'Cerrar sesión',
+    pass_email_sent:'Te hemos enviado un email para cambiar la contraseña.',
+    lang_btn:'English',
+    profile_since:'Miembro desde ',profile_ruinas_last:'Últimas ruinas',profile_no_ruinas:'Sin ruinas todavía.',
+    profile_streak:'racha',profile_deps:'DEPs',profile_ruinas_lbl:'ruinas',
+    amigos_title:'Mis amigos',amigos_empty:'Todavía no sigues a nadie.',amigos_find:'Encuéntralos en el feed.',
+    amigos_loading:'Cargando...',amigos_streak:'de racha · miembro desde ',amigos_following:' siguiendo',
+    time_now:'ahora',time_m:'hace $m',time_h:'hace $h',time_d:'hace $d',
+    err_load:'No se pudo iniciar sesión. Inténtalo de nuevo.',err_load2:'Error al cargar. Recarga la página.',
+    pass_req:'6+ caracteres',
+    ob_skip:'Saltar',ob_next:'Siguiente →',ob_start:'¡Empezar!',
+    ob1_title:'kill.me',ob1_body:`¿Alguna vez has dicho <em>"pues me mato"</em> después de un día de mierda?\n\nEsta app es exactamente eso. Suelta tu <em>ruina del día</em>, mata a tu muñeco, y sigue adelante.`,
+    ob2_title:'¿Qué es un DEP?',ob2_body:`Tus amigos ven tu ruina en el feed y te mandan un <em>DEP</em> — Descanse En Paz.\n\nComo un like, pero para lo peor de tu día. Cuantos más DEPs, más se solidarizan con tu tragedia.`,
+    ob3_title:'Las muertes',ob3_body:`Cada día que publicas tu ruina, desbloqueas nuevas formas de matar a tu muñeco: quemado, acribillado, electrocutado...\n\nMantén la <em>racha</em> y acumula DEPs para desbloquearlas todas.`,
+    ob4_title:'Una al día',ob4_body:`Solo puedes publicar <em>una ruina al día</em>. Si el día mejora (o empeora), puedes actualizarla.\n\nRecuerda que la vida da para un "pues me mato" al día — no más.`,
+  },
+  en:{
+    nav_hoy:'Today',nav_feed:'Feed',nav_senales:'Signals',nav_muertes:'Deaths',
+    login_tab:'Log in',register_tab:'Sign up',
+    auth_tagline:'"ugh, kill me."',auth_sub:'The app for days that deserve a punishment.',
+    auth_beat1:'Share your daily disaster',auth_beat2:'Choose how your doll dies',auth_beat3:'Get DEPs from your friends',
+    lbl_username:'Username',lbl_email_or_user:'Email or username',lbl_email:'Email',lbl_password:'Password',
+    ph_username:'how you want to be seen',ph_email_or_user:'email or username',ph_email:'you@email.com',
+    ph_pass_login:'your password',ph_pass_new:'at least 6 characters',
+    pass_tip:'Use a new password, not one from another site.',
+    btn_login:'Log in',btn_next:'Next →',btn_forgot:'Forgot your password?',
+    btn_back:'← back',btn_back_login:'← Back to login',
+    err_no_user:'Enter your email or username',err_no_pass:'Enter your password',
+    err_no_username:'Choose a username',err_username_short:'Username must be at least 2 characters',
+    err_username_chars:'Only letters, numbers, dots and dashes allowed',
+    err_invalid_email:'Enter a valid email address',err_pass_short:'Password too short — ',
+    err_username_taken:'That username is already taken',
+    auth_step2:'Step 2 of 2 · Your doll',auth_choose_color:'Choose your doll color',
+    btn_create:'Create account',checking:'Checking...',creating:'Creating...',sending:'Sending...',saving:'Saving...',
+    verify_title:'Confirm your email',verify_sub1:'We sent a link to',verify_sub2:'Open it to activate your account. You can close this tab.',
+    btn_resend:'Resend email',msg_sent:'Sent',
+    recovery_title:'Choose a new password',lbl_new_pass:'New password',btn_save_pass:'Save password',err_weak_pass:'Password too weak — missing ',
+    home_done:'Done for today',home_empty:'One ruina a day',
+    btn_start:"What's your ruina today?",btn_whats_this:'what is this?',
+    btn_worse:'It got worse — tell something new',btn_feed:'See the feed',prev_btn:'Something happened before',deps_received:'DEPs received',
+    razon_title:"What's your ruina today?",ph_razon:'e.g. I spilled my coffee on the floor...',btn_castigo:'Choose punishment →',
+    muerte_title:'Choose the punishment',muerte_sub:'Unlock more with streak and DEPs',btn_back_muerte:'← change what happened',
+    draw_label:'Free mode',draw_sub:'Draw the punishment yourself',
+    confirm_title:'This is how it dies?',btn_publish:'Publish',btn_back_castigo:'← change punishment',
+    posted_label:'Published',
+    dibujo_title:'Free mode',dibujo_sub:'Write what happened and draw what you do',
+    ph_razon_draw:'what happened today?',ph_desc_draw:'what did you do to it?',btn_clear:'clear',btn_back_draw:'← back to punishments',
+    feed_sub:'Today',feed_empty:'Nobody has posted today',feed_empty_sub:'be the first',feed_older:'Previous days',
+    btn_follow:' follow',btn_following:' following',prev_label:'Before that',
+    senales_title:'Signals',sig_dep:'sent you a DEP',sig_follow:'started following you',
+    senales_empty_post:'No new signals since your last visit',senales_empty_no_post:"Post your ruina today to receive signals",
+    btn_publish_ruina:'Post ruina',
+    muertes_unlocked:'unlocked',muertes_free:'Always available',muertes_streak:'By daily streak',muertes_deps:'By DEPs received',
+    death_ok:' unlocked',streak_left:' more days',deps_left:' more DEPs',days_lbl:'days',
+    ajustes_color:'Doll color',streak_lbl:'streak',deps_lbl:'total DEPs',
+    btn_change_pass:'Change password',btn_what_is:'What is kill.me?',btn_logout:'Log out',
+    pass_email_sent:'We sent you an email to change your password.',
+    lang_btn:'Español',
+    profile_since:'Member since ',profile_ruinas_last:'Latest ruinas',profile_no_ruinas:'No ruinas yet.',
+    profile_streak:'streak',profile_deps:'DEPs',profile_ruinas_lbl:'ruinas',
+    amigos_title:'My friends',amigos_empty:"You're not following anyone yet.",amigos_find:'Find them in the feed.',
+    amigos_loading:'Loading...',amigos_streak:'streak · member since ',amigos_following:' following',
+    time_now:'now',time_m:'$m ago',time_h:'$h ago',time_d:'$d ago',
+    err_load:'Could not sign in. Please try again.',err_load2:'Error loading. Reload the page.',
+    pass_req:'6+ characters',
+    ob_skip:'Skip',ob_next:'Next →',ob_start:"Let's go!",
+    ob1_title:'kill.me',ob1_body:`Ever said <em>"ugh, kill me"</em> after a terrible day?\n\nThis app is exactly that. Vent your daily <em>ruina</em>, kill your doll, and move on.`,
+    ob2_title:'What is a DEP?',ob2_body:`Your friends see your ruina in the feed and send you a <em>DEP</em> — Descanse En Paz (Rest in Peace).\n\nLike a like, but for the worst part of your day. More DEPs = more solidarity.`,
+    ob3_title:'Deaths',ob3_body:`Every day you post your ruina, you unlock new ways to kill your doll: burned, needled, electrocuted...\n\nKeep your <em>streak</em> and collect DEPs to unlock them all.`,
+    ob4_title:'Once a day',ob4_body:`You can only post <em>one ruina a day</em>. If things get better (or worse), you can update it.\n\nRemember: life fits exactly one "kill me" a day — no more.`,
+  }
+};
+function t(k){return(STRINGS[lang]||STRINGS.es)[k]||STRINGS.es[k]||k;}
+
 const DEATHS=[
-  {id:"fuego",     label:"Quemado",       min:0,  deps:0,  pose:"scared",   unlock:'free'},
-  {id:"agujas",    label:"Acribillado",   min:0,  deps:0,  pose:"cowering", unlock:'free'},
-  {id:"ahogo",     label:"Ahogado",       min:3,  deps:0,  pose:"begging",  unlock:'streak'},
-  {id:"rayo",      label:"Electrocutado", min:7,  deps:0,  pose:"dramatic", unlock:'streak'},
-  {id:"hielo",     label:"Congelado",     min:0,  deps:5,  pose:"cowering", unlock:'deps'},
-  {id:"aplastado", label:"Aplastado",     min:14, deps:0,  pose:"squish",   unlock:'streak'},
-  {id:"guillotina",label:"Guillotina",    min:0,  deps:15, pose:"scared",   unlock:'deps'},
-  {id:"fantasma",  label:"Exorcizado",    min:21, deps:0,  pose:"ghost",    unlock:'streak'},
-  {id:"zombi",     label:"Zombificado",   min:0,  deps:30, pose:"dramatic", unlock:'deps'},
+  {id:"fuego",     label:"Quemado",    en:"Burned",       min:0,  deps:0,  pose:"scared",   unlock:'free'},
+  {id:"agujas",    label:"Acribillado",en:"Needled",      min:0,  deps:0,  pose:"cowering", unlock:'free'},
+  {id:"ahogo",     label:"Ahogado",    en:"Drowned",      min:3,  deps:0,  pose:"begging",  unlock:'streak'},
+  {id:"rayo",      label:"Electrocutado",en:"Electrocuted", min:7,  deps:0,  pose:"dramatic", unlock:'streak'},
+  {id:"hielo",     label:"Congelado",   en:"Frozen",       min:0,  deps:5,  pose:"cowering", unlock:'deps'},
+  {id:"aplastado", label:"Aplastado",   en:"Crushed",      min:14, deps:0,  pose:"squish",   unlock:'streak'},
+  {id:"guillotina",label:"Guillotina",  en:"Guillotined",  min:0,  deps:15, pose:"scared",   unlock:'deps'},
+  {id:"fantasma",  label:"Exorcizado",  en:"Exorcised",    min:21, deps:0,  pose:"ghost",    unlock:'streak'},
+  {id:"zombi",     label:"Zombificado", en:"Zombified",    min:0,  deps:30, pose:"dramatic", unlock:'deps'},
 ];
 const DEATH_LABELS=Object.fromEntries(DEATHS.map(d=>[d.id,d.label]));
+function dl(id){const d=DEATHS.find(x=>x.id===id);if(!d)return id;return(lang==='en'&&d.en)?d.en:d.label;}
 
 const SB_ERRORS={
-  "Invalid login credentials":"Email o contraseña incorrectos",
-  "Email not confirmed":"Confirma tu email antes de entrar",
-  "User already registered":"Ya existe una cuenta con ese email",
+  "Invalid login credentials":{es:"Email o contraseña incorrectos",en:"Incorrect email or password"},
+  "Email not confirmed":{es:"Confirma tu email antes de entrar",en:"Please confirm your email before signing in"},
+  "User already registered":{es:"Ya existe una cuenta con ese email",en:"An account with that email already exists"},
   "Password should be at least 6 characters":"La contraseña es demasiado corta",
 };
 
@@ -469,19 +586,18 @@ const yesterS=()=>new Date(Date.now()-86400000).toISOString().split('T')[0];
 const ge=id=>document.getElementById(id);
 const initials=n=>(n||'?').slice(0,2).toUpperCase();
 const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-const sbErr=m=>SB_ERRORS[m]||m;
+const sbErr=m=>{const e=SB_ERRORS[m];return e?(e[lang]||e.es):m;};
 const timeAgo=ts=>{
   const m=Math.floor((Date.now()-new Date(ts))/60000);
-  if(m<1)return'ahora';if(m<60)return`hace ${m}m`;
-  const h=Math.floor(m/60);if(h<24)return`hace ${h}h`;return`hace ${Math.floor(h/24)}d`;
+  if(m<1)return t('time_now');
+  if(m<60)return t('time_m').replace('$m',m);
+  const h=Math.floor(m/60);if(h<24)return t('time_h').replace('$h',h);
+  return t('time_d').replace('$d',Math.floor(h/24));
 };
-function validatePass(p){
-  if(p.length<6)return['mínimo 6 caracteres'];
-  return[];
-}
+function validatePass(p){if(p.length<6)return[t('pass_req')];return[];}
 function passReqsHTML(pass){
   const ok=pass.length>=6;
-  return `<div class="pass-reqs"><span class="req${ok?' ok':''}">${ok?'✓':''} 6+ caracteres</span></div>`;
+  return `<div class="pass-reqs"><span class="req${ok?' ok':''}">${ok?'✓':''} ${t('pass_req')}</span></div>`;
 }
 
 // ── Poses ──────────────────────────────────────────────
@@ -815,33 +931,34 @@ async function toggleFollow(uid){
 }
 
 // ── Onboarding ────────────────────────────────────────
-const SLIDES=[
-  {icon:()=>`<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="21" stroke="currentColor" stroke-width="2.2"/><line x1="15" y1="17" x2="21" y2="23" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><line x1="21" y1="17" x2="15" y2="23" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><line x1="27" y1="17" x2="33" y2="23" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><line x1="33" y1="17" x2="27" y2="23" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><path d="M16 33 Q24 28 32 33" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`,title:'kill.me',body:`¿Alguna vez has dicho <em>"pues me mato"</em> después de un día de mierda?\n\nEsta app es exactamente eso. Suelta tu <em>ruina del día</em>, mata a tu muñeco, y sigue adelante.`},
-  {icon:()=>icoStat(ICO.candle,48),title:'¿Qué es un DEP?',body:`Tus amigos ven tu ruina en el feed y te mandan un <em>DEP</em> — Descanse En Paz.\n\nComo un like, pero para lo peor de tu día. Cuantos más DEPs, más se solidarizan con tu tragedia.`},
-  {icon:()=>icoStat(ICO.skull,48),title:'Las muertes',body:`Cada día que publicas tu ruina, desbloqueas nuevas formas de matar a tu muñeco: quemado, acribillado, electrocutado...\n\nMantén la <em>racha</em> y acumula DEPs para desbloquearlas todas.`},
-  {icon:()=>icoStat(ICO.flame,48),title:'Una al día',body:`Solo puedes publicar <em>una ruina al día</em>. Si el día mejora (o empeora), puedes actualizarla.\n\nRecuerda que la vida da para un "pues me mato" al día — no más.`},
-];
+const DEAD_FACE_ICO=`<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="21" stroke="currentColor" stroke-width="2.2"/><line x1="15" y1="17" x2="21" y2="23" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><line x1="21" y1="17" x2="15" y2="23" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><line x1="27" y1="17" x2="33" y2="23" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><line x1="33" y1="17" x2="27" y2="23" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><path d="M16 33 Q24 28 32 33" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`;
+function getSlides(){return[
+  {icon:()=>DEAD_FACE_ICO,          title:t('ob1_title'),body:t('ob1_body')},
+  {icon:()=>icoStat(ICO.candle,48), title:t('ob2_title'),body:t('ob2_body')},
+  {icon:()=>icoStat(ICO.skull,48),  title:t('ob3_title'),body:t('ob3_body')},
+  {icon:()=>icoStat(ICO.flame,48),  title:t('ob4_title'),body:t('ob4_body')},
+];}
 function showOnboarding(){
   if(document.getElementById('onboarding'))return;
   let cur=0;
   const el=document.createElement('div');
   el.id='onboarding';el.className='modal-overlay';
   const render=()=>{
-    const s=SLIDES[cur];
+    const slides=getSlides(),s=slides[cur];
     el.innerHTML=`<div class="modal-card">
       <div class="modal-slide on">
         <div class="modal-slide-icon" style="color:var(--warm)">${typeof s.icon==='function'?s.icon():s.icon}</div>
         <h2>${s.title}</h2>
         <p>${s.body.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p>
       </div>
-      <div class="modal-dots">${SLIDES.map((_,i)=>`<div class="modal-dot${i===cur?' on':''}"></div>`).join('')}</div>
+      <div class="modal-dots">${slides.map((_,i)=>`<div class="modal-dot${i===cur?' on':''}"></div>`).join('')}</div>
       <div class="modal-nav">
-        <button class="btn-skip" id="obSkip">Saltar</button>
-        <button class="btn-next" id="obNext">${cur<SLIDES.length-1?'Siguiente →':'¡Empezar!'}</button>
+        <button class="btn-skip" id="obSkip">${t('ob_skip')}</button>
+        <button class="btn-next" id="obNext">${cur<slides.length-1?t('ob_next'):t('ob_start')}</button>
       </div>
     </div>`;
     el.querySelector('#obSkip').onclick=()=>el.remove();
-    el.querySelector('#obNext').onclick=()=>{if(cur<SLIDES.length-1){cur++;render();}else{el.remove();}};
+    el.querySelector('#obNext').onclick=()=>{if(cur<getSlides().length-1){cur++;render();}else{el.remove();}};
   };
   render();
   document.body.appendChild(el);
@@ -914,7 +1031,7 @@ async function doSignIn(emailOrUser,pass){
   if(error)return sbErr(error.message);return null;
 }
 async function doResetPassword(email){
-  if(!email||!email.includes('@'))return'Introduce tu email primero';
+  if(!email||!email.includes('@'))return t('err_invalid_email');
   const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://webkillme.github.io/Kill.me/'});
   if(error)return sbErr(error.message);return null;
 }
@@ -933,13 +1050,13 @@ async function navToHome(errEl,btn,btnLabel){
       paint();
       setTimeout(maybeShowOnboarding,400);
     }else{
-      if(errEl)errEl.textContent='No se pudo iniciar sesión. Inténtalo de nuevo.';
-      if(btn){btn.disabled=false;btn.textContent=btnLabel||'Entrar';}
+      if(errEl)errEl.textContent=t('err_load');
+      if(btn){btn.disabled=false;btn.textContent=btnLabel||t('btn_login');}
     }
   }catch(ex){
     console.error('navToHome error',ex);
-    if(errEl)errEl.textContent='Error al cargar. Recarga la página.';
-    if(btn){btn.disabled=false;btn.textContent=btnLabel||'Entrar';}
+    if(errEl)errEl.textContent=t('err_load2');
+    if(btn){btn.disabled=false;btn.textContent=btnLabel||t('btn_login');}
   }finally{navigating=false;}
 }
 
@@ -950,23 +1067,23 @@ function renderVerify(){
   ge('root').innerHTML=`
   <div class="verify-page">
     <div class="verify-icon" style="color:var(--warm);">${ICO.mail}</div>
-    <div class="verify-title cinzel">Confirma tu email</div>
+    <div class="verify-title cinzel">${t('verify_title')}</div>
     <div class="verify-sub">
-      Te hemos enviado un enlace a<br><strong>${esc(pendingVerifyEmail)}</strong><br><br>
-      Ábrelo para activar tu cuenta. Puedes cerrar esta pestaña.
+      ${t('verify_sub1')}<br><strong>${esc(pendingVerifyEmail)}</strong><br><br>
+      ${t('verify_sub2')}
     </div>
     <div id="vErr" class="auth-err" style="margin-top:8px;"></div>
     <div style="max-width:320px;width:100%">
-      <button class="btn btn-red" id="btnResend" style="margin-bottom:8px;">Reenviar email</button>
-      <button class="btn-link" id="btnBackLogin">← Volver al login</button>
+      <button class="btn btn-red" id="btnResend" style="margin-bottom:8px;">${t('btn_resend')}</button>
+      <button class="btn-link" id="btnBackLogin">${t('btn_back_login')}</button>
     </div>
   </div>`;
   ge('btnResend').onclick=async()=>{
     const btn=ge('btnResend'),err=ge('vErr');
     btn.disabled=true;btn.textContent='...';err.style.color='';err.textContent='';
     const {error}=await sb.auth.resend({type:'signup',email:pendingVerifyEmail,options:{emailRedirectTo:'https://webkillme.github.io/Kill.me/'}}).catch(e=>({error:e}));
-    if(error){err.textContent=sbErr(error.message);btn.disabled=false;btn.textContent='Reenviar email';}
-    else{err.style.color='#4CAF82';err.textContent='Enviado';btn.disabled=false;btn.textContent='Reenviar email';}
+    if(error){err.textContent=sbErr(error.message);btn.disabled=false;btn.textContent=t('btn_resend');}
+    else{err.style.color='#4CAF82';err.textContent=t('msg_sent');btn.disabled=false;btn.textContent=t('btn_resend');}
   };
   ge('btnBackLogin').onclick=()=>{authTab='login';authStep='form';view='auth';paint();};
 }
@@ -976,16 +1093,16 @@ function renderAuth(){
   if(authStep==='color'){
     ge('root').innerHTML=`
     <div class="auth-page">
-      <div class="auth-brand"><h1 class="cinzel">kill<em>.me</em></h1><p>Elige el color de tu muñeco</p></div>
+      <div class="auth-brand"><h1 class="cinzel">kill<em>.me</em></h1><p>${t('auth_choose_color')}</p></div>
       <div class="auth-doll-preview" id="dollPreview">${dollSVG(pendingSignup.color,null,false,'idle',110)}</div>
       <div class="auth-card">
-        <div class="step-label">Paso 2 de 2 · Tu muñeco</div>
+        <div class="step-label">${t('auth_step2')}</div>
         <div class="onb-colors">
           ${DOLL_COLORS.map(c=>`<button class="onb-circle ${c===pendingSignup.color?'on':''}" data-color="${c}" style="background:${c};"></button>`).join('')}
         </div>
         <div class="auth-err" id="aErr"></div>
-        <button class="btn btn-red" id="btnCreate" style="margin-top:8px;">Crear cuenta</button>
-        <button class="btn-link" id="btnBackForm">← volver</button>
+        <button class="btn btn-red" id="btnCreate" style="margin-top:8px;">${t('btn_create')}</button>
+        <button class="btn-link" id="btnBackForm">${t('btn_back')}</button>
       </div>
     </div>`;
     document.querySelectorAll('.onb-circle').forEach(b=>{
@@ -998,22 +1115,22 @@ function renderAuth(){
     ge('btnBackForm').onclick=()=>{authStep='form';renderAuth();};
     ge('btnCreate').onclick=async()=>{
       const btn=ge('btnCreate'),err=ge('aErr');
-      btn.disabled=true;btn.textContent='Creando...';err.textContent='';
+      btn.disabled=true;btn.textContent=t('creating');err.textContent='';
       navigating=true;
       const result=await doSignUp(pendingSignup.email,pendingSignup.pass,pendingSignup.username,pendingSignup.color);
       if(typeof result==='string'){
-        err.textContent=result;btn.disabled=false;btn.textContent='Crear cuenta';navigating=false;return;
+        err.textContent=result;btn.disabled=false;btn.textContent=t('btn_create');navigating=false;return;
       }
       // Use session from signUp directly — no second signIn needed
       if(result.session){
         user=result.user;authStep='form';
-        await navToHome(err,btn,'Crear cuenta');
+        await navToHome(err,btn,t('btn_create'));
       }else{
         // autoconfirm off — shouldn't happen but fall back to signIn
-        btn.textContent='Entrando...';
+        btn.textContent='...';
         const signInErr=await doSignIn(pendingSignup.email,pendingSignup.pass);
-        if(signInErr){err.textContent=signInErr;btn.disabled=false;btn.textContent='Crear cuenta';navigating=false;}
-        else{authStep='form';await navToHome(err,btn,'Crear cuenta');}
+        if(signInErr){err.textContent=signInErr;btn.disabled=false;btn.textContent=t('btn_create');navigating=false;}
+        else{authStep='form';await navToHome(err,btn,t('btn_create'));}
       }
     };
     return;
@@ -1023,31 +1140,31 @@ function renderAuth(){
     <div class="auth-brand auth-hero">
       <h1 class="cinzel">kill<em>.me</em></h1>
       ${!login?'':` <div class="auth-pitch">
-        <div class="auth-tagline">"pues me mato."</div>
-        <div class="auth-sub">La app para los días que merecen un castigo.</div>
+        <div class="auth-tagline">${t('auth_tagline')}</div>
+        <div class="auth-sub">${t('auth_sub')}</div>
         <div class="auth-beats">
-          <span>Cuenta tu ruina del día</span>
-          <span>Elige cómo muere tu muñeco</span>
-          <span>Recibe DEPs de tus amigos</span>
+          <span>${t('auth_beat1')}</span>
+          <span>${t('auth_beat2')}</span>
+          <span>${t('auth_beat3')}</span>
         </div>
       </div>`}
     </div>
     <div class="auth-doll-preview">${dollSVG(DOLL_COLORS[0],null,true,'idle',120)}</div>
     <div class="auth-card">
       <div class="auth-tabs">
-        <button class="auth-tab ${login?'on':''}" id="tLogin">Entrar</button>
-        <button class="auth-tab ${!login?'on':''}" id="tReg">Registrarse</button>
+        <button class="auth-tab ${login?'on':''}" id="tLogin">${t('login_tab')}</button>
+        <button class="auth-tab ${!login?'on':''}" id="tReg">${t('register_tab')}</button>
       </div>
-      ${!login?`<div class="field"><label>Nombre de usuario</label><input type="text" id="aUser" placeholder="como quieres que te vean" maxlength="20"/></div>`:''}
-      <div class="field"><label>${login?'Email o usuario':'Email'}</label><input type="${login?'text':'email'}" id="aEmail" placeholder="${login?'email o nombre de usuario':'tu@email.com'}" autocomplete="${login?'username':'email'}"/></div>
+      ${!login?`<div class="field"><label>${t('lbl_username')}</label><input type="text" id="aUser" placeholder="${t('ph_username')}" maxlength="20"/></div>`:''}
+      <div class="field"><label>${login?t('lbl_email_or_user'):t('lbl_email')}</label><input type="${login?'text':'email'}" id="aEmail" placeholder="${login?t('ph_email_or_user'):t('ph_email')}" autocomplete="${login?'username':'email'}"/></div>
       <div class="field">
-        <label>Contraseña</label>
-        <input type="password" id="aPass" placeholder="${login?'tu contraseña':'mínimo 6 caracteres'}" autocomplete="${login?'current-password':'new-password'}"/>
-        ${!login?`<div id="passReqs" style="margin-top:6px;"></div><div style="margin-top:8px;font-size:clamp(10px,2.6vw,11px);color:var(--muted);line-height:1.5;">Usa una contraseña nueva, no la de otro sitio.</div>`:''}
+        <label>${t('lbl_password')}</label>
+        <input type="password" id="aPass" placeholder="${login?t('ph_pass_login'):t('ph_pass_new')}" autocomplete="${login?'current-password':'new-password'}"/>
+        ${!login?`<div id="passReqs" style="margin-top:6px;"></div><div style="margin-top:8px;font-size:clamp(10px,2.6vw,11px);color:var(--muted);line-height:1.5;">${t('pass_tip')}</div>`:''}
       </div>
       <div class="auth-err" id="aErr"></div>
-      <button class="btn btn-red" id="btnAuth">${login?'Entrar':'Siguiente →'}</button>
-      ${login?`<button class="btn-link" id="btnForgot" style="margin-top:2px;font-size:clamp(11px,2.5vw,12px);">¿Olvidaste tu contraseña?</button>`:''}
+      <button class="btn btn-red" id="btnAuth">${login?t('btn_login'):t('btn_next')}</button>
+      ${login?`<button class="btn-link" id="btnForgot" style="margin-top:2px;font-size:clamp(11px,2.5vw,12px);">${t('btn_forgot')}</button>`:''}
     </div>
   </div>`;
   ge('tLogin').onclick=()=>{authTab='login';renderAuth();};
@@ -1060,7 +1177,7 @@ function renderAuth(){
       const email=(ge('aEmail').value||'').trim(),err=ge('aErr');
       err.style.color='';
       const e=await doResetPassword(email);
-      if(e){err.textContent=e;}else{err.style.color='#4CAF82';err.textContent='Revisa tu bandeja — email de recuperación enviado.';}
+      if(e){err.textContent=e;}else{err.style.color='#4CAF82';err.textContent=lang==='en'?'Check your inbox — recovery email sent.':'Revisa tu bandeja — email de recuperación enviado.';}
     };
   }
   ge('btnAuth').onclick=async()=>{
@@ -1068,24 +1185,24 @@ function renderAuth(){
     const emailOrUser=(ge('aEmail').value||'').trim(),pass=ge('aPass').value||'';
     err.textContent='';err.style.color='';
     if(authTab==='login'){
-      if(!emailOrUser){err.textContent='Introduce tu email o usuario';return;}
-      if(!pass){err.textContent='Introduce tu contraseña';return;}
+      if(!emailOrUser){err.textContent=t('err_no_user');return;}
+      if(!pass){err.textContent=t('err_no_pass');return;}
       btn.disabled=true;btn.textContent='...';navigating=true;
       const e=await doSignIn(emailOrUser,pass);
-      if(e){err.textContent=e;btn.disabled=false;btn.textContent='Entrar';navigating=false;return;}
-      await navToHome(err,btn,'Entrar');
+      if(e){err.textContent=e;btn.disabled=false;btn.textContent=t('btn_login');navigating=false;return;}
+      await navToHome(err,btn,t('btn_login'));
     }else{
       const uname=(ge('aUser').value||'').trim(),email=emailOrUser;
-      if(!uname){err.textContent='Pon un nombre de usuario';return;}
-      if(uname.length<2){err.textContent='El nombre debe tener mínimo 2 caracteres';return;}
-      if(!/^[a-zA-Z0-9_.-]+$/.test(uname)){err.textContent='El nombre solo puede tener letras, números, puntos y guiones';return;}
-      if(!email||!email.includes('@')){err.textContent='Introduce un email válido';return;}
+      if(!uname){err.textContent=t('err_no_username');return;}
+      if(uname.length<2){err.textContent=t('err_username_short');return;}
+      if(!/^[a-zA-Z0-9_.-]+$/.test(uname)){err.textContent=t('err_username_chars');return;}
+      if(!email||!email.includes('@')){err.textContent=t('err_invalid_email');return;}
       const passErrs=validatePass(pass);
-      if(passErrs.length){err.textContent='Contraseña demasiado corta — '+passErrs.join(', ');return;}
-      btn.disabled=true;btn.textContent='Comprobando...';
+      if(passErrs.length){err.textContent=t('err_pass_short')+passErrs.join(', ');return;}
+      btn.disabled=true;btn.textContent=t('checking');
       const {data:ex}=await sb.from('profiles').select('id').eq('username',uname).maybeSingle();
-      if(ex){err.textContent='Ese nombre de usuario ya está en uso';btn.disabled=false;btn.textContent='Siguiente →';return;}
-      btn.disabled=false;btn.textContent='Siguiente →';
+      if(ex){err.textContent=t('err_username_taken');btn.disabled=false;btn.textContent=t('btn_next');return;}
+      btn.disabled=false;btn.textContent=t('btn_next');
       pendingSignup={username:uname,email,pass,color:DOLL_COLORS[0]};
       authStep='color';renderAuth();
     }
@@ -1106,10 +1223,10 @@ function shell(content){
   </div>
   <div id="app">${content}</div>
   <div class="bottomnav">
-    <div class="navbtn-wrap"><button class="navbtn ${inMain?'on':''}" id="navHoy">${ICO.doll}<span>Hoy</span></button></div>
-    <div class="navbtn-wrap"><button class="navbtn ${view==='feed'?'on':''}" id="navFeed">${ICO.feed}<span>Feed</span></button></div>
-    <div class="navbtn-wrap"><button class="navbtn ${view==='señales'?'on':''}" id="navSeñales">${ICO.bell}<span>Señales</span></button>${señalesBadge?'<div class="nav-badge"></div>':''}</div>
-    <div class="navbtn-wrap"><button class="navbtn ${view==='muertes'?'on':''}" id="navMuertes">${ICO.skull}<span>Muertes</span></button></div>
+    <div class="navbtn-wrap"><button class="navbtn ${inMain?'on':''}" id="navHoy">${ICO.doll}<span>${t('nav_hoy')}</span></button></div>
+    <div class="navbtn-wrap"><button class="navbtn ${view==='feed'?'on':''}" id="navFeed">${ICO.feed}<span>${t('nav_feed')}</span></button></div>
+    <div class="navbtn-wrap"><button class="navbtn ${view==='señales'?'on':''}" id="navSeñales">${ICO.bell}<span>${t('nav_senales')}</span></button>${señalesBadge?'<div class="nav-badge"></div>':''}</div>
+    <div class="navbtn-wrap"><button class="navbtn ${view==='muertes'?'on':''}" id="navMuertes">${ICO.skull}<span>${t('nav_muertes')}</span></button></div>
   </div>`;
   ge('btnGear').onclick=()=>{view='ajustes';paint();};
   ge('btnAmigos').onclick=async()=>{view='amigos';paint();};
@@ -1124,15 +1241,15 @@ function shell(content){
 function renderRecovery(){
   ge('root').innerHTML=`
   <div class="auth-page">
-    <div class="auth-brand"><h1 class="cinzel">kill<em>.me</em></h1><p>Elige una nueva contraseña</p></div>
+    <div class="auth-brand"><h1 class="cinzel">kill<em>.me</em></h1><p>${t('recovery_title')}</p></div>
     <div class="auth-card">
       <div class="field">
-        <label>Nueva contraseña</label>
-        <input type="password" id="rPass" placeholder="mínimo 6 caracteres" autocomplete="new-password"/>
+        <label>${t('lbl_new_pass')}</label>
+        <input type="password" id="rPass" placeholder="${t('ph_pass_new')}" autocomplete="new-password"/>
         <div id="rReqs" style="margin-top:6px;"></div>
       </div>
       <div class="auth-err" id="rErr"></div>
-      <button class="btn btn-red" id="btnSetPass">Guardar contraseña</button>
+      <button class="btn btn-red" id="btnSetPass">${t('btn_save_pass')}</button>
     </div>
   </div>`;
   if(ge('rPass'))ge('rPass').oninput=()=>{const r=ge('rReqs');if(r)r.innerHTML=passReqsHTML(ge('rPass').value);};
@@ -1140,12 +1257,12 @@ function renderRecovery(){
     const btn=ge('btnSetPass'),err=ge('rErr');
     const pass=ge('rPass').value||'';
     const errs=validatePass(pass);
-    if(errs.length){err.textContent='Contraseña débil: falta '+errs.join(', ');return;}
-    btn.disabled=true;btn.textContent='Guardando...';err.textContent='';
+    if(errs.length){err.textContent=t('err_weak_pass')+errs.join(', ');return;}
+    btn.disabled=true;btn.textContent=t('saving');err.textContent='';
     const {error}=await sb.auth.updateUser({password:pass});
-    if(error){err.textContent=sbErr(error.message);btn.disabled=false;btn.textContent='Guardar contraseña';return;}
+    if(error){err.textContent=sbErr(error.message);btn.disabled=false;btn.textContent=t('btn_save_pass');return;}
     navigating=true;view='loading';paint();
-    await navToHome(err,btn,'Guardar contraseña');
+    await navToHome(err,btn,t('btn_save_pass'));
   };
 }
 
@@ -1183,19 +1300,19 @@ async function loadProfileData(uid){
 
 function renderAmigos(){
   const friendIds=[...myFollowing];
-  if(!friendIds.length) return `<div class="screen">${hdr('Mis amigos','')}<p style="text-align:center;color:var(--muted2);margin-top:60px;font-size:clamp(13px,3.5vw,14px);">Todavía no sigues a nadie.<br><span style="font-size:clamp(11px,3vw,12px);opacity:.5;display:block;margin-top:6px;">Encuéntralos en el feed.</span></p><button class="btn-link" id="volverAmigos" style="margin-top:20px;">← volver</button></div>`;
+  if(!friendIds.length) return `<div class="screen">${hdr(t('amigos_title'),'')}<p style="text-align:center;color:var(--muted2);margin-top:60px;font-size:clamp(13px,3.5vw,14px);">${t('amigos_empty')}<br><span style="font-size:clamp(11px,3vw,12px);opacity:.5;display:block;margin-top:6px;">${t('amigos_find')}</span></p><button class="btn-link" id="volverAmigos" style="margin-top:20px;">${t('btn_back')}</button></div>`;
   const friends=friendsList||[];
   const friendRows=friends.map(f=>`
     <div class="amigo-row" data-uid="${f.id}">
       <div style="flex-shrink:0">${avatarDoll(f.doll_color||DOLL_COLORS[0],clamp(40,48))}</div>
       <div class="amigo-info">
         <div class="amigo-name">@${esc(f.username)}</div>
-        <div class="amigo-meta">${f.streak||0} de racha · miembro desde ${f.created_at?new Date(f.created_at).toLocaleDateString('es-ES',{month:'short',year:'numeric'}):'—'}</div>
+        <div class="amigo-meta">${f.streak||0} ${t('amigos_streak')}${f.created_at?new Date(f.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{month:'short',year:'numeric'}):'—'}</div>
       </div>
       <div class="amigo-arrow">›</div>
     </div>`).join('');
-  const content=friends.length?friendRows:`<div style="text-align:center;color:var(--muted2);margin-top:40px;">Cargando...</div>`;
-  return `<div class="screen">${hdr('Mis amigos',`${friendIds.length} siguiendo`)}<div>${content}</div><button class="btn-link" id="volverAmigos" style="margin-top:20px;">← volver</button></div>`;
+  const content=friends.length?friendRows:`<div style="text-align:center;color:var(--muted2);margin-top:40px;">${t('amigos_loading')}</div>`;
+  return `<div class="screen">${hdr(t('amigos_title'),`${friendIds.length}${t('amigos_following')}`)}<div>${content}</div><button class="btn-link" id="volverAmigos" style="margin-top:20px;">${t('btn_back')}</button></div>`;
 }
 
 function renderProfile(){
@@ -1203,12 +1320,12 @@ function renderProfile(){
   const {prof,posts,totalDeps:td}=viewingProfile;
   const isSelf=prof.id===user.id;
   const isFollowing=myFollowing.has(prof.id);
-  const since=prof.created_at?new Date(prof.created_at).toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'}):'—';
+  const since=prof.created_at?new Date(prof.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'long',year:'numeric'}):'—';
   const postCount=posts.length;
   const cards=posts.slice(0,10).map(p=>{
     const d=DEATHS.find(x=>x.id===p.castigo);
-    const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):DEATH_LABELS[p.castigo]||p.castigo;
-    const dateStr=new Date(p.created_at).toLocaleDateString('es-ES',{day:'numeric',month:'short'});
+    const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):dl(p.castigo);
+    const dateStr=new Date(p.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'short'});
     return `<div class="feed-card" style="opacity:1;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
         <span class="feed-time">${dateStr}</span>
@@ -1222,47 +1339,46 @@ function renderProfile(){
     </div>`;
   }).join('');
   return `<div class="screen">
-    <button class="btn-link" id="volverProfile" style="margin-bottom:4px;">← volver</button>
+    <button class="btn-link" id="volverProfile" style="margin-bottom:4px;">${t('btn_back')}</button>
     <div class="profile-hero">
       ${dollSVG(prof.doll_color||DOLL_COLORS[0],null,true,'idle',clamp(90,110))}
       <div class="profile-name">@${esc(prof.username)}</div>
-      <div class="profile-since">Miembro desde ${since}</div>
-      ${!isSelf?`<button class="follow-btn ${isFollowing?'following':''}" id="profileFollow" data-uid="${prof.id}" style="margin-top:12px;">${isFollowing?ICO.check+' siguiendo':ICO.plus+' seguir'}</button>`:''}
+      <div class="profile-since">${t('profile_since')}${since}</div>
+      ${!isSelf?`<button class="follow-btn ${isFollowing?'following':''}" id="profileFollow" data-uid="${prof.id}" style="margin-top:12px;">${isFollowing?ICO.check+t('btn_following'):ICO.plus+t('btn_follow')}</button>`:''}
     </div>
     <div style="height:1px;background:var(--border);"></div>
     <div class="profile-stats">
-      <div class="profile-stat"><div class="profile-stat-num">${prof.streak||0}</div><div class="profile-stat-lbl">${ICO.flame} racha</div></div>
-      <div class="profile-stat"><div class="profile-stat-num" style="color:#5A8FD4">${td}</div><div class="profile-stat-lbl">${ICO.candle} DEPs</div></div>
-      <div class="profile-stat"><div class="profile-stat-num">${postCount}</div><div class="profile-stat-lbl">ruinas</div></div>
+      <div class="profile-stat"><div class="profile-stat-num">${prof.streak||0}</div><div class="profile-stat-lbl">${ICO.flame} ${t('profile_streak')}</div></div>
+      <div class="profile-stat"><div class="profile-stat-num" style="color:#5A8FD4">${td}</div><div class="profile-stat-lbl">${ICO.candle} ${t('profile_deps')}</div></div>
+      <div class="profile-stat"><div class="profile-stat-num">${postCount}</div><div class="profile-stat-lbl">${t('profile_ruinas_lbl')}</div></div>
     </div>
     <div style="height:1px;background:var(--border);margin-bottom:clamp(16px,4vw,20px);"></div>
-    <div class="profile-posts-hdr">Últimas ruinas</div>
-    <div class="feed-list">${cards||`<p style="text-align:center;color:var(--muted2);">Sin ruinas todavía.</p>`}</div>
+    <div class="profile-posts-hdr">${t('profile_ruinas_last')}</div>
+    <div class="feed-list">${cards||`<p style="text-align:center;color:var(--muted2);">${t('profile_no_ruinas')}</p>`}</div>
   </div>`;
 }
 
 function renderSeñales(){
   const items=window._señalesItems||[];
-  const timeAgo=t=>{const s=Math.floor((Date.now()-new Date(t))/1000);if(s<60)return'ahora';if(s<3600)return Math.floor(s/60)+'m';if(s<86400)return Math.floor(s/3600)+'h';return Math.floor(s/86400)+'d';};
   const rows=items.map(i=>i.type==='dep'
-    ?`<div class="señal-row"><div class="señal-icon">${ICO.candle}</div><div class="señal-text"><strong>${esc(i.user)}</strong> te ha mandado un DEP</div><div class="señal-time">${timeAgo(i.time)}</div></div>`
-    :`<div class="señal-row"><div class="señal-icon">${ICO.skull}</div><div class="señal-text"><strong>${esc(i.user)}</strong> ha empezado a seguirte</div><div class="señal-time">${timeAgo(i.time)}</div></div>`
+    ?`<div class="señal-row"><div class="señal-icon">${ICO.candle}</div><div class="señal-text"><strong>${esc(i.user)}</strong> ${t('sig_dep')}</div><div class="señal-time">${timeAgo(i.time)}</div></div>`
+    :`<div class="señal-row"><div class="señal-icon">${ICO.skull}</div><div class="señal-text"><strong>${esc(i.user)}</strong> ${t('sig_follow')}</div><div class="señal-time">${timeAgo(i.time)}</div></div>`
   ).join('');
-  const emptyState=todayPost?'No hay señales nuevas desde tu última visita':'Publica tu ruina de hoy para recibir señales';
+  const emptyState=todayPost?t('senales_empty_post'):t('senales_empty_no_post');
   return `<div class="screen">
-    ${hdr('Señales',todayPost?'"'+esc(todayPost.razon).slice(0,38)+(todayPost.razon.length>38?'…':'')+'"':'')}
+    ${hdr(t('senales_title'),todayPost?'"'+esc(todayPost.razon).slice(0,38)+(todayPost.razon.length>38?'…':'')+'"':'')}
     ${items.length?rows:`<p class="señales-empty">${emptyState}</p>`}
-    ${!todayPost?`<div style="text-align:center;margin-top:20px;"><button class="btn btn-red" onclick="draftRazon='';view='razon';paint()">Publicar ruina</button></div>`:''}
+    ${!todayPost?`<div style="text-align:center;margin-top:20px;"><button class="btn btn-red" onclick="draftRazon='';view='razon';paint()">${t('btn_publish_ruina')}</button></div>`:''}
   </div>`;
 }
 
 function prevPostHTML(p,size){
   if(!p)return'';
   const d=DEATHS.find(x=>x.id===p.castigo);
-  const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):DEATH_LABELS[p.castigo]||p.castigo;
+  const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):dl(p.castigo);
   // Use the color stored in the post, not current profile color
   return `<div class="prev-inner">
-    <div class="prev-label">Lo de antes</div>
+    <div class="prev-label">${t('prev_label')}</div>
     <div style="display:flex;justify-content:center;opacity:.5;">
       ${dollWithDraw(p.doll_color,p.castigo,p.dibujo_trazos,true,d?.pose||'idle',size||60)}
     </div>
@@ -1274,10 +1390,10 @@ function prevPostHTML(p,size){
 function renderHome(){
   if(todayPost){
     const p=todayPost,d=DEATHS.find(x=>x.id===p.castigo);
-    const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):DEATH_LABELS[p.castigo]||p.castigo;
+    const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):dl(p.castigo);
     const hasPrev=!!todayPrevPost,isOpen=expandedPrev.has('home');
     return `<div class="screen" style="text-align:center;">
-      <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:8px;">Hoy ya está hecho</div>
+      <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:8px;">${t('home_done')}</div>
       <div style="font-size:clamp(13px,3.5vw,15px);color:var(--muted2);font-style:italic;margin:0 clamp(12px,4vw,24px);">"${esc(p.razon)}"</div>
       <div style="display:flex;justify-content:center;margin:clamp(20px,5vw,32px) 0;">
         ${dollWithDraw(p.doll_color,p.castigo,p.dibujo_trazos,true,d?.pose||'idle',clamp(140,170))}
@@ -1285,28 +1401,28 @@ function renderHome(){
       <div class="done-card">
         <div class="done-razon">"${esc(p.razon)}"</div>
         <div class="done-castigo">${lbl}</div>
-        <div style="color:var(--muted);font-size:clamp(11px,2.8vw,12px);margin-top:8px;letter-spacing:.3px;display:flex;align-items:center;justify-content:center;gap:5px;">${icoStat(ICO.candle,14)} ${p.dep_count||0} DEPs recibidos</div>
+        <div style="color:var(--muted);font-size:clamp(11px,2.8vw,12px);margin-top:8px;letter-spacing:.3px;display:flex;align-items:center;justify-content:center;gap:5px;">${icoStat(ICO.candle,14)} ${p.dep_count||0} ${t('deps_received')}</div>
         ${hasPrev?`
           <button class="prev-toggle ${isOpen?'open':''}" id="btnTogglePrev">
             <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-            Antes había pasado algo
+            ${t('prev_btn')}
           </button>
           <div class="prev-panel ${isOpen?'open':''}" id="prevPanel">${prevPostHTML(todayPrevPost,64)}</div>
         `:''}
       </div>
-      <button class="peor-btn" id="btnPeor">Ha ido a peor — contar algo nuevo</button>
+      <button class="peor-btn" id="btnPeor">${t('btn_worse')}</button>
       <div style="display:flex;justify-content:center;margin-top:16px;">
-        <button class="btn-warm-sm" id="goFeed">Ver el feed</button>
+        <button class="btn-warm-sm" id="goFeed">${t('btn_feed')}</button>
       </div>
     </div>`;
   }
   return `<div class="screen" style="text-align:center;">
-    <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:clamp(20px,5vw,28px);">Una ruina al día</div>
+    <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:clamp(20px,5vw,28px);">${t('home_empty')}</div>
     <div style="display:flex;justify-content:center;margin-bottom:clamp(24px,6vw,36px);animation:breathe 3.5s ease-in-out infinite;">
       ${dollSVG(profile.doll_color,null,false,'idle',clamp(150,180))}
     </div>
-    <button class="btn btn-red" id="empezar" style="max-width:240px;margin:0 auto;font-size:clamp(14px,3.5vw,16px);letter-spacing:.4px;">¿Cuál es tu ruina de hoy?</button>
-    <button class="btn-link" id="btnInstrHome" style="margin-top:10px;">¿qué es esto?</button>
+    <button class="btn btn-red" id="empezar" style="max-width:240px;margin:0 auto;font-size:clamp(14px,3.5vw,16px);letter-spacing:.4px;">${t('btn_start')}</button>
+    <button class="btn-link" id="btnInstrHome" style="margin-top:10px;">${t('btn_whats_this')}</button>
   </div>`;
 }
 
@@ -1320,13 +1436,13 @@ function renderMuerte(){
     <span class="dlabel">${d.label}</span>
   </div>`).join('');
   return `<div class="screen">
-    ${hdr("Elige su castigo","Desbloquea más con racha y DEPs")}
-    <button class="btn-link" id="volverMuerte" style="margin-top:-8px;margin-bottom:6px;">← cambiar lo que pasó</button>
+    ${hdr(t('muerte_title'),t('muerte_sub'))}
+    <button class="btn-link" id="volverMuerte" style="margin-top:-8px;margin-bottom:6px;">${t('btn_back_muerte')}</button>
     <div class="grid2">
       ${cells}
       <div class="draw-cell" id="drawCard">
         <div>${ICO.pencil}</div>
-        <div><div class="dlabel">Modo libre</div><div class="dsub">Dibuja el castigo tú mismo</div></div>
+        <div><div class="dlabel">${t('draw_label')}</div><div class="dsub">${t('draw_sub')}</div></div>
       </div>
     </div>
   </div>`;
@@ -1334,26 +1450,26 @@ function renderMuerte(){
 
 function renderDibujo(){
   return `<div class="screen">
-    ${hdr("Modo libre","Escribe qué pasó y dibuja qué le haces")}
-    <textarea id="razonDibujo" placeholder="¿qué te ha pasado hoy?" maxlength="120">${esc(draftRazon)}</textarea>
+    ${hdr(t('dibujo_title'),t('dibujo_sub'))}
+    <textarea id="razonDibujo" placeholder="${t('ph_razon_draw')}" maxlength="120">${esc(draftRazon)}</textarea>
     <div class="charcount" id="razonCount">${draftRazon.length}/120</div>
     <div style="display:flex;justify-content:center;margin-top:14px;"><canvas id="drawCanvas" width="220" height="280"></canvas></div>
     <div class="swatches">${LINE_COLORS.map((c,i)=>`<button class="swatch ${i===0?'on':''}" data-color="${c}" style="background:${c};"></button>`).join('')}</div>
     <div class="wrow">
       ${LINE_WIDTHS.map((w,i)=>`<button class="wbtn ${i===1?'on':''}" data-width="${w}"><span class="wdot" style="width:${w+4}px;height:${w+4}px;"></span></button>`).join('')}
-      <button class="clearbtn" id="clearCanvas">limpiar</button>
+      <button class="clearbtn" id="clearCanvas">${t('btn_clear')}</button>
     </div>
-    <div style="margin-top:14px;"><input type="text" id="descDibujo" placeholder="¿qué le has hecho?" maxlength="80"/></div>
-    <div style="display:flex;justify-content:center;margin-top:16px;"><button class="btn-warm-sm" id="guardarDibujo" disabled>Publicar</button></div>
-    <button class="btn-link" id="volverFormas">← volver a los castigos</button>
+    <div style="margin-top:14px;"><input type="text" id="descDibujo" placeholder="${t('ph_desc_draw')}" maxlength="80"/></div>
+    <div style="display:flex;justify-content:center;margin-top:16px;"><button class="btn-warm-sm" id="guardarDibujo" disabled>${t('btn_publish')}</button></div>
+    <button class="btn-link" id="volverFormas">${t('btn_back_draw')}</button>
   </div>`;
 }
 
 function renderPosted(){
   const p=todayPost,d=DEATHS.find(x=>x.id===p.castigo);
-  const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):DEATH_LABELS[p.castigo]||p.castigo;
+  const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):dl(p.castigo);
   return `<div class="screen" style="text-align:center;">
-    <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:16px;">Publicado</div>
+    <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:16px;">${t('posted_label')}</div>
     <div style="display:flex;justify-content:center;margin:0 0 clamp(20px,5vw,28px);">
       ${dollWithDraw(p.doll_color,p.castigo,p.dibujo_trazos,true,d?.pose||'idle',clamp(140,170))}
     </div>
@@ -1362,7 +1478,7 @@ function renderPosted(){
       <div class="done-castigo">${lbl}</div>
     </div>
     <div style="display:flex;justify-content:center;margin-top:20px;">
-      <button class="btn-warm-sm" id="irAlFeed">Ver el feed</button>
+      <button class="btn-warm-sm" id="irAlFeed">${t('btn_feed')}</button>
     </div>
   </div>`;
 }
@@ -1382,7 +1498,7 @@ function renderMuertes(){
         <div class="dr-doll">${dollSVG(profile.doll_color,d.id,true,d.pose,dollPx)}</div>
         <div class="dr-info">
           <div class="dr-name">${d.label}</div>
-          <div class="dr-status ok">${ICO.check} desbloqueada</div>
+          <div class="dr-status ok">${ICO.check}${t('death_ok')}</div>
         </div>
       </div>`;
     }
@@ -1393,10 +1509,10 @@ function renderMuertes(){
         <div class="dr-lock">${ICO.lock}</div>
         <div class="dr-info">
           <div class="dr-name">${d.label}</div>
-          <div class="dr-status streak">${left}d más de racha</div>
+          <div class="dr-status streak">${left}${t('streak_left')}</div>
           <div class="dr-bar-wrap"><div class="dr-bar-fill streak" style="width:${pct}%"></div></div>
         </div>
-        <div class="dr-prog"><div class="dr-prog-num">${streak}<span style="color:var(--muted);font-size:.7em">/${d.min}</span></div><div class="dr-prog-lbl">días</div></div>
+        <div class="dr-prog"><div class="dr-prog-num">${streak}<span style="color:var(--muted);font-size:.7em">/${d.min}</span></div><div class="dr-prog-lbl">${t('days_lbl')}</div></div>
       </div>`;
     }
     if(isNextDeps){
@@ -1406,7 +1522,7 @@ function renderMuertes(){
         <div class="dr-lock">${ICO.lock}</div>
         <div class="dr-info">
           <div class="dr-name">${d.label}</div>
-          <div class="dr-status deps">${left} DEPs más</div>
+          <div class="dr-status deps">${left}${t('deps_left')}</div>
           <div class="dr-bar-wrap"><div class="dr-bar-fill deps" style="width:${pct}%"></div></div>
         </div>
         <div class="dr-prog"><div class="dr-prog-num">${totalDeps}<span style="color:var(--muted);font-size:.7em">/${d.deps}</span></div><div class="dr-prog-lbl">DEPs</div></div>
@@ -1430,32 +1546,32 @@ function renderMuertes(){
   const unlockedCount=DEATHS.filter(d=>streak>=d.min&&totalDeps>=d.deps).length;
 
   return `<div class="screen">
-    ${hdr("Muertes")}
+    ${hdr(t('nav_muertes'))}
     <div class="deaths-header-stats">
-      <div class="dhs-pill"><div class="dhs-num" style="color:var(--warm)">${unlockedCount}<span style="color:var(--muted);font-size:.6em;font-weight:400">/${DEATHS.length}</span></div><div class="dhs-lbl">desbloqueadas</div></div>
-      <div class="dhs-pill"><div class="dhs-num">${streak}</div><div class="dhs-lbl">racha</div></div>
+      <div class="dhs-pill"><div class="dhs-num" style="color:var(--warm)">${unlockedCount}<span style="color:var(--muted);font-size:.6em;font-weight:400">/${DEATHS.length}</span></div><div class="dhs-lbl">${t('muertes_unlocked')}</div></div>
+      <div class="dhs-pill"><div class="dhs-num">${streak}</div><div class="dhs-lbl">${t('profile_streak')}</div></div>
       <div class="dhs-pill"><div class="dhs-num" style="color:#5A8FD4">${totalDeps}</div><div class="dhs-lbl">DEPs</div></div>
     </div>
 
     <div class="deaths-section">
-      <div class="deaths-section-hdr"><span>Siempre disponibles</span></div>
+      <div class="deaths-section-hdr"><span>${t('muertes_free')}</span></div>
       ${free.map(deathRow).join('')}
     </div>
 
     <div class="deaths-section">
-      <div class="deaths-section-hdr"><span>Por racha diaria</span></div>
+      <div class="deaths-section-hdr"><span>${t('muertes_streak')}</span></div>
       ${byStreak.map(deathRow).join('')}
     </div>
 
     <div class="deaths-section">
-      <div class="deaths-section-hdr"><span>Por DEPs recibidos</span></div>
+      <div class="deaths-section-hdr"><span>${t('muertes_deps')}</span></div>
       ${byDeps.map(deathRow).join('')}
     </div>
   </div>`;
 }
 
 function feedCardHTML(item,older=false){
-  const lbl=item.castigo==='dibujo'?esc(item.dibujo_descripcion):DEATH_LABELS[item.castigo]||item.castigo;
+  const lbl=item.castigo==='dibujo'?esc(item.dibujo_descripcion):dl(item.castigo);
   const given=myDeps.has(item.id),own=item.user_id===user.id;
   const friend=myFollowing.has(item.user_id);
   const d=DEATHS.find(x=>x.id===item.castigo);
@@ -1469,7 +1585,7 @@ function feedCardHTML(item,older=false){
         <div class="feed-name">${esc(item.username)}</div>
         <div class="feed-time">${timeAgo(item.created_at)}</div>
       </div>
-      ${!own&&!older?`<button class="follow-btn ${friend?'following':''}" data-uid="${item.user_id}">${friend?ICO.check+' siguiendo':ICO.plus+' seguir'}</button>`:''}
+      ${!own&&!older?`<button class="follow-btn ${friend?'following':''}" data-uid="${item.user_id}">${friend?ICO.check+t('btn_following'):ICO.plus+t('btn_follow')}</button>`:''}
     </div>
     <p class="feed-razon">"${esc(item.razon)}"</p>
     <span class="feed-castigo">${lbl}</span>
@@ -1482,7 +1598,7 @@ function feedCardHTML(item,older=false){
     ${hasPrev&&!older?`
       <button class="prev-toggle ${isOpen?'open':''}" data-feedprev="${item.id}">
         <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        Antes había pasado algo
+        ${t('prev_btn')}
       </button>
       <div class="prev-panel ${isOpen?'open':''}">${prevPostHTML(item._prev,54)}</div>
     `:''}
@@ -1490,39 +1606,40 @@ function feedCardHTML(item,older=false){
 }
 
 function renderFeed(){
-  const olderHTML=feedOlder.length?`<div class="feed-older-hdr">Días anteriores</div><div class="feed-older">${feedOlder.map(i=>feedCardHTML(i,true)).join('')}</div>`:'';
-  if(!feedData.length)return`<div class="screen">${hdr("Feed","Lo de hoy")}<div style="text-align:center;color:var(--muted2);margin-top:40px;font-size:clamp(13px,3.5vw,15px);">Nadie ha publicado hoy<br><span style="font-size:clamp(11px,3vw,12px);opacity:.45;display:block;margin-top:6px;">sé el primero</span></div>${olderHTML}</div>`;
+  const olderHTML=feedOlder.length?`<div class="feed-older-hdr">${t('feed_older')}</div><div class="feed-older">${feedOlder.map(i=>feedCardHTML(i,true)).join('')}</div>`:'';
+  if(!feedData.length)return`<div class="screen">${hdr(t('nav_feed'),t('feed_sub'))}<div style="text-align:center;color:var(--muted2);margin-top:40px;font-size:clamp(13px,3.5vw,15px);">${t('feed_empty')}<br><span style="font-size:clamp(11px,3vw,12px);opacity:.45;display:block;margin-top:6px;">${t('feed_empty_sub')}</span></div>${olderHTML}</div>`;
   const cards=feedData.map(item=>feedCardHTML(item,false)).join('');
-  return `<div class="screen">${hdr("Feed","Lo de hoy")}<div class="feed-list">${cards}</div>${olderHTML}</div>`;
+  return `<div class="screen">${hdr(t('nav_feed'),t('feed_sub'))}<div class="feed-list">${cards}</div>${olderHTML}</div>`;
 }
 
 function renderAjustes(){
   const streak=profile?.streak||0;
   return `<div class="screen">
-    ${hdr("Ajustes",`@${esc(profile.username)}`)}
+    ${hdr(t('ajustes_title'),`@${esc(profile.username)}`)}
     <div style="text-align:center;color:var(--muted);font-size:clamp(10px,2.6vw,11px);margin-bottom:16px;">${esc(user?.email||'')}</div>
     <div style="display:flex;justify-content:center;margin:8px 0 18px;">
       ${dollSVG(profile.doll_color,null,false,'idle',110)}
     </div>
-    <div style="text-align:center;color:var(--muted2);font-size:clamp(9px,2.5vw,10px);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Color del muñeco</div>
+    <div style="text-align:center;color:var(--muted2);font-size:clamp(9px,2.5vw,10px);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">${t('ajustes_color')}</div>
     <div class="colorpick">
       ${DOLL_COLORS.map(c=>`<button class="ccircle ${c===profile.doll_color?'on':''}" data-color="${c}" style="background:${c};"></button>`).join('')}
     </div>
     <div class="stat-row">
       <div class="stat-block">
         <div style="display:flex;align-items:center;justify-content:center;gap:6px;">${icoStat(ICO.flame)}<div class="stat-num">${streak}</div></div>
-        <div class="stat-label">racha del día</div>
+        <div class="stat-label">${t('streak_lbl')}</div>
       </div>
       <div class="stat-block">
         <div style="display:flex;align-items:center;justify-content:center;gap:6px;">${icoStat(ICO.candle)}<div class="stat-num blue">${totalDeps}</div></div>
-        <div class="stat-label">DEPs totales</div>
+        <div class="stat-label">${t('deps_lbl')}</div>
       </div>
     </div>
     <div style="height:1px;background:var(--border);margin:clamp(20px,5vw,26px) 0;"></div>
-    <button class="btn-ghost" id="btnChangePass" style="margin-bottom:10px;">Cambiar contraseña</button>
-    <button class="btn-ghost" id="btnInstructions" style="margin-bottom:10px;">¿Qué es kill.me?</button>
-    <button class="btn-ghost" id="btnLogout">Cerrar sesión</button>
-    <button class="btn-link" id="volverAjustes">← volver</button>
+    <button class="btn-ghost" id="btnChangePass" style="margin-bottom:10px;">${t('btn_change_pass')}</button>
+    <button class="btn-ghost" id="btnInstructions" style="margin-bottom:10px;">${t('btn_what_is')}</button>
+    <button class="btn-ghost" id="btnLang" style="margin-bottom:10px;">${t('lang_btn')}</button>
+    <button class="btn-ghost" id="btnLogout">${t('btn_logout')}</button>
+    <button class="btn-link" id="volverAjustes">${t('btn_back')}</button>
   </div>`;
 }
 
@@ -1584,10 +1701,11 @@ function attachListeners(){
       const btn=ge('btnChangePass');
       btn.disabled=true;btn.textContent='Enviando...';
       const {error}=await sb.auth.resetPasswordForEmail(user.email,{redirectTo:location.origin+location.pathname});
-      btn.disabled=false;btn.textContent='Cambiar contraseña';
+      btn.disabled=false;btn.textContent=t('btn_change_pass');
       if(error){alert('Error: '+sbErr(error.message));}
-      else{alert('Te hemos enviado un email para cambiar la contraseña.');}
+      else{alert(t('pass_email_sent'));}
     };
+    if(ge('btnLang'))ge('btnLang').onclick=()=>{lang=lang==='es'?'en':'es';localStorage.setItem('kill_lang',lang);paint();};
     if(ge('btnLogout'))ge('btnLogout').onclick=async()=>{
       await sb.auth.signOut().catch(()=>{});
       user=null;profile=null;todayPost=null;todayPrevPost=null;
@@ -1636,13 +1754,13 @@ function attachListeners(){
 
 function renderRazon(){
   return `<div class="screen">
-    ${hdr("¿Cuál es tu ruina de hoy?")}
-    <textarea id="razonInput" placeholder="ej: se me ha caído el café al suelo..." maxlength="120">${esc(draftRazon)}</textarea>
+    ${hdr(t('razon_title'))}
+    <textarea id="razonInput" placeholder="${t('ph_razon')}" maxlength="120">${esc(draftRazon)}</textarea>
     <div class="charcount" id="razonInputCount">${draftRazon.length}/120</div>
     <div style="display:flex;justify-content:center;margin-top:20px;">
-      <button class="btn btn-red" id="btnElegirCastigo" ${draftRazon.trim().length<2?'disabled':''}>Elegir castigo →</button>
+      <button class="btn btn-red" id="btnElegirCastigo" ${draftRazon.trim().length<2?'disabled':''}>${t('btn_castigo')}</button>
     </div>
-    <button class="btn-link" id="volverRazon">← volver</button>
+    <button class="btn-link" id="volverRazon">${t('btn_back')}</button>
   </div>`;
 }
 
@@ -1650,7 +1768,7 @@ function promptConfirmDeath(death){
   const d=DEATHS.find(x=>x.id===death);
   const lbl=d?.label||death;
   ge('app').innerHTML=`<div class="screen" style="text-align:center;">
-    <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:12px;">¿Así muere?</div>
+    <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:12px;">${t('confirm_title')}</div>
     <div style="display:flex;justify-content:center;margin:0 0 clamp(16px,4vw,24px);">
       ${dollSVG(profile.doll_color,death,true,d?.pose||'idle',clamp(130,160))}
     </div>
@@ -1659,9 +1777,9 @@ function promptConfirmDeath(death){
       <div class="done-castigo">${lbl}</div>
     </div>
     <div style="display:flex;justify-content:center;">
-      <button class="btn btn-red" id="btnPublicarFinal">Publicar</button>
+      <button class="btn btn-red" id="btnPublicarFinal">${t('btn_publish')}</button>
     </div>
-    <button class="btn-link" id="volverConfirm">← cambiar castigo</button>
+    <button class="btn-link" id="volverConfirm">${t('btn_back_castigo')}</button>
   </div>`;
   ge('btnPublicarFinal').onclick=async()=>{
     const btn=ge('btnPublicarFinal');

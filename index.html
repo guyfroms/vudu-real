@@ -248,13 +248,34 @@ textarea:focus,input:focus{border-color:var(--red);}
 .feed-older .feed-card{opacity:.45;pointer-events:none;}
 .feed-older .dep-btn{opacity:.45;}
 
-/* ── Auth tagline slides ── */
+/* ── Auth tagline ── */
 .auth-hero{margin-bottom:8px;}
-.auth-pitch{margin-top:20px;text-align:center;}
-.auth-quote{margin-bottom:10px;line-height:1.3;}
-.auth-quote-who{font-size:clamp(11px,2.8vw,13px);color:var(--muted2);font-weight:600;letter-spacing:.5px;margin-right:5px;}
-.auth-quote-text{font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(20px,5.2vw,26px);font-weight:700;color:var(--text);}
-.auth-tagline{color:var(--muted2);font-size:clamp(11px,2.8vw,13px);letter-spacing:.3px;}
+.auth-pitch{margin-top:18px;text-align:center;}
+.auth-tagline{font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(22px,5.8vw,28px);font-weight:700;color:var(--text);line-height:1.2;margin-bottom:10px;}
+.auth-sub{color:var(--muted2);font-size:clamp(12px,3vw,13px);margin-bottom:18px;letter-spacing:.2px;}
+.auth-beats{display:flex;flex-direction:column;gap:7px;text-align:left;max-width:260px;margin:0 auto;}
+.auth-beats span{color:var(--bone2);font-size:clamp(12px,3vw,13px);line-height:1.4;padding-left:16px;position:relative;}
+.auth-beats span::before{content:'—';position:absolute;left:0;color:var(--red);}
+
+/* ── Perfil de usuario ── */
+.profile-hero{display:flex;flex-direction:column;align-items:center;padding:clamp(20px,5vw,28px) 0 clamp(16px,4vw,22px);}
+.profile-name{font-family:'Playfair Display',serif;font-size:clamp(20px,5vw,24px);font-weight:900;margin-top:12px;color:var(--text);}
+.profile-since{font-size:clamp(10px,2.5vw,11px);color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px;}
+.profile-stats{display:flex;gap:0;margin:clamp(18px,4vw,24px) 0;width:100%;}
+.profile-stat{flex:1;text-align:center;padding:clamp(12px,3vw,16px) 0;border-right:1px solid var(--border);}
+.profile-stat:last-child{border-right:none;}
+.profile-stat-num{font-family:system-ui,sans-serif;font-variant-numeric:lining-nums tabular-nums;font-size:clamp(20px,5vw,26px);font-weight:700;color:var(--text);line-height:1;}
+.profile-stat-lbl{font-size:clamp(9px,2.2vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-top:4px;}
+.profile-posts-hdr{font-size:clamp(9px,2.5vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;}
+
+/* ── Mis amigos ── */
+.amigo-row{display:flex;align-items:center;gap:14px;padding:clamp(12px,3vw,16px) 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.amigo-row:last-child{border-bottom:none;}
+.amigo-row:active{opacity:.7;}
+.amigo-info{flex:1;min-width:0;}
+.amigo-name{font-weight:700;font-size:clamp(14px,3.5vw,15px);color:var(--text);}
+.amigo-meta{font-size:clamp(11px,2.8vw,12px);color:var(--muted2);margin-top:2px;}
+.amigo-arrow{color:var(--muted);font-size:18px;flex-shrink:0;}
 
 /* ── Notif banner ── */
 .notif-banner{background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
@@ -423,6 +444,7 @@ const ICO={
   mail:`<svg width="36" height="28" viewBox="0 0 36 28" fill="none"><rect x="1" y="1" width="34" height="26" rx="4" stroke="currentColor" stroke-width="1.8"/><path d="M1 7l17 11 17-11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
   skull:`<svg width="20" height="22" viewBox="0 0 20 22" fill="none"><path d="M10 2C5.58 2 2 5.36 2 9.5c0 2.5 1.28 4.7 3.2 6.1V18a1 1 0 0 0 1 1h7.6a1 1 0 0 0 1-1v-2.4C16.72 14.2 18 12 18 9.5 18 5.36 14.42 2 10 2Z" stroke="currentColor" stroke-width="1.7"/><circle cx="7" cy="10" r="1.6" fill="currentColor"/><circle cx="13" cy="10" r="1.6" fill="currentColor"/><path d="M7 19v2M10 19v2M13 19v2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`,
   bell:`<svg width="20" height="22" viewBox="0 0 20 22" fill="none"><path d="M10 2a6 6 0 0 0-6 6v4l-2 3h16l-2-3V8a6 6 0 0 0-6-6Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 17a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.7"/></svg>`,
+  people:`<svg width="22" height="20" viewBox="0 0 22 20" fill="none"><circle cx="8" cy="5" r="3.2" stroke="currentColor" stroke-width="1.7"/><path d="M1 19c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="17" cy="5" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M20 19c0-2.8-1.6-5.2-4-6.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
   question:`<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7.5" stroke="currentColor" stroke-width="1.6"/><path d="M7 7c0-1.1.9-2 2-2s2 .9 2 2c0 .8-.5 1.4-1.2 1.7C9.3 9 9 9.5 9 10v.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="9" cy="13" r=".8" fill="currentColor"/></svg>`,
 };
 
@@ -431,7 +453,7 @@ let user=null,profile=null,view="loading",todayPost=null;
 let feedData=[],myDeps=new Set(),myFollowing=new Set();
 let todayPrevPost=null,expandedPrev=new Set();
 let authTab="login",authStep="form",pendingVerifyEmail="",recoverySession=false;
-let feedOlder=[],señalesBadge=false;
+let feedOlder=[],señalesBadge=false,viewingProfile=null,friendsList=null;
 let pendingSignup={username:"",email:"",pass:"",color:DOLL_COLORS[0]};
 let draftRazon="",totalDeps=0,navigating=false;
 
@@ -780,6 +802,7 @@ async function toggleFollow(uid){
     await sb.from('follows').insert({follower_id:user.id,following_id:uid});
     myFollowing.add(uid);
   }
+  friendsList=null;
   feedData.sort((a,b)=>{const af=myFollowing.has(a.user_id)?0:1,bf=myFollowing.has(b.user_id)?0:1;return af-bf||(new Date(b.created_at)-new Date(a.created_at));});
   paint();
 }
@@ -993,10 +1016,13 @@ function renderAuth(){
     <div class="auth-brand auth-hero">
       <h1 class="cinzel">kill<em>.me</em></h1>
       ${!login?'':` <div class="auth-pitch">
-        <div class="auth-quote">
-          <span class="auth-quote-who">Yo:</span><span class="auth-quote-text">"pues me mato."</span>
+        <div class="auth-tagline">"pues me mato."</div>
+        <div class="auth-sub">La app para los días que merecen un castigo.</div>
+        <div class="auth-beats">
+          <span>Cuenta tu ruina del día</span>
+          <span>Elige cómo muere tu muñeco</span>
+          <span>Recibe DEPs de tus amigos</span>
         </div>
-        <div class="auth-tagline">La app donde desahogar tus desgracias.</div>
       </div>`}
     </div>
     <div class="auth-doll-preview">${dollSVG(DOLL_COLORS[0],null,true,'idle',120)}</div>
@@ -1067,6 +1093,7 @@ function shell(content){
     <span class="logo cinzel">kill<em>.me</em></span>
     <div class="topbar-r">
       ${streak>0?`<div class="streak-pill">${ICO.flame}<span>${streak}</span></div>`:''}
+      <button class="gear-btn" id="btnAmigos" style="margin-right:2px;">${ICO.people}</button>
       <button class="gear-btn" id="btnGear">${ICO.gear}</button>
     </div>
   </div>
@@ -1078,6 +1105,7 @@ function shell(content){
     <div class="navbtn-wrap"><button class="navbtn ${view==='muertes'?'on':''}" id="navMuertes">${ICO.skull}<span>Muertes</span></button></div>
   </div>`;
   ge('btnGear').onclick=()=>{view='ajustes';paint();};
+  ge('btnAmigos').onclick=async()=>{view='amigos';paint();};
   ge('navHoy').onclick=()=>{view='home';paint();};
   ge('navFeed').onclick=async()=>{await loadFeed();view='feed';paint();};
   ge('navSeñales').onclick=async()=>{señalesBadge=false;window._señalesItems=await loadSeñales();view='señales';paint();};
@@ -1129,7 +1157,81 @@ function paint(){
   else if(view==='muertes')c=renderMuertes();
   else if(view==='ajustes')c=renderAjustes();
   else if(view==='señales')c=renderSeñales();
+  else if(view==='amigos')c=renderAmigos();
+  else if(view==='profile')c=renderProfile();
   shell(c);
+}
+
+async function loadProfileData(uid){
+  const [{data:prof},{data:posts},{data:depRows}]=await Promise.all([
+    sb.from('profiles').select('*').eq('id',uid).single(),
+    sb.from('posts').select('*').eq('user_id',uid).eq('is_primary',true).order('created_at',{ascending:false}).limit(20),
+    sb.from('deps').select('dep_count:post_id.count()').eq('user_id',uid),
+  ]).catch(()=>[{data:null},{data:[]},{data:[]}]);
+  // total deps = sum of dep_count across their posts
+  const {data:depSum}=await sb.from('posts').select('dep_count').eq('user_id',uid).catch(()=>({data:[]}));
+  const totalD=(depSum||[]).reduce((s,p)=>s+(p.dep_count||0),0);
+  return {prof:prof||{}, posts:posts||[], totalDeps:totalD};
+}
+
+function renderAmigos(){
+  const friendIds=[...myFollowing];
+  if(!friendIds.length) return `<div class="screen">${hdr('Mis amigos','')}<p style="text-align:center;color:var(--muted2);margin-top:60px;font-size:clamp(13px,3.5vw,14px);">Todavía no sigues a nadie.<br><span style="font-size:clamp(11px,3vw,12px);opacity:.5;display:block;margin-top:6px;">Encuéntralos en el feed.</span></p><button class="btn-link" id="volverAmigos" style="margin-top:20px;">← volver</button></div>`;
+  const friends=friendsList||[];
+  const friendRows=friends.map(f=>`
+    <div class="amigo-row" data-uid="${f.id}">
+      <div style="flex-shrink:0">${avatarDoll(f.doll_color||DOLL_COLORS[0],clamp(40,48))}</div>
+      <div class="amigo-info">
+        <div class="amigo-name">@${esc(f.username)}</div>
+        <div class="amigo-meta">${f.streak||0} de racha · miembro desde ${f.created_at?new Date(f.created_at).toLocaleDateString('es-ES',{month:'short',year:'numeric'}):'—'}</div>
+      </div>
+      <div class="amigo-arrow">›</div>
+    </div>`).join('');
+  const content=friends.length?friendRows:`<div style="text-align:center;color:var(--muted2);margin-top:40px;">Cargando...</div>`;
+  return `<div class="screen">${hdr('Mis amigos',`${friendIds.length} siguiendo`)}<div>${content}</div><button class="btn-link" id="volverAmigos" style="margin-top:20px;">← volver</button></div>`;
+}
+
+function renderProfile(){
+  if(!viewingProfile||Array.isArray(viewingProfile))return`<div class="screen"><button class="btn-link" id="volverProfile">← volver</button></div>`;
+  const {prof,posts,totalDeps:td}=viewingProfile;
+  const isSelf=prof.id===user.id;
+  const isFollowing=myFollowing.has(prof.id);
+  const since=prof.created_at?new Date(prof.created_at).toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'}):'—';
+  const postCount=posts.length;
+  const cards=posts.slice(0,10).map(p=>{
+    const d=DEATHS.find(x=>x.id===p.castigo);
+    const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):DEATH_LABELS[p.castigo]||p.castigo;
+    const dateStr=new Date(p.created_at).toLocaleDateString('es-ES',{day:'numeric',month:'short'});
+    return `<div class="feed-card" style="opacity:1;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span class="feed-time">${dateStr}</span>
+        <span class="feed-castigo">${lbl}</span>
+      </div>
+      <p class="feed-razon">"${esc(p.razon)}"</p>
+      <div style="display:flex;justify-content:center;margin:4px 0 10px;">
+        ${dollWithDraw(p.doll_color||prof.doll_color,p.castigo,p.dibujo_trazos,true,d?.pose||'idle',clamp(72,88))}
+      </div>
+      <div class="own-dep">${ICO.candle} <span>${p.dep_count||0} DEPs</span></div>
+    </div>`;
+  }).join('');
+  return `<div class="screen">
+    <button class="btn-link" id="volverProfile" style="margin-bottom:4px;">← volver</button>
+    <div class="profile-hero">
+      ${dollSVG(prof.doll_color||DOLL_COLORS[0],null,true,'idle',clamp(90,110))}
+      <div class="profile-name">@${esc(prof.username)}</div>
+      <div class="profile-since">Miembro desde ${since}</div>
+      ${!isSelf?`<button class="follow-btn ${isFollowing?'following':''}" id="profileFollow" data-uid="${prof.id}" style="margin-top:12px;">${isFollowing?ICO.check+' siguiendo':ICO.plus+' seguir'}</button>`:''}
+    </div>
+    <div style="height:1px;background:var(--border);"></div>
+    <div class="profile-stats">
+      <div class="profile-stat"><div class="profile-stat-num">${prof.streak||0}</div><div class="profile-stat-lbl">${ICO.flame} racha</div></div>
+      <div class="profile-stat"><div class="profile-stat-num" style="color:#5A8FD4">${td}</div><div class="profile-stat-lbl">${ICO.candle} DEPs</div></div>
+      <div class="profile-stat"><div class="profile-stat-num">${postCount}</div><div class="profile-stat-lbl">ruinas</div></div>
+    </div>
+    <div style="height:1px;background:var(--border);margin-bottom:clamp(16px,4vw,20px);"></div>
+    <div class="profile-posts-hdr">Últimas ruinas</div>
+    <div class="feed-list">${cards||`<p style="text-align:center;color:var(--muted2);">Sin ruinas todavía.</p>`}</div>
+  </div>`;
 }
 
 function renderSeñales(){
@@ -1352,7 +1454,9 @@ function feedCardHTML(item,older=false){
   const hasPrev=!!item.previous_post_id&&!!item._prev,isOpen=expandedPrev.has(item.id);
   return `<div class="feed-card${friend&&!own?' fc-friend':''}${older?' older-card':''}">
     <div class="feed-head">
-      <div class="avatar">${avatarDoll(item.doll_color,clamp(30,36))}${friend&&!own?'<span class="friend-dot"></span>':''}</div>
+      <button class="feed-avatar-btn" data-uid="${item.user_id}" style="background:none;border:none;padding:0;cursor:pointer;position:relative;">
+        <div class="avatar">${avatarDoll(item.doll_color,clamp(30,36))}${friend&&!own?'<span class="friend-dot"></span>':''}</div>
+      </button>
       <div class="feed-meta">
         <div class="feed-name">${esc(item.username)}</div>
         <div class="feed-time">${timeAgo(item.created_at)}</div>
@@ -1483,6 +1587,43 @@ function attachListeners(){
       navigating=false;authStep='form';view='auth';paint();
     };
   }
+  if(view==='amigos'){
+    if(ge('volverAmigos'))ge('volverAmigos').onclick=()=>{view=todayPost?'feed':'home';paint();};
+    if(!friendsList){
+      (async()=>{
+        const ids=[...myFollowing];
+        if(!ids.length){friendsList=[];paint();return;}
+        const {data}=await sb.from('profiles').select('*').in('id',ids).catch(()=>({data:[]}));
+        friendsList=data||[];
+        paint();
+      })();
+    }
+    document.querySelectorAll('.amigo-row').forEach(row=>{
+      row.onclick=async()=>{
+        viewingProfile=await loadProfileData(row.getAttribute('data-uid'));
+        view='profile';paint();
+      };
+    });
+  }
+  if(view==='profile'){
+    if(ge('volverProfile'))ge('volverProfile').onclick=()=>{view='amigos';paint();};
+    const fb=ge('profileFollow');
+    if(fb)fb.onclick=async()=>{
+      const uid=fb.getAttribute('data-uid');
+      await toggleFollow(uid);
+      viewingProfile=await loadProfileData(uid);
+      paint();
+    };
+  }
+  // Feed: click avatar → open profile
+  document.querySelectorAll('.feed-avatar-btn').forEach(btn=>{
+    btn.onclick=async(e)=>{
+      e.stopPropagation();
+      const uid=btn.getAttribute('data-uid');
+      viewingProfile=await loadProfileData(uid);
+      view='profile';paint();
+    };
+  });
 }
 
 function renderRazon(){

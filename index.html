@@ -716,75 +716,102 @@ function passReqsHTML(pass){
 }
 
 // ── Poses ──────────────────────────────────────────────
+// Body is now a filled rect; returns {bHW,bT,bB,bRx,aL,aR,lL,lR}
 function getPose(name,w,h){
-  // Big head (r≈h*.225, bottom≈h*.495). Body h*.52→h*.67 (short). Arms near-horizontal. Legs nearly vertical.
-  const P={
-    idle:    {body:`M${w/2} ${h*.52}Q${w*.46} ${h*.60} ${w/2} ${h*.67}`,
-              aL:`M${w/2} ${h*.54}Q${w*.25} ${h*.59} ${w*.11} ${h*.67}`,
-              aR:`M${w/2} ${h*.54}Q${w*.75} ${h*.59} ${w*.89} ${h*.67}`,
-              lL:`M${w/2} ${h*.67}Q${w*.42} ${h*.82} ${w*.40} ${h*.97}`,
-              lR:`M${w/2} ${h*.67}Q${w*.58} ${h*.82} ${w*.60} ${h*.97}`},
-    scared:  {body:`M${w/2} ${h*.52}Q${w*.46} ${h*.60} ${w/2} ${h*.67}`,
-              aL:`M${w/2} ${h*.54}Q${w*.28} ${h*.38} ${w*.20} ${h*.22}`,
-              aR:`M${w/2} ${h*.54}Q${w*.72} ${h*.38} ${w*.80} ${h*.22}`,
-              lL:`M${w/2} ${h*.67}Q${w*.42} ${h*.82} ${w*.40} ${h*.97}`,
-              lR:`M${w/2} ${h*.67}Q${w*.58} ${h*.82} ${w*.60} ${h*.97}`},
-    cowering:{body:`M${w/2} ${h*.52}Q${w*.47} ${h*.59} ${w*.5} ${h*.67}`,
-              aL:`M${w/2} ${h*.54}Q${w*.33} ${h*.42} ${w*.28} ${h*.30}`,
-              aR:`M${w/2} ${h*.54}Q${w*.67} ${h*.42} ${w*.72} ${h*.30}`,
-              lL:`M${w*.5} ${h*.67}Q${w*.38} ${h*.82} ${w*.35} ${h*.97}`,
-              lR:`M${w*.5} ${h*.67}Q${w*.62} ${h*.82} ${w*.65} ${h*.97}`},
-    begging: {body:`M${w/2} ${h*.52}Q${w*.46} ${h*.60} ${w/2} ${h*.67}`,
-              aL:`M${w/2} ${h*.54}Q${w*.27} ${h*.62} ${w*.10} ${h*.67}`,
-              aR:`M${w/2} ${h*.54}Q${w*.73} ${h*.62} ${w*.90} ${h*.67}`,
-              lL:`M${w/2} ${h*.67}Q${w*.42} ${h*.82} ${w*.40} ${h*.97}`,
-              lR:`M${w/2} ${h*.67}Q${w*.58} ${h*.82} ${w*.60} ${h*.97}`},
-    dramatic:{body:`M${w/2} ${h*.52}Q${w*.46} ${h*.60} ${w/2} ${h*.67}`,
-              aL:`M${w/2} ${h*.54}Q${w*.68} ${h*.46} ${w*.88} ${h*.38}`,
-              aR:`M${w/2} ${h*.54}Q${w*.26} ${h*.60} ${w*.10} ${h*.68}`,
-              lL:`M${w/2} ${h*.67}Q${w*.40} ${h*.82} ${w*.36} ${h*.97}`,
-              lR:`M${w/2} ${h*.67}Q${w*.62} ${h*.82} ${w*.66} ${h*.97}`},
-    squish:  {body:`M${w/2} ${h*.52}Q${w*.46} ${h*.57} ${w*.5} ${h*.62}`,
-              aL:`M${w/2} ${h*.54}Q${w*.20} ${h*.55} ${w*.04} ${h*.58}`,
-              aR:`M${w/2} ${h*.54}Q${w*.80} ${h*.55} ${w*.96} ${h*.58}`,
-              lL:`M${w*.5} ${h*.62}Q${w*.32} ${h*.69} ${w*.18} ${h*.76}`,
-              lR:`M${w*.5} ${h*.62}Q${w*.68} ${h*.69} ${w*.82} ${h*.76}`},
-    ghost:   {body:`M${w/2} ${h*.52}Q${w*.44} ${h*.61} ${w*.5} ${h*.70}`,
-              aL:`M${w/2} ${h*.54}Q${w*.25} ${h*.44} ${w*.12} ${h*.34}`,
-              aR:`M${w/2} ${h*.54}Q${w*.75} ${h*.44} ${w*.88} ${h*.34}`,
-              lL:`M${w*.5} ${h*.70}Q${w*.40} ${h*.83} ${w*.38} ${h*.97}`,
-              lR:`M${w*.5} ${h*.70}Q${w*.60} ${h*.83} ${w*.62} ${h*.97}`},
+  const cx=w/2;
+  const hr=Math.round(h*.30);   // head radius: 84px (h=280)
+  const hcy=Math.round(h*.35);  // head center y: 98px
+  const bHW=Math.round(w*.148); // body half-width: 33px
+  const bT=hcy+hr-8;             // body top overlaps head base slightly
+  const bB=bT+Math.round(h*.18); // body taller
+  const aY=Math.round(bT+(bB-bT)*.42); // arm y
+  const lW=Math.round(w*.062);  // leg half-width at bottom: 14px
+  const D={bHW,bT,bB,bRx:9,
+    aL:`M${cx-bHW} ${aY} Q${w*.15} ${aY+18} ${w*.06} ${aY+38}`,
+    aR:`M${cx+bHW} ${aY} Q${w*.85} ${aY+18} ${w*.94} ${aY+38}`,
+    lL:`M${cx-lW} ${bB} Q${cx-lW-2} ${h*.88} ${cx-lW-5} ${h*.97}`,
+    lR:`M${cx+lW} ${bB} Q${cx+lW+2} ${h*.88} ${cx+lW+5} ${h*.97}`,
   };
-  return P[name]||P.idle;
+  // Arms always start from BODY SIDES; head is drawn on top so upward arms hide naturally behind head
+  if(name==='scared') return{...D,
+    aL:`M${cx-bHW} ${aY} Q${w*.04} ${(bT+hcy)*.57} ${w*.05} ${h*.37}`,
+    aR:`M${cx+bHW} ${aY} Q${w*.96} ${(bT+hcy)*.57} ${w*.95} ${h*.37}`,
+  };
+  if(name==='cowering') return{...D,
+    aL:`M${cx-bHW} ${aY} Q${w*.12} ${bT*.82} ${w*.21} ${h*.41}`,
+    aR:`M${cx+bHW} ${aY} Q${w*.88} ${bT*.82} ${w*.79} ${h*.41}`,
+  };
+  if(name==='begging') return{...D,
+    aL:`M${cx-bHW} ${aY} Q${w*.14} ${aY+16} ${w*.04} ${aY+22}`,
+    aR:`M${cx+bHW} ${aY} Q${w*.86} ${aY+16} ${w*.96} ${aY+22}`,
+  };
+  if(name==='dramatic') return{...D,
+    aL:`M${cx-bHW} ${aY} Q${w*.04} ${(bT+hcy)*.58} ${w*.06} ${h*.38}`,
+    aR:`M${cx+bHW} ${aY} Q${w*.88} ${aY-10} ${w*.97} ${aY-22}`,
+  };
+  const sbHW=Math.round(bHW*1.28),sbB=Math.round(bT+(bB-bT)*.62),saY=Math.round(bT+(sbB-bT)*.42);
+  if(name==='squish') return{bHW:sbHW,bT,bB:sbB,bRx:9,
+    aL:`M${cx-sbHW} ${saY} Q${w*.14} ${saY+2} ${w*.03} ${saY+4}`,
+    aR:`M${cx+sbHW} ${saY} Q${w*.86} ${saY+2} ${w*.97} ${saY+4}`,
+    lL:`M${cx-lW} ${sbB} Q${cx-lW-2} ${h*.79} ${cx-lW-5} ${h*.90}`,
+    lR:`M${cx+lW} ${sbB} Q${cx+lW+2} ${h*.79} ${cx+lW+5} ${h*.90}`,
+  };
+  if(name==='ghost') return{...D,
+    aL:`M${cx-bHW} ${aY} Q${w*.05} ${bT*.74} ${w*.04} ${h*.42}`,
+    aR:`M${cx+bHW} ${aY} Q${w*.95} ${bT*.74} ${w*.96} ${h*.42}`,
+  };
+  return D;
+}
+// dummy shim so old code that reads pose.body doesn't crash
+function _legacyBody(p){return `M110 ${p.bT}L110 ${p.bB}`;}
+
+// ── Doll SVG – core draw ────────────────────────────────
+// draw order: fx → shadow → legs → body rect → arms → head → mechón → face
+// head drawn LAST so upward arms hide naturally behind it
+function _dollCore(color,dead,poseName,w,h,sw,extraFx){
+  const pose=getPose(poseName||'idle',w,h);
+  const dark=color==="#C0B898"||color==="#D0C8B8"||color==="#E8E8E8";
+  const ec=dark?"#2A1E38":"#080808";
+  const ec2=dark?"rgba(0,0,0,.5)":"rgba(255,255,255,.6)";
+  const hr=Math.round(h*.30),hcy=Math.round(h*.35),cx=w/2;
+  // Eyes — wider apart, bigger radius
+  const lx=cx-hr*.28,rx=cx+hr*.28,ey=hcy-hr*.21;
+  const er=Math.max(5,hr*.115);
+  const sw_f=Math.max(4.5,hr*.072); // face stroke (mouth/XX)
+  const face=dead?`
+    <line x1="${lx-hr*.13}" y1="${ey-hr*.11}" x2="${lx+hr*.13}" y2="${ey+hr*.11}" stroke="${ec}" stroke-width="${sw_f}" stroke-linecap="round"/>
+    <line x1="${lx+hr*.13}" y1="${ey-hr*.11}" x2="${lx-hr*.13}" y2="${ey+hr*.11}" stroke="${ec}" stroke-width="${sw_f}" stroke-linecap="round"/>
+    <line x1="${rx-hr*.13}" y1="${ey-hr*.11}" x2="${rx+hr*.13}" y2="${ey+hr*.11}" stroke="${ec}" stroke-width="${sw_f}" stroke-linecap="round"/>
+    <line x1="${rx+hr*.13}" y1="${ey-hr*.11}" x2="${rx-hr*.13}" y2="${ey+hr*.11}" stroke="${ec}" stroke-width="${sw_f}" stroke-linecap="round"/>
+    <path d="M${cx-hr*.30} ${hcy+hr*.30} Q${cx} ${hcy+hr*.20} ${cx+hr*.30} ${hcy+hr*.30}" stroke="${ec}" stroke-width="${sw_f}" fill="none" stroke-linecap="round"/>
+  `:`
+    <circle cx="${lx}" cy="${ey}" r="${er}" fill="${ec}"/>
+    <circle cx="${rx}" cy="${ey}" r="${er}" fill="${ec}"/>
+    <circle cx="${lx-er*.28}" cy="${ey-er*.32}" r="${er*.28}" fill="${ec2}"/>
+    <circle cx="${rx-er*.28}" cy="${ey-er*.32}" r="${er*.28}" fill="${ec2}"/>
+    <path d="M${cx-hr*.20} ${hcy+hr*.35} Q${cx} ${hcy+hr*.56} ${cx+hr*.20} ${hcy+hr*.35}" stroke="${ec}" stroke-width="${sw_f}" fill="none" stroke-linecap="round"/>
+  `;
+  // Mechón — filled closed arch at upper-left of head, curves above head top
+  const mech=`<path d="M${cx-hr*.36} ${hcy-hr*.78} C${cx-hr*.58} ${hcy-hr*.80} ${cx-hr*.60} ${hcy-hr*1.08} ${cx-hr*.26} ${hcy-hr*1.10} C${cx-hr*.08} ${hcy-hr*1.10} ${cx-hr*.06} ${hcy-hr*.84} ${cx-hr*.20} ${hcy-hr*.78} Z" fill="${color}"/>`;
+  const shd=`<circle cx="${cx+hr*.10}" cy="${hcy+hr*.14}" r="${hr}" fill="rgba(0,0,0,.18)"/>`;
+  return `${extraFx||''}
+    ${shd}
+    <g stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="${pose.lL}"/><path d="${pose.lR}"/>
+    </g>
+    <rect x="${cx-pose.bHW}" y="${pose.bT}" width="${pose.bHW*2}" height="${pose.bB-pose.bT}" rx="${pose.bRx}" fill="${color}"/>
+    <g stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="${pose.aL}"/><path d="${pose.aR}"/>
+    </g>
+    <circle cx="${cx}" cy="${hcy}" r="${hr}" fill="${color}" stroke="none"/>
+    ${mech}
+    ${face}`;
 }
 
 // ── Doll SVG ──────────────────────────────────────────
 function dollSVG(color,death,dead,poseName,px){
-  const w=220,h=280,sw=18;
+  const w=220,h=280,sw=22;
   px=px||110;
-  const pose=getPose(poseName||'idle',w,h);
-  const dark=color==="#C0B898"||color==="#D0C8B8"||color==="#E8E8E8";
-  const ec=dark?"#2A1E38":"#080808";
-  const ec2=dark?"rgba(0,0,0,.5)":"rgba(255,255,255,.55)";
-  // Head: cy=h*0.27, r=h*0.225 (big head). Eyes at ±55% r from center, 15% above center.
-  const hr=h*.225,hcy=h*.27;
-  const lx=w/2-hr*.55,rx=w/2+hr*.55,ey=hcy-hr*.15,ex=hr*.22,eo=hr*.18;
-  const er=Math.max(2.2,hr*.075);
-  const face=dead?`
-    <line x1="${lx-ex}" y1="${ey-eo}" x2="${lx+ex}" y2="${ey+eo}" stroke="${ec}" stroke-width="3.5" stroke-linecap="round"/>
-    <line x1="${lx+ex}" y1="${ey-eo}" x2="${lx-ex}" y2="${ey+eo}" stroke="${ec}" stroke-width="3.5" stroke-linecap="round"/>
-    <line x1="${rx-ex}" y1="${ey-eo}" x2="${rx+ex}" y2="${ey+eo}" stroke="${ec}" stroke-width="3.5" stroke-linecap="round"/>
-    <line x1="${rx+ex}" y1="${ey-eo}" x2="${rx-ex}" y2="${ey+eo}" stroke="${ec}" stroke-width="3.5" stroke-linecap="round"/>
-    <path d="M ${w/2-hr*.32} ${hcy+hr*.28} Q ${w/2} ${hcy+hr*.18} ${w/2+hr*.32} ${hcy+hr*.28}" stroke="${ec}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-  `:`
-    <circle cx="${lx}" cy="${ey}" r="${er}" fill="${ec}"/>
-    <circle cx="${rx}" cy="${ey}" r="${er}" fill="${ec}"/>
-    <circle cx="${lx-er*.25}" cy="${ey-er*.3}" r="${er*.25}" fill="${ec2}"/>
-    <circle cx="${rx-er*.25}" cy="${ey-er*.3}" r="${er*.25}" fill="${ec2}"/>
-    <path d="M ${w/2-hr*.28} ${hcy+hr*.30} Q ${w/2} ${hcy+hr*.42} ${w/2+hr*.28} ${hcy+hr*.30}" stroke="${ec}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-  `;
-  // Unified visual language: monochromatic, line-based, no saturated colors.
-  // Palette: near-black overlays, bone whites (#C4BDB2), muted crimson (#8A1818→#A82828), dark greys.
   let fx="";
   if(death==="fuego"){
     // Wide campfire — 5 flames spread across the base, lower profile (max h*.52)
@@ -941,21 +968,10 @@ function dollSVG(color,death,dead,poseName,px){
     });
   }
   const anim=poseName==='ghost'?'style="animation:floatSlow 3.5s ease-in-out infinite"':'';
-  const ht=Math.round(px*280/220);
+  const ht=Math.round(px*h/w);
   return `<div class="doll-wrap" style="width:${px}px;height:${ht}px;">
   <svg viewBox="0 0 ${w} ${h}" width="${px}" height="${ht}" xmlns="http://www.w3.org/2000/svg" style="overflow:visible;display:block;" ${anim}>
-    ${fx}
-    <circle cx="${w/2+hr*.11}" cy="${hcy+hr*.16}" r="${hr}" fill="rgba(0,0,0,.2)"/>
-    <g stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" fill="none">
-      <circle cx="${w/2}" cy="${hcy}" r="${hr}" fill="${color}" stroke="none"/>
-      <path d="${pose.body}"/>
-      <path d="${pose.aL}"/>
-      <path d="${pose.aR}"/>
-      <path d="${pose.lL}"/>
-      <path d="${pose.lR}"/>
-    </g>
-    <path d="M${w/2-hr*.15} ${hcy-hr*.88} Q${w/2-hr*.48} ${hcy-hr*1.30} ${w/2-hr*.06} ${hcy-hr*1.08}" stroke="${color}" stroke-width="${sw*.55}" fill="none" stroke-linecap="round"/>
-    ${face}
+    ${_dollCore(color,dead,poseName,w,h,sw,fx)}
   </svg></div>`;
 }
 
@@ -1035,7 +1051,12 @@ async function loadFriendRequests(){
 async function sendFriendRequest(uid){
   try{
     await sb.from('friend_requests').insert({sender_id:user.id,receiver_id:uid});
-    sentFriendReqs.add(uid);paint();
+    sentFriendReqs.add(uid);
+    if(!myFollowing.has(uid)){
+      await sb.from('follows').insert({follower_id:user.id,following_id:uid}).catch(()=>{});
+      myFollowing.add(uid);
+    }
+    paint();
   }catch(e){alert('Error al enviar solicitud: '+e.message);}
 }
 async function acceptFriendRequest(reqId,senderId){
@@ -1044,6 +1065,10 @@ async function acceptFriendRequest(reqId,senderId){
     pendingFriendReqs=pendingFriendReqs.filter(r=>r.id!==reqId);
     myFriends.add(senderId);
     señalesBadge=pendingFriendReqs.length>0;
+    if(!myFollowing.has(senderId)){
+      await sb.from('follows').insert({follower_id:user.id,following_id:senderId}).catch(()=>{});
+      myFollowing.add(senderId);
+    }
     paint();
   }catch(e){alert('Error: '+e.message);}
 }
@@ -1117,6 +1142,11 @@ async function toggleDep(pid){
 }
 async function toggleFollow(uid){
   if(myFollowing.has(uid)){
+    if(myFriends.has(uid)){
+      const msg=lang==='en'?'Unfollowing will remove your friendship. You\'ll need to send a new request to be friends again. Continue?':'Al dejar de seguir perderás la amistad y tendrás que volver a solicitar. ¿Continuar?';
+      if(!confirm(msg))return;
+      await removeFriend(uid);
+    }
     await sb.from('follows').delete().eq('follower_id',user.id).eq('following_id',uid);
     myFollowing.delete(uid);
   }else{
@@ -1129,33 +1159,10 @@ async function toggleFollow(uid){
 }
 
 function dollPureSVG(color,death,strokes,dead,poseName,svgW,svgH){
-  // Returns a standalone <svg> string (no wrapper div) suitable for canvas rendering
-  const w=svgW||220,h=svgH||280,sw=18;
-  const pose=getPose(poseName||'idle',w,h);
-  const dark=color==="#C0B898"||color==="#D0C8B8"||color==="#E8E8E8";
-  const ec=dark?"#2A1E38":"#080808";
-  const ec2=dark?"rgba(0,0,0,.5)":"rgba(255,255,255,.55)";
-  const hr=h*.225,hcy=h*.27;
-  const lx=w/2-hr*.55,rx=w/2+hr*.55,ey=hcy-hr*.15,ex=hr*.22,eo=hr*.18;
-  const er=Math.max(2.2,hr*.075);
-  const face=dead?`
-    <line x1="${lx-ex}" y1="${ey-eo}" x2="${lx+ex}" y2="${ey+eo}" stroke="${ec}" stroke-width="3.5" stroke-linecap="round"/>
-    <line x1="${lx+ex}" y1="${ey-eo}" x2="${lx-ex}" y2="${ey+eo}" stroke="${ec}" stroke-width="3.5" stroke-linecap="round"/>
-    <line x1="${rx-ex}" y1="${ey-eo}" x2="${rx+ex}" y2="${ey+eo}" stroke="${ec}" stroke-width="3.5" stroke-linecap="round"/>
-    <line x1="${rx+ex}" y1="${ey-eo}" x2="${rx-ex}" y2="${ey+eo}" stroke="${ec}" stroke-width="3.5" stroke-linecap="round"/>
-    <path d="M ${w/2-hr*.32} ${hcy+hr*.28} Q ${w/2} ${hcy+hr*.18} ${w/2+hr*.32} ${hcy+hr*.28}" stroke="${ec}" stroke-width="2.4" fill="none" stroke-linecap="round"/>`
-  :`<circle cx="${lx}" cy="${ey}" r="${er}" fill="${ec}"/>
-    <circle cx="${rx}" cy="${ey}" r="${er}" fill="${ec}"/>
-    <path d="M ${w/2-hr*.28} ${hcy+hr*.30} Q ${w/2} ${hcy+hr*.42} ${w/2+hr*.28} ${hcy+hr*.30}" stroke="${ec}" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+  const w=svgW||220,h=svgH||280,sw=22;
   const drawLayer=strokes&&death==='dibujo'?strokes.map(s=>`<polyline points="${s.puntos.map(pt=>`${pt.x},${pt.y}`).join(' ')}" stroke="${s.color}" stroke-width="${s.grosor}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`).join(''):'';
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">
-    <circle cx="${w/2+hr*.11}" cy="${hcy+hr*.16}" r="${hr}" fill="rgba(0,0,0,.2)"/>
-    <g stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" fill="none">
-      <circle cx="${w/2}" cy="${hcy}" r="${hr}" fill="${color}" stroke="none"/>
-      <path d="${pose.body}"/><path d="${pose.aL}"/><path d="${pose.aR}"/><path d="${pose.lL}"/><path d="${pose.lR}"/>
-    </g>
-    <path d="M${w/2-hr*.15} ${hcy-hr*.88} Q${w/2-hr*.48} ${hcy-hr*1.30} ${w/2-hr*.06} ${hcy-hr*1.08}" stroke="${color}" stroke-width="${sw*.55}" fill="none" stroke-linecap="round"/>
-    ${face}${drawLayer}
+    ${_dollCore(color,dead,poseName,w,h,sw,'')}${drawLayer}
   </svg>`;
 }
 
@@ -1301,8 +1308,8 @@ async function loadSeñales(){
   const deps=myPostIds.length?results[0].data||[]:[];
   const follows=results[myPostIds.length?1:0].data||[];
   const newItems=[
-    ...deps.map(d=>({type:'dep',time:d.created_at,user:d.profiles?.username||'alguien'})),
-    ...follows.map(f=>({type:'follow',time:f.created_at,user:f['profiles!follower_id']?.username||f.profiles?.username||'alguien'})),
+    ...deps.map(d=>({type:'dep',time:d.created_at,user:d.profiles?.username||'alguien',uid:d.user_id})),
+    ...follows.map(f=>({type:'follow',time:f.created_at,user:f['profiles!follower_id']?.username||f.profiles?.username||'alguien',uid:f.follower_id})),
   ];
   // Merge with history — dedup by time+type+user
   const seen=new Set(history.map(i=>`${i.type}|${i.time}|${i.user}`));
@@ -1323,7 +1330,7 @@ async function checkSeñalesBadge(){
     sb.from('deps').select('*',{count:'exact',head:true}).eq('post_id',todayPost.id).gt('created_at',since),
     sb.from('follows').select('*',{count:'exact',head:true}).eq('following_id',user.id).gt('created_at',since),
   ]).catch(()=>[{count:0},{count:0}]);
-  señalesBadge=!!((c1||0)+(c2||0));
+  señalesBadge=!!((c1||0)+(c2||0)+pendingFriendReqs.length);
 }
 
 // ── Auth ──────────────────────────────────────────────
@@ -1471,7 +1478,7 @@ function renderAuth(){
         </div>
       </div>`}
     </div>
-    <div class="auth-doll-preview">${dollSVG(DOLL_COLORS[0],null,true,'idle',120)}</div>
+    <div class="auth-doll-preview">${dollSVG(DOLL_COLORS[0],null,false,'idle',120)}</div>
     <div class="auth-card">
       <div class="auth-tabs">
         <button class="auth-tab ${login?'on':''}" id="tLogin">${t('login_tab')}</button>
@@ -1700,14 +1707,19 @@ function renderProfile(){
       ${dollSVG(prof.doll_color||DOLL_COLORS[0],null,true,'idle',clamp(90,110))}
       <div class="profile-name">@${esc(prof.username)}</div>
       <div class="profile-since">${t('profile_since')}${since}</div>
-      ${!isSelf?`<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px;">
-        <button class="follow-btn ${isFollowing?'following':''}" id="profileFollow" data-uid="${prof.id}">${isFollowing?ICO.check+t('btn_following'):ICO.plus+t('btn_follow')}</button>
-        ${myFriends.has(prof.id)
-          ?`<button class="follow-btn following" id="profileUnfriend" data-uid="${prof.id}">${ICO.check} ${lang==='en'?'Friends':'Amigos'}</button>`
-          :sentFriendReqs.has(prof.id)
-            ?`<button class="follow-btn" id="profileFriendReq" disabled style="opacity:.5;">${ICO.people} ${lang==='en'?'Request sent':'Solicitud enviada'}</button>`
-            :`<button class="follow-btn" id="profileFriendReq" data-uid="${prof.id}">${ICO.people} ${lang==='en'?'Add friend':'Añadir amigo'}</button>`}
-      </div>`:''}
+      ${!isSelf?(()=>{
+        const incomingReq=pendingFriendReqs.find(r=>r.sender_id===prof.id);
+        return `<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px;">
+          <button class="follow-btn ${isFollowing?'following':''}" id="profileFollow" data-uid="${prof.id}">${isFollowing?ICO.check+t('btn_following'):ICO.plus+t('btn_follow')}</button>
+          ${myFriends.has(prof.id)
+            ?`<button class="follow-btn following" id="profileUnfriend" data-uid="${prof.id}">${ICO.check} ${lang==='en'?'Friends':'Amigos'}</button>`
+            :incomingReq
+              ?`<button class="follow-btn" id="profileAcceptFriend" data-reqid="${incomingReq.id}" data-senderid="${incomingReq.sender_id}" style="background:var(--warm);color:#120a02;border-color:var(--warm);">${ICO.check} ${lang==='en'?'Accept friendship':'Aceptar amistad'}</button>`
+              :sentFriendReqs.has(prof.id)
+                ?`<button class="follow-btn" id="profileFriendReq" disabled style="opacity:.5;">${ICO.people} ${lang==='en'?'Request sent':'Solicitud enviada'}</button>`
+                :`<button class="follow-btn" id="profileFriendReq" data-uid="${prof.id}">${ICO.people} ${lang==='en'?'Add friend':'Añadir amigo'}</button>`}
+        </div>`;
+      })():''}
     </div>
     <div style="height:1px;background:var(--border);"></div>
     <div class="profile-stats">
@@ -1724,10 +1736,13 @@ function renderProfile(){
 
 function renderSeñales(){
   const items=window._señalesItems||[];
-  const rows=items.map(i=>i.type==='dep'
-    ?`<div class="señal-row"><div class="señal-icon">${ICO.candle}</div><div class="señal-text"><strong>${esc(i.user)}</strong> ${t('sig_dep')}</div><div class="señal-time">${timeAgo(i.time)}</div></div>`
-    :`<div class="señal-row"><div class="señal-icon">${ICO.skull}</div><div class="señal-text"><strong>${esc(i.user)}</strong> ${t('sig_follow')}</div><div class="señal-time">${timeAgo(i.time)}</div></div>`
-  ).join('');
+  const rows=items.map(i=>{
+    const uidAttr=i.uid?` data-uid="${i.uid}"`:'';
+    const uname=i.uid?`<button class="btn-link señal-user" style="font-weight:600;padding:0;font-size:inherit;"${uidAttr}>${esc(i.user)}</button>`:`<strong>${esc(i.user)}</strong>`;
+    return i.type==='dep'
+      ?`<div class="señal-row"><div class="señal-icon">${ICO.candle}</div><div class="señal-text">${uname} ${t('sig_dep')}</div><div class="señal-time">${timeAgo(i.time)}</div></div>`
+      :`<div class="señal-row"><div class="señal-icon">${ICO.skull}</div><div class="señal-text">${uname} ${t('sig_follow')}</div><div class="señal-time">${timeAgo(i.time)}</div></div>`;
+  }).join('');
   const friendReqRows=pendingFriendReqs.map(r=>`
     <div class="señal-row" style="align-items:center;gap:10px;background:rgba(176,120,48,.06);border-radius:8px;padding:10px 12px;border:1px solid rgba(176,120,48,.2);">
       <div style="flex-shrink:0;">${avatarDoll(r.sender?.doll_color||DOLL_COLORS[0],clamp(32,36))}</div>
@@ -1849,6 +1864,7 @@ function renderMuerte(){
   return `<div class="screen">
     ${hdr(t('muerte_title'),t('muerte_sub'))}
     <button class="btn-link" id="volverMuerte" style="margin-top:-8px;margin-bottom:6px;">${t('btn_back_muerte')}</button>
+    <div style="display:flex;justify-content:center;margin-bottom:12px;">${dollSVG(profile.doll_color,null,false,'scared',clamp(70,90))}</div>
     <div class="grid2">
       ${cells}
       <div class="draw-cell" id="drawCard">
@@ -2185,9 +2201,9 @@ function renderAjustes(){
             <span style="flex:1;color:var(--text);">${new Date(profile.birth_date+'T12:00:00').toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'long',year:'numeric'})}</span>
             <span style="font-size:clamp(11px,2.8vw,12px);color:var(--muted2);">${getZodiacSign(new Date(profile.birth_date+'T12:00:00'))}</span>
           </div>`
-        :`<div style="display:flex;gap:8px;align-items:center;">
-            <input type="date" id="birthdayInput" value="" style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:10px 12px;font-size:clamp(13px,3.5vw,14px);font-family:inherit;outline:none;" max="${new Date().toISOString().slice(0,10)}"/>
-            <button class="btn-warm-sm" id="btnSaveBirthday">${t('btn_save_birthday')}</button>
+        :`<div style="display:flex;flex-direction:column;gap:8px;">
+            <input type="date" id="birthdayInput" value="" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:10px 12px;font-size:clamp(13px,3.5vw,14px);font-family:inherit;outline:none;box-sizing:border-box;" max="${new Date().toISOString().slice(0,10)}"/>
+            <button class="action-btn warm" id="btnSaveBirthday" style="max-width:100%;flex-direction:row;justify-content:center;gap:6px;">${t('btn_save_birthday')}</button>
           </div>`}
     </div>
     <div style="height:1px;background:var(--border);margin:clamp(20px,5vw,26px) 0;"></div>
@@ -2243,10 +2259,25 @@ function attachListeners(){
     if(ge('btnShare'))ge('btnShare').onclick=()=>sharePost(todayPost);
     if(ge('btnDeletePost'))ge('btnDeletePost').onclick=async()=>{
       if(!confirm(t('confirm_delete')))return;
-      await sb.from('posts').delete().eq('id',todayPost.id).eq('user_id',user.id);
-      try{await sb.from('profiles').update({streak:Math.max(0,(profile.streak||1)-1),last_post_date:null}).eq('id',user.id);}catch(e){}
-      profile.streak=Math.max(0,(profile.streak||1)-1);
-      todayPost=null;todayPrevPost=null;cemeteryPosts=null;view='home';paint();
+      const deletingId=todayPost.id;
+      const prevId=todayPost.previous_post_id||null;
+      const {error}=await sb.from('posts').delete().eq('id',deletingId).eq('user_id',user.id);
+      if(error){alert('Error al borrar: '+(error.message||'inténtalo de nuevo'));return;}
+      cemeteryPosts=null;
+      if(prevId){
+        // Restore previous post as the primary for today
+        try{await sb.from('posts').update({is_primary:true}).eq('id',prevId);}catch(e){}
+        let restored=null;
+        try{({data:restored}=await sb.from('posts').select('*').eq('id',prevId).single());}catch(e){}
+        todayPost=restored||null;
+        todayPrevPost=null;
+        view='home';paint();
+      }else{
+        // No previous post — reset streak, go back to empty home
+        try{await sb.from('profiles').update({streak:Math.max(0,(profile.streak||1)-1),last_post_date:null}).eq('id',user.id);}catch(e){}
+        profile.streak=Math.max(0,(profile.streak||1)-1);
+        todayPost=null;todayPrevPost=null;view='home';paint();
+      }
     };
     if(ge('btnCemetery'))ge('btnCemetery').onclick=()=>{view='cementerio';paint();};
     if(ge('cemeteryCount')){
@@ -2357,8 +2388,7 @@ function attachListeners(){
         const {error}=await sb.from('profiles').update({birth_date:val}).eq('id',user.id);
         if(error)throw error;
         profile.birth_date=val;
-        btn.disabled=false;btn.textContent='✓ '+t('btn_save_birthday');
-        setTimeout(()=>{if(btn){btn.textContent=t('btn_save_birthday');btn.disabled=false;}},2500);
+        paint();
       }catch(e){
         btn.disabled=false;btn.textContent=t('btn_save_birthday');
         alert('Error al guardar: '+(e.message||'inténtalo de nuevo'));
@@ -2464,6 +2494,24 @@ function attachListeners(){
     document.querySelectorAll('.fr-reject').forEach(btn=>{
       btn.onclick=async()=>await rejectFriendRequest(btn.getAttribute('data-reqid'));
     });
+    document.querySelectorAll('.señal-user').forEach(btn=>{
+      btn.onclick=async()=>{
+        const uid=btn.getAttribute('data-uid');
+        if(!uid)return;
+        profileReturnView='señales';
+        viewingProfile=await loadProfileData(uid);
+        view='profile';paint();
+      };
+    });
+  }
+  if(view==='profile'){
+    const afb=ge('profileAcceptFriend');
+    if(afb)afb.onclick=async()=>{
+      await acceptFriendRequest(afb.getAttribute('data-reqid'),afb.getAttribute('data-senderid'));
+      const uid=afb.getAttribute('data-senderid');
+      viewingProfile=await loadProfileData(uid);
+      paint();
+    };
   }
   // Feed: click avatar → open profile
   document.querySelectorAll('.feed-avatar-btn').forEach(btn=>{

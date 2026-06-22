@@ -1233,13 +1233,6 @@ function renderAuth(){
   <div class="auth-page">
     <div class="auth-brand auth-hero">
       <h1 class="cinzel">kill<em>.me</em></h1>
-      <div style="display:flex;justify-content:center;margin:8px 0;">
-        <div style="display:inline-flex;border:1px solid var(--border2);border-radius:8px;overflow:hidden;font-size:12px;">
-          <button id="authLangEs" style="padding:6px 16px;border:none;background:${lang==='es'?'var(--surface2)':'transparent'};color:${lang==='es'?'var(--text)':'var(--muted2)'};font-weight:${lang==='es'?700:400};cursor:pointer;">🇪🇸 ES</button>
-          <div style="width:1px;background:var(--border2);"></div>
-          <button id="authLangEn" style="padding:6px 16px;border:none;background:${lang==='en'?'var(--surface2)':'transparent'};color:${lang==='en'?'var(--text)':'var(--muted2)'};font-weight:${lang==='en'?700:400};cursor:pointer;">🇺🇸 EN</button>
-        </div>
-      </div>
       ${!login?'':` <div class="auth-pitch">
         <div class="auth-tagline">${t('auth_tagline')}</div>
         <div class="auth-sub">${t('auth_sub')}</div>
@@ -1266,7 +1259,14 @@ function renderAuth(){
       <div class="auth-err" id="aErr"></div>
       <button class="btn btn-red" id="btnAuth">${login?t('btn_login'):t('btn_next')}</button>
       ${login?`<button class="btn-link" id="btnForgot" style="margin-top:2px;font-size:clamp(11px,2.5vw,12px);">${t('btn_forgot')}</button>`:''}
-      <div style="margin-top:14px;text-align:center;font-size:clamp(9px,2.3vw,10px);color:var(--muted);line-height:1.6;">${t('safety_note')} <a href="https://www.telefonodelaesperanza.org" target="_blank" style="color:var(--muted2);">${t('safety_link')}</a></div>
+      <div style="display:flex;justify-content:center;margin-top:16px;">
+        <div style="display:inline-flex;border:1px solid var(--border2);border-radius:8px;overflow:hidden;font-size:12px;">
+          <button id="authLangEs" style="padding:6px 16px;border:none;background:${lang==='es'?'var(--surface2)':'transparent'};color:${lang==='es'?'var(--text)':'var(--muted2)'};font-weight:${lang==='es'?700:400};cursor:pointer;">🇪🇸 ES</button>
+          <div style="width:1px;background:var(--border2);"></div>
+          <button id="authLangEn" style="padding:6px 16px;border:none;background:${lang==='en'?'var(--surface2)':'transparent'};color:${lang==='en'?'var(--text)':'var(--muted2)'};font-weight:${lang==='en'?700:400};cursor:pointer;">🇺🇸 EN</button>
+        </div>
+      </div>
+      <div style="margin-top:10px;text-align:center;font-size:clamp(9px,2.3vw,10px);color:var(--muted);line-height:1.6;">${t('safety_note')} <a href="https://www.telefonodelaesperanza.org" target="_blank" style="color:var(--muted2);">${t('safety_link')}</a></div>
     </div>
   </div>`;
   ge('tLogin').onclick=()=>{authTab='login';renderAuth();};

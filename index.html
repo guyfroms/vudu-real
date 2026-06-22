@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>kill.me</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23C0392B'/%3E%3Cline x1='10' y1='11' x2='14' y2='15' stroke='%23fff' stroke-width='2.5' stroke-linecap='round'/%3E%3Cline x1='14' y1='11' x2='10' y2='15' stroke='%23fff' stroke-width='2.5' stroke-linecap='round'/%3E%3Cline x1='18' y1='11' x2='22' y2='15' stroke='%23fff' stroke-width='2.5' stroke-linecap='round'/%3E%3Cline x1='22' y1='11' x2='18' y2='15' stroke='%23fff' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M11 21 Q16 18 21 21' stroke='%23fff' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"/>
 <link rel="manifest" href="manifest.json"/>
@@ -398,7 +398,7 @@ const LINE_WIDTHS=[2,4,8];
 let lang=localStorage.getItem('kill_lang')||(navigator.language.startsWith('es')?'es':'en');
 const STRINGS={
   es:{
-    nav_hoy:'Hoy',nav_feed:'Feed',nav_senales:'Señales',nav_muertes:'Muertes',
+    nav_hoy:'Hoy',nav_feed:'Funeral',nav_senales:'Actividad',nav_muertes:'Castigos',
     login_tab:'Entrar',register_tab:'Registrarse',
     auth_tagline:'"pues me mato."',auth_sub:'Hay desgracias que acaban contigo.',
     auth_beat1:'Cuenta tu ruina del día',auth_beat2:'Elige cómo muere tu muñeco',auth_beat3:'Recibe DEPs de tus amigos',
@@ -428,9 +428,9 @@ const STRINGS={
     posted_label:'Publicado',
     dibujo_title:'Modo libre',dibujo_sub:'Escribe qué pasó y dibuja qué le haces',
     ph_razon_draw:'¿qué te ha pasado hoy?',ph_desc_draw:'¿qué le has hecho?',btn_clear:'limpiar',btn_back_draw:'← volver a los castigos',
-    feed_sub:'Lo de hoy',feed_empty:'Nadie ha publicado hoy',feed_empty_sub:'sé el primero',feed_older:'Días anteriores',
+    feed_sub:'Los funerales de hoy',feed_empty:'Nadie ha publicado hoy',feed_empty_sub:'sé el primero',feed_older:'Días anteriores',
     btn_follow:' seguir',btn_following:' siguiendo',prev_label:'Lo de antes',
-    senales_title:'Señales',sig_dep:'te ha mandado un DEP',sig_follow:'ha empezado a seguirte',
+    senales_title:'Actividad',sig_dep:'te ha mandado un DEP',sig_follow:'ha empezado a seguirte',
     senales_empty_post:'No hay señales nuevas desde tu última visita',senales_empty_no_post:'Publica tu ruina de hoy para recibir señales',
     btn_publish_ruina:'Publicar ruina',
     muertes_unlocked:'desbloqueadas',muertes_free:'Siempre disponibles',muertes_streak:'Por racha diaria',muertes_deps:'Por DEPs recibidos',
@@ -451,9 +451,19 @@ const STRINGS={
     ob2_title:'¿Qué es un DEP?',ob2_body:`Tus amigos ven tu ruina en el feed y te mandan un <em>DEP</em> — Descanse En Paz.\n\nComo un like, pero para lo peor de tu día. Cuantos más DEPs, más se solidarizan con tu tragedia.`,
     ob3_title:'Las muertes',ob3_body:`Cada día que publicas tu ruina, desbloqueas nuevas formas de matar a tu muñeco: quemado, acribillado, electrocutado...\n\nMantén la <em>racha</em> y acumula DEPs para desbloquearlas todas.`,
     ob4_title:'Una al día',ob4_body:`Solo puedes publicar <em>una ruina al día</em>. Si el día mejora (o empeora), puedes actualizarla.\n\nRecuerda que la vida da para un "pues me mato" al día — no más.`,
+    ajustes_title:'Ajustes',
+    safety_note:'Esto es humor dramático, no literal. Si algo se siente real,',safety_link:'hay ayuda disponible',
+    dep_velado_1:'1 persona ha velado tu ruina',dep_velado_n:'$n personas han velado tu ruina',
+    btn_delete:'Borrar desgracia',confirm_delete:'¿Seguro? Perderás los DEPs de hoy y no contará para la racha.',
+    vis_label:'Visibilidad',vis_public:'🌍 Público · aparece en el feed global',vis_friends:'👥 Amigos · solo lo ven tus amigos',vis_private:'🔒 Privado · solo lo ves tú',
+    cemetery_title:'Cementerio',cemetery_sub:'$n desgracias enterradas',cemetery_empty:'Aún no tienes ninguna desgracia enterrada.',cemetery_loading:'Cargando...',btn_cemetery:'Ver cementerio',
+    following_tab:'Siguiendo',followers_tab:'Seguidores',no_followers:'Todavía nadie te sigue.',
+    logros_title:'Logros',castigos_tab:'Castigos',logros_tab:'Logros',
+    lbl_birthday:'Fecha de nacimiento',btn_save_birthday:'Guardar',
+    btn_share:'Compartir ruina',
   },
   en:{
-    nav_hoy:'Today',nav_feed:'Feed',nav_senales:'Signals',nav_muertes:'Deaths',
+    nav_hoy:'Today',nav_feed:'Funeral',nav_senales:'Activity',nav_muertes:'Punishments',
     login_tab:'Log in',register_tab:'Sign up',
     auth_tagline:'"ugh, kill me."',auth_sub:'Some days just wreck you.',
     auth_beat1:'Share your daily disaster',auth_beat2:'Choose how your doll dies',auth_beat3:'Get DEPs from your friends',
@@ -483,9 +493,9 @@ const STRINGS={
     posted_label:'Published',
     dibujo_title:'Free mode',dibujo_sub:'Write what happened and draw what you do',
     ph_razon_draw:'what happened today?',ph_desc_draw:'what did you do to it?',btn_clear:'clear',btn_back_draw:'← back to punishments',
-    feed_sub:'Today',feed_empty:'Nobody has posted today',feed_empty_sub:'be the first',feed_older:'Previous days',
+    feed_sub:"Today's funerals",feed_empty:'Nobody has posted today',feed_empty_sub:'be the first',feed_older:'Previous days',
     btn_follow:' follow',btn_following:' following',prev_label:'Before that',
-    senales_title:'Signals',sig_dep:'sent you a DEP',sig_follow:'started following you',
+    senales_title:'Activity',sig_dep:'sent you a DEP',sig_follow:'started following you',
     senales_empty_post:'No new signals since your last visit',senales_empty_no_post:"Post your ruina today to receive signals",
     btn_publish_ruina:'Post ruina',
     muertes_unlocked:'unlocked',muertes_free:'Always available',muertes_streak:'By daily streak',muertes_deps:'By DEPs received',
@@ -506,6 +516,16 @@ const STRINGS={
     ob2_title:'What is a DEP?',ob2_body:`Your friends see your ruina in the feed and send you a <em>DEP</em> — Descanse En Paz (Rest in Peace).\n\nLike a like, but for the worst part of your day. More DEPs = more solidarity.`,
     ob3_title:'Deaths',ob3_body:`Every day you post your ruina, you unlock new ways to kill your doll: burned, needled, electrocuted...\n\nKeep your <em>streak</em> and collect DEPs to unlock them all.`,
     ob4_title:'Once a day',ob4_body:`You can only post <em>one ruina a day</em>. If things get better (or worse), you can update it.\n\nRemember: life fits exactly one "kill me" a day — no more.`,
+    ajustes_title:'Settings',
+    safety_note:'This is dramatic humor, not literal. If something feels real,',safety_link:'help is available',
+    dep_velado_1:'1 person mourned your ruina',dep_velado_n:'$n people mourned your ruina',
+    btn_delete:'Delete ruina',confirm_delete:"Are you sure? You'll lose today's DEPs and streak.",
+    vis_label:'Visibility',vis_public:'🌍 Public · appears in the global feed',vis_friends:'👥 Friends · only your friends see it',vis_private:'🔒 Private · only you see it',
+    cemetery_title:'Cemetery',cemetery_sub:'$n ruinas buried',cemetery_empty:"You don't have any buried ruinas yet.",cemetery_loading:'Loading...',btn_cemetery:'View cemetery',
+    following_tab:'Following',followers_tab:'Followers',no_followers:"Nobody is following you yet.",
+    logros_title:'Achievements',castigos_tab:'Punishments',logros_tab:'Achievements',
+    lbl_birthday:'Date of birth',btn_save_birthday:'Save',
+    btn_share:'Share ruina',
   }
 };
 function t(k){return(STRINGS[lang]||STRINGS.es)[k]||STRINGS.es[k]||k;}
@@ -523,6 +543,32 @@ const DEATHS=[
 ];
 const DEATH_LABELS=Object.fromEntries(DEATHS.map(d=>[d.id,d.label]));
 function dl(id){const d=DEATHS.find(x=>x.id===id);if(!d)return id;return(lang==='en'&&d.en)?d.en:d.label;}
+
+const ACHIEVEMENTS=[
+  {id:'dep1',  cat:'dep',    icon:'🕯', title_es:'Primera vela',    title_en:'First candle',   desc_es:'Recibe tu primer DEP',        desc_en:'Receive your first DEP',    check:s=>s.totalDeps>=1},
+  {id:'dep10', cat:'dep',    icon:'🕯', title_es:'10 velas',        title_en:'10 candles',     desc_es:'Acumula 10 DEPs',             desc_en:'Collect 10 DEPs',           check:s=>s.totalDeps>=10},
+  {id:'dep100',cat:'dep',    icon:'🕯', title_es:'100 velas',       title_en:'100 candles',    desc_es:'Acumula 100 DEPs',            desc_en:'Collect 100 DEPs',          check:s=>s.totalDeps>=100},
+  {id:'dep500',cat:'dep',    icon:'🕯', title_es:'500 velas',       title_en:'500 candles',    desc_es:'Acumula 500 DEPs',            desc_en:'Collect 500 DEPs',          check:s=>s.totalDeps>=500},
+  {id:'dep1k', cat:'dep',    icon:'🕯', title_es:'1000 velas',      title_en:'1000 candles',   desc_es:'Acumula 1000 DEPs',           desc_en:'Collect 1000 DEPs',         check:s=>s.totalDeps>=1000},
+  {id:'s7',    cat:'racha',  icon:'🔥', title_es:'Primera semana',  title_en:'First week',     desc_es:'7 días de racha',             desc_en:'7-day streak',              check:s=>s.streak>=7},
+  {id:'s30',   cat:'racha',  icon:'🔥', title_es:'Primer mes',      title_en:'First month',    desc_es:'30 días de racha',            desc_en:'30-day streak',             check:s=>s.streak>=30},
+  {id:'s100',  cat:'racha',  icon:'🔥', title_es:'Centenario',      title_en:'Centenarian',    desc_es:'100 días de racha',           desc_en:'100-day streak',            check:s=>s.streak>=100},
+  {id:'p1',    cat:'ruinas', icon:'⚰️', title_es:'Primera desgracia',title_en:'First ruina',  desc_es:'Publica tu primera desgracia',desc_en:'Publish your first ruina',  check:s=>s.postCount>=1},
+  {id:'p10',   cat:'ruinas', icon:'⚰️', title_es:'Decena',          title_en:'Ten down',       desc_es:'10 desgracias publicadas',    desc_en:'10 ruinas published',       check:s=>s.postCount>=10},
+  {id:'p50',   cat:'ruinas', icon:'⚰️', title_es:'Cincuentena',     title_en:'Fifty',          desc_es:'50 desgracias publicadas',    desc_en:'50 ruinas published',       check:s=>s.postCount>=50},
+  {id:'p100',  cat:'ruinas', icon:'⚰️', title_es:'El centenar',     title_en:'The century',    desc_es:'100 desgracias publicadas',   desc_en:'100 ruinas published',      check:s=>s.postCount>=100},
+  {id:'vr13',  cat:'special',icon:'🪦', title_es:'Viernes 13',      title_en:'Friday the 13th',desc_es:'Publica una desgracia en viernes 13',desc_en:'Post a ruina on Friday the 13th',check:s=>(s.posts||[]).some(p=>{const d=new Date(p.post_date||p.created_at);return d.getDay()===5&&d.getDate()===13;})},
+  {id:'xmas',  cat:'special',icon:'🎄', title_es:'Navidad en familia',title_en:'Xmas family',  desc_es:'Publica entre el 24 y el 25 de diciembre',desc_en:'Post on Dec 24th or 25th',check:s=>(s.posts||[]).some(p=>{const d=new Date(p.post_date||p.created_at);return d.getMonth()===11&&(d.getDate()===24||d.getDate()===25);})},
+  {id:'ny',    cat:'special',icon:'🎆', title_es:'Feliz año nuevo',  title_en:'Happy New Year', desc_es:'Publica el 1 de enero',       desc_en:'Post on January 1st',       check:s=>(s.posts||[]).some(p=>{const d=new Date(p.post_date||p.created_at);return d.getMonth()===0&&d.getDate()===1;})},
+  {id:'late',  cat:'special',icon:'😩', title_es:'La gota que colmó el vaso',title_en:'The last straw',desc_es:'Publica una desgracia a las 23:xx',desc_en:'Post a ruina at 23:xx',check:s=>(s.posts||[]).some(p=>{const d=new Date(p.created_at);return d.getHours()===23;})},
+  {id:'wknd',  cat:'special',icon:'🥴', title_es:'Resaca emocional', title_en:'Emotional hangover',desc_es:'Publica sábado y domingo consecutivos',desc_en:'Post on consecutive Saturday and Sunday',check:s=>{const dates=(s.posts||[]).map(p=>p.post_date||p.created_at.slice(0,10));for(let i=0;i<dates.length;i++){const d=new Date(dates[i]);if(d.getDay()===0){const sat=new Date(d);sat.setDate(sat.getDate()-1);const satStr=sat.toISOString().slice(0,10);if(dates.includes(satStr))return true;}}return false;}},
+  {id:'bday',  cat:'special',icon:'🎂', title_es:"No era tu día",   title_en:'Not your day',   desc_es:'Publica una desgracia en tu cumpleaños',desc_en:'Post on your birthday', check:s=>{if(!s.birthDate)return false;const b=new Date(s.birthDate);return(s.posts||[]).some(p=>{const d=new Date(p.post_date||p.created_at);return d.getMonth()===b.getMonth()&&d.getDate()===b.getDate();});}},
+];
+
+function computeAchievements(posts){
+  const state={totalDeps,streak:profile?.streak||0,postCount:posts.length,posts,birthDate:profile?.birth_date||null};
+  return ACHIEVEMENTS.map(a=>({...a,unlocked:a.check(state)}));
+}
 
 const SB_ERRORS={
   "Invalid login credentials":{es:"Email o contraseña incorrectos",en:"Incorrect email or password"},
@@ -580,6 +626,8 @@ let authTab="login",authStep="form",pendingVerifyEmail="",recoverySession=false;
 let feedOlder=[],señalesBadge=false,viewingProfile=null,friendsList=null;
 let pendingSignup={username:"",email:"",pass:"",color:DOLL_COLORS[0]};
 let draftRazon="",totalDeps=0,navigating=false;
+let cemeteryPosts=null,muertesTab='castigos';
+let followersList=null,amigosTab='following';
 
 const todayS=()=>new Date().toISOString().split('T')[0];
 const yesterS=()=>new Date(Date.now()-86400000).toISOString().split('T')[0];
@@ -864,6 +912,10 @@ async function loadTodayPost(){
   todayPost=all.find(p=>p.is_primary)||all[0]||null;
   todayPrevPost=todayPost?.previous_post_id ? all.find(p=>p.id===todayPost.previous_post_id)||null : null;
 }
+async function loadFollows(){
+  const {data}=await sb.from('follows').select('following_id').eq('follower_id',user.id).catch(()=>({data:[]}));
+  myFollowing=new Set((data||[]).map(f=>f.following_id));
+}
 async function loadFeed(){
   const [{data:posts},{data:deps},{data:follows}]=await Promise.all([
     sb.from('posts').select('*').eq('post_date',todayS()).eq('is_primary',true).order('created_at',{ascending:false}),
@@ -896,6 +948,7 @@ async function submitPost(pd){
     dibujo_trazos:pd.dibujo?.trazos||null,dibujo_descripcion:pd.dibujo?.descripcion||null,
     doll_color:profile.doll_color,  // always use current profile color for new posts
     post_date:t,is_primary:true,previous_post_id:prevId,
+    visibility:window._postVisibility||'friends',
   }).select().single();
   if(error){alert('Error: '+error.message);return;}
   if(!profile.last_post_date||profile.last_post_date!==t){
@@ -930,12 +983,50 @@ async function toggleFollow(uid){
   paint();
 }
 
+function sharePost(p){
+  if(!p)return;
+  const d=DEATHS.find(x=>x.id===p.castigo);
+  const lbl=p.castigo==='dibujo'?p.dibujo_descripcion:dl(p.castigo);
+  const cv=document.createElement('canvas');
+  cv.width=1080;cv.height=1080;
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='#080808';ctx.fillRect(0,0,1080,1080);
+  ctx.fillStyle='#C0392B';ctx.fillRect(0,0,1080,8);
+  ctx.fillStyle='#DEDEDE';ctx.font='bold 42px Georgia,serif';ctx.textAlign='center';
+  ctx.fillText('kill.me',540,90);
+  ctx.fillStyle='#A0A0A0';ctx.font='italic 52px Georgia,serif';ctx.textAlign='center';
+  const words=p.razon.split(' ');
+  let line='',y=300;
+  for(const word of words){
+    const test=line+word+' ';
+    if(ctx.measureText('"'+test+'"').width>900&&line){
+      ctx.fillText('"'+line.trim()+'"',540,y);line=word+' ';y+=70;
+    }else{line=test;}
+  }
+  ctx.fillText('"'+line.trim()+'"',540,y);
+  ctx.fillStyle='#B07830';ctx.font='bold 36px system-ui,sans-serif';ctx.textAlign='center';
+  ctx.fillText(lbl.toUpperCase(),540,y+80);
+  ctx.fillStyle='#686868';ctx.font='28px system-ui,sans-serif';
+  ctx.fillText(`${p.dep_count||0} DEPs`,540,y+130);
+  ctx.fillStyle='#3C3C3C';ctx.font='24px system-ui,sans-serif';
+  ctx.fillText('webkillme.github.io/Kill.me',540,1040);
+  cv.toBlob(async blob=>{
+    const file=new File([blob],'kill-me-ruina.png',{type:'image/png'});
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+      try{await navigator.share({files:[file],title:'kill.me',text:`"${p.razon}" — ${lbl}`});}catch(e){}
+    }else{
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');a.href=url;a.download='kill-me-ruina.png';a.click();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }
+  },'image/png');
+}
+
 // ── Onboarding ────────────────────────────────────────
 const DEAD_FACE_ICO=`<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="21" stroke="currentColor" stroke-width="2.2"/><line x1="15" y1="17" x2="21" y2="23" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><line x1="21" y1="17" x2="15" y2="23" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><line x1="27" y1="17" x2="33" y2="23" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><line x1="33" y1="17" x2="27" y2="23" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><path d="M16 33 Q24 28 32 33" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`;
 function getSlides(){return[
   {icon:()=>DEAD_FACE_ICO,          title:t('ob1_title'),body:t('ob1_body')},
   {icon:()=>icoStat(ICO.candle,48), title:t('ob2_title'),body:t('ob2_body')},
-  {icon:()=>icoStat(ICO.skull,48),  title:t('ob3_title'),body:t('ob3_body')},
   {icon:()=>icoStat(ICO.flame,48),  title:t('ob4_title'),body:t('ob4_body')},
 ];}
 function showOnboarding(){
@@ -976,18 +1067,20 @@ async function loadSeñales(){
   // Fetch new items since last check
   const lastCheck=parseInt(localStorage.getItem('señalesCheck')||'0');
   const since=new Date(lastCheck||Date.now()-86400000*7).toISOString();
+  const {data:myPosts}=await sb.from('posts').select('id').eq('user_id',user.id).gte('post_date',new Date(Date.now()-86400000*30).toISOString().slice(0,10)).catch(()=>({data:[]}));
+  const myPostIds=(myPosts||[]).map(p=>p.id);
   const queries=[
     sb.from('follows').select('created_at,follower_id,profiles!follower_id(username)').eq('following_id',user.id).gt('created_at',since).order('created_at',{ascending:false}),
   ];
-  if(todayPost)queries.unshift(
-    sb.from('deps').select('created_at,user_id,profiles(username)').eq('post_id',todayPost.id).gt('created_at',since).order('created_at',{ascending:false})
+  if(myPostIds.length)queries.unshift(
+    sb.from('deps').select('created_at,user_id,profiles(username)').in('post_id',myPostIds).gt('created_at',since).neq('user_id',user.id).order('created_at',{ascending:false}).limit(50)
   );
   const results=await Promise.all(queries).catch(()=>queries.map(()=>({data:[]})));
-  const deps=todayPost?results[0].data||[]:[];
-  const follows=results[todayPost?1:0].data||[];
+  const deps=myPostIds.length?results[0].data||[]:[];
+  const follows=results[myPostIds.length?1:0].data||[];
   const newItems=[
     ...deps.map(d=>({type:'dep',time:d.created_at,user:d.profiles?.username||'alguien'})),
-    ...follows.map(f=>({type:'follow',time:f.created_at,user:f.profiles?.username||'alguien'})),
+    ...follows.map(f=>({type:'follow',time:f.created_at,user:f['profiles!follower_id']?.username||f.profiles?.username||'alguien'})),
   ];
   // Merge with history — dedup by time+type+user
   const seen=new Set(history.map(i=>`${i.type}|${i.time}|${i.user}`));
@@ -1045,6 +1138,7 @@ async function navToHome(errEl,btn,btnLabel){
       user=s.user;await loadProfile();
       if(!profile){const u=user.user_metadata?.username||user.email.split('@')[0];await sb.from('profiles').upsert({id:user.id,username:u,doll_color:DOLL_COLORS[0],email:user.email}).catch(()=>{});await loadProfile();}
       await loadTodayPost();
+      await loadFollows();
       if(todayPost){await loadFeed();view='feed';}else{view='home';}
       checkSeñalesBadge();
       paint();
@@ -1139,6 +1233,13 @@ function renderAuth(){
   <div class="auth-page">
     <div class="auth-brand auth-hero">
       <h1 class="cinzel">kill<em>.me</em></h1>
+      <div style="display:flex;justify-content:center;margin:8px 0;">
+        <div style="display:inline-flex;border:1px solid var(--border2);border-radius:8px;overflow:hidden;font-size:12px;">
+          <button id="authLangEs" style="padding:6px 16px;border:none;background:${lang==='es'?'var(--surface2)':'transparent'};color:${lang==='es'?'var(--text)':'var(--muted2)'};font-weight:${lang==='es'?700:400};cursor:pointer;">🇪🇸 ES</button>
+          <div style="width:1px;background:var(--border2);"></div>
+          <button id="authLangEn" style="padding:6px 16px;border:none;background:${lang==='en'?'var(--surface2)':'transparent'};color:${lang==='en'?'var(--text)':'var(--muted2)'};font-weight:${lang==='en'?700:400};cursor:pointer;">🇺🇸 EN</button>
+        </div>
+      </div>
       ${!login?'':` <div class="auth-pitch">
         <div class="auth-tagline">${t('auth_tagline')}</div>
         <div class="auth-sub">${t('auth_sub')}</div>
@@ -1165,10 +1266,14 @@ function renderAuth(){
       <div class="auth-err" id="aErr"></div>
       <button class="btn btn-red" id="btnAuth">${login?t('btn_login'):t('btn_next')}</button>
       ${login?`<button class="btn-link" id="btnForgot" style="margin-top:2px;font-size:clamp(11px,2.5vw,12px);">${t('btn_forgot')}</button>`:''}
+      <div style="margin-top:14px;text-align:center;font-size:clamp(9px,2.3vw,10px);color:var(--muted);line-height:1.6;">${t('safety_note')} <a href="https://www.telefonodelaesperanza.org" target="_blank" style="color:var(--muted2);">${t('safety_link')}</a></div>
     </div>
   </div>`;
   ge('tLogin').onclick=()=>{authTab='login';renderAuth();};
   ge('tReg').onclick=()=>{authTab='register';renderAuth();};
+  if(ge('authLangEs'))ge('authLangEs').onclick=()=>{if(lang!=='es'){lang='es';localStorage.setItem('kill_lang','es');renderAuth();}};
+  if(ge('authLangEn'))ge('authLangEn').onclick=()=>{if(lang!=='en'){lang='en';localStorage.setItem('kill_lang','en');renderAuth();}};
+
   if(!login&&ge('aPass')){
     ge('aPass').oninput=()=>{const pr=ge('passReqs');if(pr)pr.innerHTML=passReqsHTML(ge('aPass').value);};
   }
@@ -1214,7 +1319,7 @@ function shell(content){
   const inMain=['home','razon','muerte','dibujo','posted'].includes(view);
   ge('root').innerHTML=`
   <div class="topbar">
-    <span class="logo cinzel">kill<em>.me</em></span>
+    <button class="logo cinzel" id="logoBtn" style="background:none;border:none;cursor:pointer;padding:0;">kill<em>.me</em></button>
     <div class="topbar-r">
       ${streak>0?`<div class="streak-pill">${ICO.flame}<span>${streak}</span></div>`:''}
       <button class="gear-btn" id="btnAmigos" style="margin-right:2px;">${ICO.people}</button>
@@ -1234,6 +1339,7 @@ function shell(content){
   ge('navFeed').onclick=async()=>{await loadFeed();view='feed';paint();};
   ge('navSeñales').onclick=async()=>{señalesBadge=false;window._señalesItems=await loadSeñales();view='señales';paint();};
   ge('navMuertes').onclick=()=>{view='muertes';paint()};
+  ge('logoBtn').onclick=async()=>{await loadFeed();view='feed';paint();};
   attachListeners();
   if(view==='dibujo')setupCanvas();
 }
@@ -1283,6 +1389,8 @@ function paint(){
   else if(view==='señales')c=renderSeñales();
   else if(view==='amigos')c=renderAmigos();
   else if(view==='profile')c=renderProfile();
+  else if(view==='cementerio')c=renderCemetery();
+  else if(view==='logros')c=renderLogros();
   shell(c);
 }
 
@@ -1300,20 +1408,38 @@ async function loadProfileData(uid){
 
 function renderAmigos(){
   const friendIds=[...myFollowing];
-  if(!friendIds.length) return `<div class="screen">${hdr(t('amigos_title'),'')}<p style="text-align:center;color:var(--muted2);margin-top:60px;font-size:clamp(13px,3.5vw,14px);">${t('amigos_empty')}<br><span style="font-size:clamp(11px,3vw,12px);opacity:.5;display:block;margin-top:6px;">${t('amigos_find')}</span></p><button class="btn-link" id="volverAmigos" style="margin-top:20px;">${t('btn_back')}</button></div>`;
-  if(friendsList===null) return `<div class="screen">${hdr(t('amigos_title'),'')}<p style="text-align:center;color:var(--muted2);margin-top:60px;">${t('amigos_loading')}</p></div>`;
-  const friends=friendsList;
-  const friendRows=friends.map(f=>`
-    <div class="amigo-row" data-uid="${f.id}">
-      <div style="flex-shrink:0">${avatarDoll(f.doll_color||DOLL_COLORS[0],clamp(40,48))}</div>
-      <div class="amigo-info">
-        <div class="amigo-name">@${esc(f.username)}</div>
-        <div class="amigo-meta">${f.streak||0} ${t('amigos_streak')}${f.created_at?new Date(f.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{month:'short',year:'numeric'}):'—'}</div>
-      </div>
-      <div class="amigo-arrow">›</div>
-    </div>`).join('');
-  const content=friends.length?friendRows:`<div style="text-align:center;color:var(--muted2);margin-top:40px;">${t('amigos_loading')}</div>`;
-  return `<div class="screen">${hdr(t('amigos_title'),`${friendIds.length}${t('amigos_following')}`)}<div>${content}</div><button class="btn-link" id="volverAmigos" style="margin-top:20px;">${t('btn_back')}</button></div>`;
+  const tabBar=`<div style="display:flex;border-bottom:1px solid var(--border);margin-bottom:clamp(16px,4vw,20px);">
+    <button id="tabFollowing" style="flex:1;padding:10px;background:none;border:none;border-bottom:2px solid ${amigosTab==='following'?'var(--red)':'transparent'};color:${amigosTab==='following'?'var(--text)':'var(--muted2)'};font-weight:${amigosTab==='following'?700:400};font-size:clamp(12px,3vw,13px);cursor:pointer;">${t('following_tab')} <span style="opacity:.6">${friendIds.length}</span></button>
+    <button id="tabFollowers" style="flex:1;padding:10px;background:none;border:none;border-bottom:2px solid ${amigosTab==='followers'?'var(--red)':'transparent'};color:${amigosTab==='followers'?'var(--text)':'var(--muted2)'};font-weight:${amigosTab==='followers'?700:400};font-size:clamp(12px,3vw,13px);cursor:pointer;">${t('followers_tab')} ${followersList?`<span style="opacity:.6">${followersList.length}</span>`:''}</button>
+  </div>`;
+
+  if(amigosTab==='following'){
+    if(!friendIds.length) return `<div class="screen">${hdr(t('amigos_title'),'')}<button class="btn-link" id="volverAmigos" style="margin-bottom:0;">${t('btn_back')}</button>${tabBar}<p style="text-align:center;color:var(--muted2);margin-top:40px;font-size:clamp(13px,3.5vw,14px);">${t('amigos_empty')}<br><span style="font-size:clamp(11px,3vw,12px);opacity:.5;display:block;margin-top:6px;">${t('amigos_find')}</span></p></div>`;
+    if(friendsList===null) return `<div class="screen">${hdr(t('amigos_title'),'')}<button class="btn-link" id="volverAmigos" style="margin-bottom:0;">${t('btn_back')}</button>${tabBar}<p style="text-align:center;color:var(--muted2);margin-top:40px;">${t('amigos_loading')}</p></div>`;
+    const rows=friendsList.map(f=>`
+      <div class="amigo-row" data-uid="${f.id}">
+        <div style="flex-shrink:0">${avatarDoll(f.doll_color||DOLL_COLORS[0],clamp(40,48))}</div>
+        <div class="amigo-info">
+          <div class="amigo-name">@${esc(f.username)}</div>
+          <div class="amigo-meta">${f.streak||0} ${t('amigos_streak')}${f.created_at?new Date(f.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{month:'short',year:'numeric'}):'—'}</div>
+        </div>
+        <div class="amigo-arrow">›</div>
+      </div>`).join('');
+    return `<div class="screen">${hdr(t('amigos_title'),'')}<button class="btn-link" id="volverAmigos" style="margin-bottom:0;">${t('btn_back')}</button>${tabBar}<div>${rows}</div></div>`;
+  } else {
+    if(followersList===null) return `<div class="screen">${hdr(t('amigos_title'),'')}<button class="btn-link" id="volverAmigos" style="margin-bottom:0;">${t('btn_back')}</button>${tabBar}<p style="text-align:center;color:var(--muted2);margin-top:40px;">${t('amigos_loading')}</p></div>`;
+    if(!followersList.length) return `<div class="screen">${hdr(t('amigos_title'),'')}<button class="btn-link" id="volverAmigos" style="margin-bottom:0;">${t('btn_back')}</button>${tabBar}<p style="text-align:center;color:var(--muted2);margin-top:40px;">${t('no_followers')}</p></div>`;
+    const rows=followersList.map(f=>`
+      <div class="amigo-row" data-uid="${f.id}">
+        <div style="flex-shrink:0">${avatarDoll(f.doll_color||DOLL_COLORS[0],clamp(40,48))}</div>
+        <div class="amigo-info">
+          <div class="amigo-name">@${esc(f.username)}</div>
+          <div class="amigo-meta">${f.streak||0} ${t('amigos_streak')}${f.created_at?new Date(f.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{month:'short',year:'numeric'}):'—'}</div>
+        </div>
+        <div class="amigo-arrow">›</div>
+      </div>`).join('');
+    return `<div class="screen">${hdr(t('amigos_title'),'')}<button class="btn-link" id="volverAmigos" style="margin-bottom:0;">${t('btn_back')}</button>${tabBar}<div>${rows}</div></div>`;
+  }
 }
 
 function renderProfile(){
@@ -1367,7 +1493,7 @@ function renderSeñales(){
   ).join('');
   const emptyState=todayPost?t('senales_empty_post'):t('senales_empty_no_post');
   return `<div class="screen">
-    ${hdr(t('senales_title'),todayPost?'"'+esc(todayPost.razon).slice(0,38)+(todayPost.razon.length>38?'…':'')+'"':'')}
+    ${hdr(t('senales_title'),'')}
     ${items.length?rows:`<p class="señales-empty">${emptyState}</p>`}
     ${!todayPost?`<div style="text-align:center;margin-top:20px;"><button class="btn btn-red" onclick="draftRazon='';view='razon';paint()">${t('btn_publish_ruina')}</button></div>`:''}
   </div>`;
@@ -1413,8 +1539,20 @@ function renderHome(){
       <div style="display:flex;justify-content:center;margin-top:20px;">
         <button class="btn btn-red" id="goFeed" style="max-width:220px;font-size:clamp(13px,3.5vw,15px);">${t('btn_feed')}</button>
       </div>
+      <div style="display:flex;justify-content:center;margin-top:6px;">
+        <button class="btn-link" id="btnShare" style="font-size:clamp(11px,3vw,12px);opacity:.7;">${t('btn_share')}</button>
+      </div>
       <div style="display:flex;justify-content:center;margin-top:10px;">
         <button class="btn-link" id="btnPeor" style="font-size:clamp(11px,3vw,12px);opacity:.7;">${t('btn_worse')}</button>
+      </div>
+      <div style="display:flex;justify-content:center;margin-top:10px;">
+        <button class="btn-link" id="btnDeletePost" style="font-size:clamp(10px,2.5vw,11px);color:var(--muted);opacity:.6;">${t('btn_delete')}</button>
+      </div>
+      <div style="height:1px;background:var(--border);margin:clamp(20px,5vw,26px) 0;"></div>
+      <div style="text-align:center;">
+        <div style="font-size:clamp(10px,2.5vw,11px);text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:6px;">🪦 ${t('cemetery_title')}</div>
+        <div style="font-size:clamp(12px,3vw,13px);color:var(--muted2);margin-bottom:12px;" id="cemeteryCount">${t('cemetery_loading')}</div>
+        <button class="btn-link" id="btnCemetery">${t('btn_cemetery')}</button>
       </div>
     </div>`;
   }
@@ -1425,6 +1563,12 @@ function renderHome(){
     </div>
     <button class="btn btn-red" id="empezar" style="max-width:240px;margin:0 auto;font-size:clamp(14px,3.5vw,16px);letter-spacing:.4px;">${t('btn_start')}</button>
     <button class="btn-link" id="btnInstrHome" style="margin-top:10px;">${t('btn_whats_this')}</button>
+    <div style="height:1px;background:var(--border);margin:clamp(16px,4vw,20px) 0;"></div>
+    <div style="text-align:center;">
+      <div style="font-size:clamp(10px,2.5vw,11px);text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:6px;">🪦 ${t('cemetery_title')}</div>
+      <div style="font-size:clamp(12px,3vw,13px);color:var(--muted2);margin-bottom:12px;" id="cemeteryCount">${t('cemetery_loading')}</div>
+      <button class="btn-link" id="btnCemetery">${t('btn_cemetery')}</button>
+    </div>
   </div>`;
 }
 
@@ -1435,12 +1579,12 @@ function renderMuerte(){
   const cells=DEATHS.map(d=>{
     const ok=streak>=d.min&&totalDeps>=d.deps;
     if(ok) return `<div class="dcell on" data-death="${d.id}">
-      ${dollSVG(profile.doll_color,d.id,true,d.pose,clamp(52,64))}
+      <div style="width:${clamp(52,64)}px;height:${clamp(52,64)}px;display:flex;align-items:center;justify-content:center;overflow:hidden;">${dollSVG(profile.doll_color,d.id,true,d.pose,clamp(52,64))}</div>
       <span class="dlabel">${dl(d.id)}</span>
     </div>`;
     const req=d.min>0&&streak<d.min?`${icoStat(ICO.flame,10)} ${d.min}d`:`${icoStat(ICO.candle,10)} ${d.deps}`;
     return `<div class="dcell off">
-      ${dollSVG(profile.doll_color,d.id,true,d.pose,clamp(52,64))}
+      <div style="width:${clamp(52,64)}px;height:${clamp(52,64)}px;display:flex;align-items:center;justify-content:center;overflow:hidden;">${dollSVG(profile.doll_color,d.id,true,d.pose,clamp(52,64))}</div>
       <span class="dlabel">${dl(d.id)}</span>
       <span class="dreq">${req}</span>
     </div>`;
@@ -1461,8 +1605,8 @@ function renderMuerte(){
 function renderDibujo(){
   return `<div class="screen">
     ${hdr(t('dibujo_title'),t('dibujo_sub'))}
-    <textarea id="razonDibujo" placeholder="${t('ph_razon_draw')}" maxlength="120">${esc(draftRazon)}</textarea>
-    <div class="charcount" id="razonCount">${draftRazon.length}/120</div>
+    <textarea id="razonDibujo" placeholder="${t('ph_razon_draw')}" maxlength="280">${esc(draftRazon)}</textarea>
+    <div class="charcount" id="razonCount">${draftRazon.length}/280</div>
     <div style="display:flex;justify-content:center;margin-top:14px;"><canvas id="drawCanvas" width="220" height="280"></canvas></div>
     <div class="swatches">${LINE_COLORS.map((c,i)=>`<button class="swatch ${i===0?'on':''}" data-color="${c}" style="background:${c};"></button>`).join('')}</div>
     <div class="wrow">
@@ -1495,6 +1639,7 @@ function renderPosted(){
 }
 
 function renderMuertes(){
+  if(muertesTab==='logros')return renderLogros();
   const streak=profile?.streak||0;
   const dollPx=clamp(56,72);
 
@@ -1558,6 +1703,10 @@ function renderMuertes(){
 
   return `<div class="screen">
     ${hdr(t('nav_muertes'))}
+    <div style="display:flex;border-bottom:1px solid var(--border);margin-bottom:16px;">
+      <button id="tabCastigos" style="flex:1;padding:10px;background:none;border:none;border-bottom:2px solid ${muertesTab!=='logros'?'var(--red)':'transparent'};color:${muertesTab!=='logros'?'var(--text)':'var(--muted2)'};font-weight:${muertesTab!=='logros'?700:400};font-size:clamp(12px,3vw,13px);cursor:pointer;">${t('castigos_tab')}</button>
+      <button id="tabLogros" style="flex:1;padding:10px;background:none;border:none;border-bottom:2px solid ${muertesTab==='logros'?'var(--red)':'transparent'};color:${muertesTab==='logros'?'var(--text)':'var(--muted2)'};font-weight:${muertesTab==='logros'?700:400};font-size:clamp(12px,3vw,13px);cursor:pointer;">${t('logros_title')}</button>
+    </div>
     <div class="deaths-header-stats">
       <div class="dhs-pill"><div class="dhs-num" style="color:var(--warm)">${unlockedCount}<span style="color:var(--muted);font-size:.6em;font-weight:400">/${DEATHS.length}</span></div><div class="dhs-lbl">${t('muertes_unlocked')}</div></div>
       <div class="dhs-pill"><div class="dhs-num">${streak}</div><div class="dhs-lbl">${t('profile_streak')}</div></div>
@@ -1587,6 +1736,7 @@ function feedCardHTML(item,older=false){
   const friend=myFollowing.has(item.user_id);
   const d=DEATHS.find(x=>x.id===item.castigo);
   const hasPrev=!!item.previous_post_id&&!!item._prev,isOpen=expandedPrev.has(item.id);
+  const depCount=item.dep_count||0;
   return `<div class="feed-card${friend&&!own?' fc-friend':''}${older?' older-card':''}">
     <div class="feed-head">
       <button class="feed-avatar-btn" data-uid="${item.user_id}" style="background:none;border:none;padding:0;cursor:pointer;position:relative;">
@@ -1598,14 +1748,18 @@ function feedCardHTML(item,older=false){
       </div>
       ${!own&&!older?`<button class="follow-btn ${friend?'following':''}" data-uid="${item.user_id}">${friend?ICO.check+t('btn_following'):ICO.plus+t('btn_follow')}</button>`:''}
     </div>
-    <p class="feed-razon">"${esc(item.razon)}"</p>
-    <span class="feed-castigo">${lbl}</span>
-    <div style="display:flex;justify-content:center;margin:4px 0 14px;">
-      ${dollWithDraw(item.doll_color,item.castigo,item.dibujo_trazos,true,d?.pose||'idle',clamp(90,110))}
+    <div style="display:flex;gap:12px;align-items:flex-start;margin:8px 0 12px;">
+      <div style="flex-shrink:0;opacity:.9;">
+        ${dollWithDraw(item.doll_color,item.castigo,item.dibujo_trazos,true,d?.pose||'idle',clamp(56,68))}
+      </div>
+      <div style="flex:1;min-width:0;">
+        <p class="feed-razon" style="margin-bottom:6px;">"${esc(item.razon)}"</p>
+        <span class="feed-castigo">${lbl}</span>
+      </div>
     </div>
     ${older?'':(own
-      ?`<div class="own-dep">${ICO.candle} <span>${item.dep_count||0} ${item.dep_count===1?'DEP':'DEPs'}</span></div>`
-      :`<button class="dep-btn ${given?'given':''}" data-pid="${item.id}">${ICO.candle} DEP <span class="dep-count">${item.dep_count||0}</span></button>`)}
+      ?`<div class="own-dep">${ICO.candle} <span style="font-size:clamp(11px,2.8vw,12px);color:var(--muted2);">${depCount===1?t('dep_velado_1'):t('dep_velado_n').replace('$n',depCount)}</span></div>`
+      :`<button class="dep-btn ${given?'given':''}" data-pid="${item.id}">${ICO.candle} DEP <span class="dep-count">${depCount}</span></button>`)}
     ${hasPrev&&!older?`
       <button class="prev-toggle ${isOpen?'open':''}" data-feedprev="${item.id}">
         <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -1613,6 +1767,58 @@ function feedCardHTML(item,older=false){
       </button>
       <div class="prev-panel ${isOpen?'open':''}">${prevPostHTML(item._prev,54)}</div>
     `:''}
+  </div>`;
+}
+
+function renderCemetery(){
+  if(!cemeteryPosts){
+    (async()=>{
+      const {data}=await sb.from('posts').select('*').eq('user_id',user.id).eq('is_primary',true).order('created_at',{ascending:false}).limit(50).catch(()=>({data:[]}));
+      cemeteryPosts=data||[];
+      paint();
+    })();
+    return `<div class="screen">${hdr('🪦 '+t('cemetery_title'),'')}<p style="text-align:center;color:var(--muted2);margin-top:60px;">${t('amigos_loading')}</p></div>`;
+  }
+  const total=cemeteryPosts.length;
+  const rows=cemeteryPosts.map(p=>{
+    const d=DEATHS.find(x=>x.id===p.castigo);
+    const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):dl(p.castigo);
+    const dateStr=new Date(p.post_date||p.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'short',year:'numeric'});
+    return `<div style="display:flex;gap:12px;align-items:center;padding:clamp(10px,2.5vw,12px) 0;border-bottom:1px solid var(--border);">
+      <div style="flex-shrink:0;">
+        ${dollWithDraw(p.doll_color,p.castigo,p.dibujo_trazos,true,d?.pose||'idle',clamp(44,52))}
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:clamp(11px,2.8vw,12px);color:var(--muted2);margin-bottom:3px;">${dateStr} · ${lbl}</div>
+        <div style="font-size:clamp(13px,3.5vw,14px);color:var(--text2);font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">"${esc(p.razon)}"</div>
+        <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-top:3px;">${ICO.candle} ${p.dep_count||0} DEPs</div>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="screen">
+    ${hdr('🪦 '+t('cemetery_title'),t('cemetery_sub').replace('$n',total))}
+    ${total?rows:`<p style="text-align:center;color:var(--muted2);margin-top:60px;">${t('cemetery_empty')}</p>`}
+    <button class="btn-link" id="volverCemetery" style="margin-top:20px;">${t('btn_back')}</button>
+  </div>`;
+}
+
+function renderLogros(){
+  const posts=cemeteryPosts||[];
+  const list=computeAchievements(posts);
+  const unlocked=list.filter(a=>a.unlocked).length;
+  const rows=list.map(a=>`
+    <div style="display:flex;gap:12px;align-items:center;padding:clamp(10px,2.5vw,12px) 0;border-bottom:1px solid var(--border);opacity:${a.unlocked?1:.4};">
+      <div style="font-size:clamp(22px,5vw,26px);flex-shrink:0;width:36px;text-align:center;">${a.icon}</div>
+      <div style="flex:1;">
+        <div style="font-size:clamp(13px,3.5vw,14px);font-weight:700;color:${a.unlocked?'var(--text)':'var(--muted2)'};">${lang==='en'?a.title_en:a.title_es}</div>
+        <div style="font-size:clamp(11px,2.8vw,12px);color:var(--muted2);margin-top:2px;">${lang==='en'?a.desc_en:a.desc_es}</div>
+      </div>
+      ${a.unlocked?`<div style="color:var(--warm);font-size:16px;">✓</div>`:''}
+    </div>`).join('');
+  return `<div class="screen">
+    ${hdr(t('logros_title'),`${unlocked}/${list.length}`)}
+    ${!cemeteryPosts?`<p style="text-align:center;color:var(--muted2);">${t('amigos_loading')}</p>`:rows}
+    <button class="btn-link" id="volverLogros" style="margin-top:20px;">${t('btn_back')}</button>
   </div>`;
 }
 
@@ -1645,6 +1851,14 @@ function renderAjustes(){
         <div class="stat-label">${t('deps_lbl')}</div>
       </div>
     </div>
+    <div style="height:1px;background:var(--border);margin:clamp(14px,3.5vw,18px) 0;"></div>
+    <div style="margin-bottom:16px;">
+      <div style="font-size:clamp(9px,2.5vw,10px);color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">${t('lbl_birthday')}</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="date" id="birthdayInput" value="${profile.birth_date||''}" style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:10px 12px;font-size:clamp(13px,3.5vw,14px);font-family:inherit;outline:none;" max="${new Date().toISOString().slice(0,10)}"/>
+        <button class="btn-warm-sm" id="btnSaveBirthday">${t('btn_save_birthday')}</button>
+      </div>
+    </div>
     <div style="height:1px;background:var(--border);margin:clamp(20px,5vw,26px) 0;"></div>
     <button class="btn-ghost" id="btnChangePass" style="margin-bottom:10px;">${t('btn_change_pass')}</button>
     <button class="btn-ghost" id="btnInstructions" style="margin-bottom:10px;">${t('btn_what_is')}</button>
@@ -1668,6 +1882,22 @@ function attachListeners(){
     if(ge('btnInstrHome'))ge('btnInstrHome').onclick=()=>showOnboarding();
     if(ge('goFeed'))ge('goFeed').onclick=async()=>{await loadFeed();view='feed';paint();};
     if(ge('btnPeor'))ge('btnPeor').onclick=()=>{draftRazon='';view='razon';paint();};
+    if(ge('btnShare'))ge('btnShare').onclick=()=>sharePost(todayPost);
+    if(ge('btnDeletePost'))ge('btnDeletePost').onclick=async()=>{
+      if(!confirm(t('confirm_delete')))return;
+      await sb.from('posts').delete().eq('id',todayPost.id).eq('user_id',user.id);
+      await sb.from('profiles').update({streak:Math.max(0,(profile.streak||1)-1),last_post_date:null}).eq('id',user.id).catch(()=>{});
+      profile.streak=Math.max(0,(profile.streak||1)-1);
+      todayPost=null;todayPrevPost=null;cemeteryPosts=null;view='home';paint();
+    };
+    if(ge('btnCemetery'))ge('btnCemetery').onclick=()=>{view='cementerio';paint();};
+    if(ge('cemeteryCount')){
+      (async()=>{
+        const {count}=await sb.from('posts').select('id',{count:'exact',head:true}).eq('user_id',user.id).eq('is_primary',true).catch(()=>({count:0}));
+        const el=ge('cemeteryCount');
+        if(el)el.textContent=t('cemetery_sub').replace('$n',count||0);
+      })();
+    }
     if(ge('btnTogglePrev')){
       ge('btnTogglePrev').onclick=()=>{
         if(expandedPrev.has('home'))expandedPrev.delete('home');else expandedPrev.add('home');
@@ -1678,7 +1908,7 @@ function attachListeners(){
   }
   if(view==='razon'){
     const ta=ge('razonInput'),btn=ge('btnElegirCastigo'),cnt=ge('razonInputCount');
-    if(ta){ta.oninput=()=>{draftRazon=ta.value;cnt.textContent=`${draftRazon.length}/120`;btn.disabled=draftRazon.trim().length<2;};}
+    if(ta){ta.oninput=()=>{draftRazon=ta.value;cnt.textContent=`${draftRazon.length}/280`;btn.disabled=draftRazon.trim().length<2;};}
     if(btn)btn.onclick=()=>{view='muerte';paint();};
     if(ge('volverRazon'))ge('volverRazon').onclick=()=>{view='home';paint();};
   }
@@ -1688,7 +1918,7 @@ function attachListeners(){
     if(ge('volverMuerte'))ge('volverMuerte').onclick=()=>{view='razon';paint();};
   }
   if(view==='dibujo'){
-    ge('razonDibujo').oninput=e=>{draftRazon=e.target.value;ge('razonCount').textContent=`${draftRazon.length}/120`;checkDraw();};
+    ge('razonDibujo').oninput=e=>{draftRazon=e.target.value;ge('razonCount').textContent=`${draftRazon.length}/280`;checkDraw();};
     ge('descDibujo').oninput=checkDraw;
     ge('volverFormas').onclick=()=>{view='muerte';paint();};
   }
@@ -1727,16 +1957,36 @@ function attachListeners(){
     if(ge('btnLangEs'))ge('btnLangEs').onclick=()=>{if(lang!=='es'){lang='es';localStorage.setItem('kill_lang','es');paint();}};
     if(ge('btnLangEn'))ge('btnLangEn').onclick=()=>{if(lang!=='en'){lang='en';localStorage.setItem('kill_lang','en');paint();}};
 
+    if(ge('btnSaveBirthday'))ge('btnSaveBirthday').onclick=async()=>{
+      const val=ge('birthdayInput').value;
+      if(!val)return;
+      await sb.from('profiles').update({birth_date:val}).eq('id',user.id).catch(()=>{});
+      profile.birth_date=val;
+      const btn=ge('btnSaveBirthday');if(btn){btn.textContent='✓';setTimeout(()=>{if(btn)btn.textContent=t('btn_save_birthday');},2000);}
+    };
     if(ge('btnLogout'))ge('btnLogout').onclick=async()=>{
       await sb.auth.signOut().catch(()=>{});
       user=null;profile=null;todayPost=null;todayPrevPost=null;
       feedData=[];myDeps=new Set();myFollowing=new Set();expandedPrev=new Set();
+      cemeteryPosts=null;followersList=null;friendsList=null;
       navigating=false;authStep='form';view='auth';paint();
     };
   }
   if(view==='amigos'){
     if(ge('volverAmigos'))ge('volverAmigos').onclick=()=>{view=todayPost?'feed':'home';paint();};
-    if(!friendsList){
+    if(ge('tabFollowing'))ge('tabFollowing').onclick=()=>{amigosTab='following';paint();};
+    if(ge('tabFollowers'))ge('tabFollowers').onclick=()=>{
+      amigosTab='followers';
+      if(followersList===null){
+        (async()=>{
+          const {data}=await sb.from('follows').select('follower_id,profiles!follower_id(*)').eq('following_id',user.id).catch(()=>({data:[]}));
+          followersList=(data||[]).map(r=>r['profiles!follower_id']||r.profiles||{}).filter(Boolean);
+          paint();
+        })();
+      }
+      paint();
+    };
+    if(amigosTab==='following'&&!friendsList){
       (async()=>{
         const ids=[...myFollowing];
         if(!ids.length){friendsList=[];paint();return;}
@@ -1751,6 +2001,26 @@ function attachListeners(){
         view='profile';paint();
       };
     });
+  }
+  if(view==='muertes'){
+    if(ge('tabCastigos'))ge('tabCastigos').onclick=()=>{muertesTab='castigos';paint();};
+    if(ge('tabLogros'))ge('tabLogros').onclick=()=>{
+      muertesTab='logros';
+      if(!cemeteryPosts){
+        (async()=>{
+          const {data}=await sb.from('posts').select('*').eq('user_id',user.id).eq('is_primary',true).order('created_at',{ascending:false}).limit(200).catch(()=>({data:[]}));
+          cemeteryPosts=data||[];paint();
+        })();
+      }
+      paint();
+    };
+    if(ge('volverLogros'))ge('volverLogros').onclick=()=>{muertesTab='castigos';paint();};
+  }
+  if(view==='cementerio'){
+    if(ge('volverCemetery'))ge('volverCemetery').onclick=()=>{view='home';paint();};
+  }
+  if(view==='logros'){
+    if(ge('volverLogros'))ge('volverLogros').onclick=()=>{view='muertes';muertesTab='castigos';paint();};
   }
   if(view==='profile'){
     if(ge('volverProfile'))ge('volverProfile').onclick=()=>{view='amigos';paint();};
@@ -1776,8 +2046,8 @@ function attachListeners(){
 function renderRazon(){
   return `<div class="screen">
     ${hdr(t('razon_title'))}
-    <textarea id="razonInput" placeholder="${t('ph_razon')}" maxlength="120">${esc(draftRazon)}</textarea>
-    <div class="charcount" id="razonInputCount">${draftRazon.length}/120</div>
+    <textarea id="razonInput" placeholder="${t('ph_razon')}" maxlength="280">${esc(draftRazon)}</textarea>
+    <div class="charcount" id="razonInputCount">${draftRazon.length}/280</div>
     <div style="display:flex;justify-content:center;margin-top:20px;">
       <button class="btn btn-red" id="btnElegirCastigo" ${draftRazon.trim().length<2?'disabled':''}>${t('btn_castigo')}</button>
     </div>
@@ -1786,22 +2056,45 @@ function renderRazon(){
 }
 
 function promptConfirmDeath(death){
+  window._postVisibility=window._postVisibility||'friends';
   const d=DEATHS.find(x=>x.id===death);
-  const lbl=d?.label||death;
+  const lbl=dl(death);
   ge('app').innerHTML=`<div class="screen" style="text-align:center;">
     <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:12px;">${t('confirm_title')}</div>
     <div style="display:flex;justify-content:center;margin:0 0 clamp(16px,4vw,24px);">
       ${dollSVG(profile.doll_color,death,true,d?.pose||'idle',clamp(130,160))}
     </div>
-    <div class="done-card" style="margin-bottom:20px;">
-      <div class="done-razon">"${esc(draftRazon)}"</div>
-      <div class="done-castigo">${lbl}</div>
+    <div class="done-card" style="margin-bottom:20px;text-align:left;">
+      <div class="done-razon" style="text-align:center;">"${esc(draftRazon)}"</div>
+      <div class="done-castigo" style="text-align:center;">${lbl}</div>
+      <div style="margin-top:14px;text-align:left;">
+        <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">${t('vis_label')}</div>
+        <div id="visSelector" style="display:flex;flex-direction:column;gap:6px;">
+          ${['friends','public','private'].map(v=>`
+            <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid ${window._postVisibility===v?'var(--warm)':'var(--border2)'};border-radius:8px;cursor:pointer;background:${window._postVisibility===v?'rgba(176,120,48,.06)':'transparent'};">
+              <input type="radio" name="vis" value="${v}" ${window._postVisibility===v?'checked':''} style="display:none;">
+              <span style="font-size:clamp(12px,3vw,13px);color:${window._postVisibility===v?'var(--text)':'var(--text2)'};">${t('vis_'+v)}</span>
+            </label>`).join('')}
+        </div>
+      </div>
     </div>
     <div style="display:flex;justify-content:center;">
       <button class="btn btn-red" id="btnPublicarFinal">${t('btn_publish')}</button>
     </div>
     <button class="btn-link" id="volverConfirm">${t('btn_back_castigo')}</button>
   </div>`;
+  document.querySelectorAll('#visSelector label').forEach(lbl=>{
+    lbl.onclick=()=>{
+      window._postVisibility=lbl.querySelector('input').value;
+      document.querySelectorAll('#visSelector label').forEach(l=>{
+        const v=l.querySelector('input').value;
+        const on=v===window._postVisibility;
+        l.style.borderColor=on?'var(--warm)':'var(--border2)';
+        l.style.background=on?'rgba(176,120,48,.06)':'transparent';
+        l.querySelector('span').style.color=on?'var(--text)':'var(--text2)';
+      });
+    };
+  });
   ge('btnPublicarFinal').onclick=async()=>{
     const btn=ge('btnPublicarFinal');
     btn.disabled=true;btn.textContent='...';
@@ -1880,6 +2173,7 @@ async function init(){
         await loadProfile();
       }
       await loadTodayPost();
+      await loadFollows();
       if(todayPost){await loadFeed();view='feed';}else{view='home';}
     }else{view='auth';}
   }catch(e){console.error('init error',e);view='auth';}

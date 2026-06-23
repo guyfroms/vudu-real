@@ -2256,7 +2256,7 @@ function renderCemetery(){
     })();
     return `<div class="screen">${hdr('🪦 '+t('cemetery_title'),'')}<p style="text-align:center;color:var(--muted2);margin-top:60px;">${t('amigos_loading')}</p></div>`;
   }
-  const filters=[['all',lang==='en'?'All':'Todas'],['friends',lang==='en'?'Friends':'Amigos'],['public',lang==='en'?'Public':'Público'],['private',lang==='en'?'Private':'Privado']];
+  const filters=[['all',lang==='en'?'All':'Todas'],['public',lang==='en'?'Public':'Público'],['friends',lang==='en'?'Friends':'Amigos'],['private',lang==='en'?'Private':'Privado']];
   const filterBar=`<div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;">${filters.map(([val,lbl])=>`<button class="cem-filter ${cemeteryVisFilter===val?'on':''}" data-vf="${val}" style="padding:5px 11px;font-size:clamp(10px,2.5vw,11px);border-radius:20px;border:1px solid ${cemeteryVisFilter===val?'var(--warm)':'var(--border2)'};background:${cemeteryVisFilter===val?'rgba(176,120,48,.1)':'transparent'};color:${cemeteryVisFilter===val?'var(--warm)':'var(--muted2)'};cursor:pointer;font-family:inherit;">${lbl}</button>`).join('')}</div>`;
   const filtered=cemeteryVisFilter==='all'?cemeteryPosts:cemeteryPosts.filter(p=>p.visibility===cemeteryVisFilter);
   const total=cemeteryPosts.length;
@@ -2265,7 +2265,9 @@ function renderCemetery(){
     const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):dl(p.castigo);
     const dateStr=new Date(p.post_date||p.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'short',year:'numeric'});
     const vl=visLabel(p.visibility);
-    const visBadge=vl?`<span style="opacity:.5;">·</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:clamp(9px,2.3vw,10px);padding:2px 7px;border-radius:10px;border:1px solid var(--border2);color:var(--muted2);">${vl.ico} ${vl.txt}</span>`:'';
+    const visBadge=vl
+      ?`<span style="opacity:.5;">·</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:clamp(9px,2.3vw,10px);padding:2px 7px;border-radius:10px;border:1px solid var(--border2);color:var(--muted2);">${vl.ico} ${vl.txt}</span>`
+      :`<span style="opacity:.5;">·</span><span style="font-size:clamp(9px,2.3vw,10px);padding:2px 7px;border-radius:10px;border:1px solid var(--border2);color:var(--muted2);opacity:.4;">sin categoría</span>`;
     return `<div class="cemetery-row" data-cemid="${p.id}">
       <div style="flex-shrink:0;">${dollWithDraw(p.doll_color,p.castigo,p.dibujo_trazos,true,d?.pose||'idle',clamp(44,54))}</div>
       <div style="flex:1;min-width:0;">

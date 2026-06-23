@@ -1936,7 +1936,7 @@ function renderHome(){
       </div>
       <div class="done-card">
         <div class="done-castigo">${lbl}</div>
-        <div style="color:var(--muted);font-size:clamp(11px,2.8vw,12px);margin-top:8px;letter-spacing:.3px;display:flex;align-items:center;justify-content:center;gap:5px;">${icoStat(ICO.candle,14)} ${p.dep_count||0} ${t('deps_received')}</div>
+        <div style="color:var(--muted);font-size:clamp(11px,2.8vw,12px);margin-top:8px;letter-spacing:.3px;display:flex;align-items:center;justify-content:center;gap:8px;">${icoStat(ICO.candle,14)} ${p.dep_count||0} ${t('deps_received')}${(()=>{const vl=visLabel(p.visibility);return vl?`<span style="opacity:.6;">·</span><span style="display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:10px;border:1px solid var(--border2);">${vl.ico} ${vl.txt}</span>`:p.visibility===null||p.visibility===undefined?'':``;})()}</div>
         ${hasPrev?`
           <button class="prev-toggle ${isOpen?'open':''}" id="btnTogglePrev">
             <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>

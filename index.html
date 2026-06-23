@@ -173,6 +173,7 @@ button,a,input,label,select,textarea{touch-action:manipulation;}
 .dr-prog-lbl{font-size:clamp(8px,2vw,9px);color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:1px;}
 /* Feed */
 .feed-list{margin-top:8px;}
+.tomb-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
 .feed-card{border-bottom:1px solid var(--border);padding:clamp(14px,3.5vw,18px) 0;animation:fadeUp .2s ease;}
 .feed-card:last-child{border-bottom:none;}
 .feed-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
@@ -976,7 +977,7 @@ function dollSVG(color,death,dead,poseName,px){
       fx+=`<polygon points="${x-hw*.35},${h*.052} ${x+hw*.35},${h*.052} ${x},${bot}" fill="white" opacity=".38"/>`;
       if(bot>h*.5)fx+=`<ellipse cx="${x}" cy="${bot+h*.012}" rx="${w*.013}" ry="${h*.012}" fill="#AADDFF" opacity=".55"/>`;
     });
-    fx+=`<rect x="${w*.02}" y="${h*.03}" width="${w*.1}" height="${h*.98}" fill="white" opacity="0" style="animation:iceGlimmer 4.5s 1.2s ease-in-out infinite"/>`;
+    fx+=`<clipPath id="iceClip${w}"><rect x="${w*.05}" y="${h*.03}" width="${w*.9}" height="${h*.98}" rx="5"/></clipPath><rect clip-path="url(#iceClip${w})" x="${w*.02}" y="${h*.03}" width="${w*.1}" height="${h*.98}" fill="white" opacity="0" style="animation:iceGlimmer 4.5s 1.2s ease-in-out infinite"/>`;
   }
   if(death==="guillotina"){
     // Very dark wood + muted grey blade, structural and clean
@@ -2460,19 +2461,19 @@ function tombstoneCardHTML(item){
   const lbl=item.castigo==='dibujo'?esc(item.dibujo_descripcion):dl(item.castigo);
   const isOpen=expandedTombstone.has(item.id);
   const friend=myFollowing.has(item.user_id),own=item.user_id===user.id;
-  return `<div class="feed-card tombstone-card" style="opacity:.72;">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <button class="feed-avatar-btn" data-uid="${item.user_id}" style="background:none;border:none;padding:0;cursor:pointer;">
-        <div class="avatar">${avatarDoll(item.doll_color,clamp(28,34))}${friend&&!own?'<span class="friend-dot"></span>':''}</div>
+  return `<div class="feed-card tombstone-card" style="opacity:.72;padding:10px 8px;">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+      <button class="feed-avatar-btn" data-uid="${item.user_id}" style="background:none;border:none;padding:0;cursor:pointer;flex-shrink:0;">
+        <div class="avatar">${avatarDoll(item.doll_color,clamp(22,28))}${friend&&!own?'<span class="friend-dot"></span>':''}</div>
       </button>
-      <div style="flex:1;min-width:0;">
-        <button class="feed-avatar-btn" data-uid="${item.user_id}" style="background:none;border:none;padding:0;cursor:pointer;font-size:clamp(12px,3vw,13px);color:var(--text2);font-weight:600;">@${esc(item.username)}</button>
-        <div style="font-size:clamp(13px,3.5vw,14px);font-weight:700;color:var(--warm);letter-spacing:.5px;text-transform:uppercase;margin-top:2px;">${lbl}</div>
-        <div style="font-size:clamp(11px,2.8vw,12px);color:var(--text2);font-style:italic;margin-top:3px;line-height:1.5;">"${esc(item.razon)}"</div>
-        <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-top:4px;">${ICO.candle} ${item.dep_count||0} DEPs</div>
-      </div>
-      <button class="tombstone-toggle ${isOpen?'open':''}" data-tomb="${item.id}" style="flex-shrink:0;background:none;border:1px solid var(--border2);border-radius:7px;padding:5px 8px;cursor:pointer;display:flex;align-items:center;gap:5px;color:var(--muted2);font-size:clamp(10px,2.5vw,11px);">
-        ${ICO.tombstone} <span>${isOpen?t('feed_tomb_hide'):lbl}</span>
+      <button class="feed-avatar-btn" data-uid="${item.user_id}" style="background:none;border:none;padding:0;cursor:pointer;font-size:clamp(10px,2.5vw,11px);color:var(--text2);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;">@${esc(item.username)}</button>
+    </div>
+    <div style="font-size:clamp(10px,2.5vw,11px);font-weight:700;color:var(--warm);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;">${lbl}</div>
+    <div style="font-size:clamp(11px,2.8vw,12px);color:var(--text2);font-style:italic;line-height:1.4;margin-bottom:4px;">"${esc(item.razon)}"</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:4px;">
+      <span style="font-size:clamp(9px,2.2vw,10px);color:var(--muted2);">${ICO.candle} ${item.dep_count||0}</span>
+      <button class="tombstone-toggle ${isOpen?'open':''}" data-tomb="${item.id}" style="background:none;border:1px solid var(--border2);border-radius:6px;padding:3px 6px;cursor:pointer;display:flex;align-items:center;gap:4px;color:var(--muted2);font-size:clamp(9px,2.2vw,10px);">
+        ${ICO.tombstone}
       </button>
     </div>
     ${isOpen?`<div style="margin-top:10px;padding:12px;background:var(--bg2);border-radius:8px;animation:fadeUp .18s ease;text-align:center;">${dollWithDraw(item.doll_color,item.castigo,item.dibujo_trazos,true,item?.pose||d?.pose||'idle',clamp(80,100))}</div>`:''}
@@ -2484,14 +2485,14 @@ function renderFeed(){
   const visible=feedYesterday.slice(0,feedPreviousShown);
   const hasMore=feedYesterday.length>feedPreviousShown;
   const loadMoreBtn=hasMore?`<button class="btn-load-more" id="btnLoadMorePrev">${t('btn_load_more')}</button>`:'';
-  const yesterHTML=feedYesterday.length?`<div class="feed-older-hdr" style="display:flex;align-items:center;gap:6px;">${ICO.tombstone} ${t('feed_yesterday')}</div><div class="feed-list">${visible.map(tombstoneCardHTML).join('')}</div>${loadMoreBtn}`:'';
+  const yesterHTML=feedYesterday.length?`<div class="feed-older-hdr" style="display:flex;align-items:center;gap:6px;">${ICO.tombstone} ${t('feed_yesterday')}</div><div class="tomb-grid">${visible.map(tombstoneCardHTML).join('')}</div>${loadMoreBtn}`:'';
   // Group feedOlder by date
   const olderByDate={};
   for(const p of feedOlder){const d=p.post_date||p.created_at?.slice(0,10);if(!olderByDate[d])olderByDate[d]=[];olderByDate[d].push(p);}
   const olderDates=Object.keys(olderByDate).sort((a,b)=>b.localeCompare(a));
   const olderHTML=olderDates.length?olderDates.map(date=>{
     const label=new Date(date+'T12:00:00').toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'long'});
-    return `<div class="feed-older-hdr" style="display:flex;align-items:center;gap:6px;">${ICO.tombstone} ${label}</div><div class="feed-list">${olderByDate[date].map(p=>tombstoneCardHTML(p)).join('')}</div>`;
+    return `<div class="feed-older-hdr" style="display:flex;align-items:center;gap:6px;">${ICO.tombstone} ${label}</div><div class="tomb-grid">${olderByDate[date].map(p=>tombstoneCardHTML(p)).join('')}</div>`;
   }).join(''):'';
   if(!feedData.length)return`<div class="screen">${hdr(t('nav_feed'),t('feed_sub'))}<div style="text-align:center;color:var(--muted2);margin-top:40px;font-size:clamp(13px,3.5vw,15px);">${t('feed_empty')}<br><span style="font-size:clamp(11px,3vw,12px);opacity:.45;display:block;margin-top:6px;">${t('feed_empty_sub')}</span></div>${yesterHTML}${olderHTML}</div>`;
   const cards=feedData.map(item=>feedCardHTML(item,false)).join('');

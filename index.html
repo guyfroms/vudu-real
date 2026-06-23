@@ -1129,39 +1129,45 @@ async function removeFriend(uid){
   }catch(e){alert('Error: '+e.message);}
 }
 async function loadFeed(){
-  const [{data:posts},{data:ownOld},{data:deps},{data:follows},{data:yPosts}]=await Promise.all([
-    sb.from('posts').select('*').eq('post_date',todayS()).eq('is_primary',true).order('created_at',{ascending:false}),
-    sb.from('posts').select('*').eq('post_date',todayS()).eq('user_id',user.id).eq('is_primary',false).order('created_at',{ascending:false}),
+  const [{data:todayRaw},{data:deps},{data:follows},{data:yPosts}]=await Promise.all([
+    sb.from('posts').select('*').eq('post_date',todayS()).order('created_at',{ascending:false}),
     sb.from('deps').select('post_id').eq('user_id',user.id),
     sb.from('follows').select('following_id').eq('follower_id',user.id),
     sb.from('posts').select('*').lt('post_date',todayS()).gte('post_date',new Date(Date.now()-86400000*30).toISOString().slice(0,10)).eq('is_primary',true).order('post_date',{ascending:false}).order('created_at',{ascending:false}).limit(60),
   ]);
   myDeps=new Set((deps||[]).map(d=>d.post_id));
   myFollowing=new Set((follows||[]).map(f=>f.following_id));
-  const primary=posts||[];
-  // Build map of all today's known posts for chain building
-  const todayMap={};
-  [...primary,...(ownOld||[])].forEach(p=>{todayMap[p.id]=p;});
-  // Load prev posts for other users missing from map
-  const missingIds=primary.filter(p=>p.user_id!==user.id&&p.previous_post_id&&!todayMap[p.previous_post_id]).map(p=>p.previous_post_id);
-  if(missingIds.length){
-    const {data:prevPosts}=await sb.from('posts').select('*').in('id',missingIds);
-    (prevPosts||[]).forEach(p=>{todayMap[p.id]=p;});
+  // Group today's posts by user
+  const byUser={};
+  for(const p of todayRaw||[]){if(!byUser[p.user_id])byUser[p.user_id]=[];byUser[p.user_id].push(p);}
+  const ownFeed=[],othersFeed=[];
+  for(const [uid,posts] of Object.entries(byUser)){
+    const sorted=[...posts].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+    if(uid===user.id){
+      // Own: show latest per visibility category (up to 3 separate cards, no privates hidden)
+      const latestByVis={};
+      for(const p of sorted){const v=p.visibility||'friends';if(!latestByVis[v])latestByVis[v]=p;}
+      ['private','friends','public'].forEach(v=>{if(latestByVis[v])ownFeed.push({...latestByVis[v],_prevChain:[]});});
+    } else {
+      // Others: 1 per day — latest of most restrictive accessible category
+      const isFriend=myFriends.has(uid);
+      const accessible=sorted.filter(p=>{
+        const v=p.visibility||'friends';
+        if(v==='private')return false;
+        if(v==='friends')return isFriend;
+        return true;
+      });
+      if(!accessible.length)continue;
+      // Most restrictive first (friends > public), then latest
+      const vRank={friends:0,public:1};
+      accessible.sort((a,b)=>(vRank[a.visibility||'friends']??1)-(vRank[b.visibility||'friends']??1)||new Date(b.created_at)-new Date(a.created_at));
+      othersFeed.push({...accessible[0],_prevChain:accessible.slice(1)});
+    }
   }
-  function buildChain(post){
-    const chain=[];let cur=post;
-    while(cur.previous_post_id&&todayMap[cur.previous_post_id]&&chain.length<10){cur=todayMap[cur.previous_post_id];chain.push(cur);}
-    return chain;
-  }
-  // Own posts: all today shown individually, no chain
-  const ownAll=[...primary.filter(p=>p.user_id===user.id),...(ownOld||[])].map(p=>({...p,_prevChain:[]}));
-  // Other users: primary only with full prev chain
-  const others=primary.filter(p=>p.user_id!==user.id).map(p=>({...p,_prevChain:buildChain(p)}));
-  feedData=[...ownAll,...others]
-    .sort((a,b)=>{const af=myFollowing.has(a.user_id)?0:1,bf=myFollowing.has(b.user_id)?0:1;return af-bf||(new Date(b.created_at)-new Date(a.created_at));});
+  feedData=[...ownFeed,...othersFeed]
+    .sort((a,b)=>{const af=a.user_id===user.id?-1:myFollowing.has(a.user_id)?0:1,bf=b.user_id===user.id?-1:myFollowing.has(b.user_id)?0:1;return af-bf||(new Date(b.created_at)-new Date(a.created_at));});
   feedYesterday=(yPosts||[]).sort((a,b)=>{const af=myFollowing.has(a.user_id)?0:1,bf=myFollowing.has(b.user_id)?0:1;return af-bf||(new Date(b.created_at)-new Date(a.created_at));});
-  feedOlder=[];
-  feedPreviousShown=10;
+  feedOlder=[];feedPreviousShown=10;
 }
 async function submitPost(pd){
   const t=todayS(),y=yesterS();
@@ -1778,12 +1784,10 @@ function paint(){
 }
 
 async function loadProfileData(uid){
-  const [{data:prof},{data:posts},{data:depRows}]=await Promise.all([
+  const [{data:prof},{data:posts}]=await Promise.all([
     sb.from('profiles').select('*').eq('id',uid).single(),
-    sb.from('posts').select('*').eq('user_id',uid).eq('is_primary',true).order('created_at',{ascending:false}).limit(20),
-    sb.from('deps').select('dep_count:post_id.count()').eq('user_id',uid),
-  ]).catch(()=>[{data:null},{data:[]},{data:[]}]);
-  // total deps = sum of dep_count across their posts
+    sb.from('posts').select('*').eq('user_id',uid).order('created_at',{ascending:false}).limit(100),
+  ]).catch(()=>[{data:null},{data:[]}]);
   let depSum;try{({data:depSum}=await sb.from('posts').select('dep_count').eq('user_id',uid));}catch(e){depSum=[];}
   const totalD=(depSum||[]).reduce((s,p)=>s+(p.dep_count||0),0);
   return {prof:prof||{}, posts:posts||[], totalDeps:totalD};
@@ -1847,26 +1851,43 @@ function renderProfile(){
   const isFollowing=myFollowing.has(prof.id);
   const isFriend=myFriends.has(prof.id);
   const since=prof.created_at?new Date(prof.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'long',year:'numeric'}):'—';
-  // filter posts by visibility + relationship
-  const visiblePosts=isSelf?posts:posts.filter(p=>{
-    if(!p.visibility||p.visibility==='public')return true;
-    if(p.visibility==='friends')return isFriend||isFollowing;
-    return false; // private — never shown to others
-  });
-  const postCount=visiblePosts.length;
-  const cards=visiblePosts.slice(0,10).map(p=>{
-    const d=DEATHS.find(x=>x.id===p.castigo);
-    const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):dl(p.castigo);
-    const dateStr=new Date(p.post_date||p.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'short',year:'numeric'});
-    return `<div style="display:flex;gap:12px;align-items:flex-start;padding:clamp(12px,3vw,16px) 0;border-bottom:1px solid var(--border);">
-      <div style="flex-shrink:0;">${dollWithDraw(p.doll_color||prof.doll_color,p.castigo,p.dibujo_trazos,true,d?.pose||'idle',clamp(44,54))}</div>
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:clamp(10px,2.5vw,11px);color:var(--warm);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">${lbl} <span style="color:var(--muted2);font-weight:400;text-transform:none;">· ${dateStr}</span></div>
-        <p style="font-size:clamp(13px,3.5vw,14px);color:var(--text2);font-style:italic;line-height:1.6;margin:4px 0 6px;">"${esc(p.razon)}"</p>
-        <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);">${ICO.candle} ${p.dep_count||0} DEPs</div>
+  // Group posts by day, pick 1 per day (most restrictive accessible), chain = rest
+  const vRank={friends:0,public:1};
+  const byDay={};
+  for(const p of posts){
+    const day=p.post_date||p.created_at?.slice(0,10);
+    if(!byDay[day])byDay[day]=[];
+    byDay[day].push(p);
+  }
+  const dayCards=Object.keys(byDay).sort((a,b)=>b.localeCompare(a)).slice(0,20).map(day=>{
+    const all=byDay[day].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+    const accessible=isSelf?all:all.filter(p=>{
+      const v=p.visibility||'friends';
+      if(v==='private')return false;
+      if(v==='friends')return isFriend;
+      return true;
+    });
+    if(!accessible.length)return'';
+    if(!isSelf)accessible.sort((a,b)=>(vRank[a.visibility||'friends']??1)-(vRank[b.visibility||'friends']??1)||new Date(b.created_at)-new Date(a.created_at));
+    const primary=accessible[0];
+    const chain=accessible.slice(1);
+    const d=DEATHS.find(x=>x.id===primary.castigo);
+    const lbl=primary.castigo==='dibujo'?esc(primary.dibujo_descripcion):dl(primary.castigo);
+    const dateStr=new Date(primary.post_date||primary.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'short',year:'numeric'});
+    const isOpen=expandedPrev.has('prof_'+primary.id);
+    return `<div style="padding:clamp(10px,2.5vw,14px) 0;border-bottom:1px solid var(--border);">
+      <div style="display:flex;gap:12px;align-items:flex-start;">
+        <div style="flex-shrink:0;">${dollWithDraw(primary.doll_color||prof.doll_color,primary.castigo,primary.dibujo_trazos,true,d?.pose||'idle',clamp(44,54))}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:clamp(10px,2.5vw,11px);color:var(--warm);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">${lbl} <span style="color:var(--muted2);font-weight:400;text-transform:none;">· ${dateStr}</span></div>
+          <p style="font-size:clamp(13px,3.5vw,14px);color:var(--text2);font-style:italic;line-height:1.6;margin:4px 0 6px;">"${esc(primary.razon)}"</p>
+          <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);">${primary.visibility!=='private'?`${ICO.candle} ${primary.dep_count||0} DEPs`:''}</div>
+        </div>
       </div>
+      ${chain.length?`<button class="prev-toggle ${isOpen?'open':''}" data-profprev="${primary.id}" style="margin-top:6px;"><svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> ${t('prev_btn')}</button><div class="prev-panel ${isOpen?'open':''}">${chain.map(c=>prevPostHTML(c,54)).join('')}</div>`:''}
     </div>`;
   }).join('');
+  const postCount=Object.values(byDay).flat().filter(p=>isSelf||p.visibility!=='private').length;
   return `<div class="screen">
     <button class="btn-link" id="volverProfile" style="margin-bottom:4px;">${t('btn_back')}</button>
     <div class="profile-hero">
@@ -1896,7 +1917,7 @@ function renderProfile(){
 ${(()=>{const profState={totalDeps:td,streak:prof.streak||0,postCount:posts.length,posts,birthDate:prof.birth_date||null,drawCount:posts.filter(p=>p.castigo==='dibujo').length};const toShow=isSelf?pinnedLogros.map(aid=>ACHIEVEMENTS.find(x=>x.id===aid)).filter(a=>a&&a.check(profState)):ACHIEVEMENTS.filter(a=>!a.secret&&a.check(profState));if(!toShow.length)return'';return`<div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:clamp(14px,3.5vw,18px);">${toShow.map(a=>`<div class="logro-badge ${logroClass(a)}" data-desc="${esc(lang==='en'?a.desc_en:a.desc_es)}" style="display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:clamp(10px,2.5vw,11px);">${a.icon} <span style="color:var(--text2);">${lang==='en'?a.title_en:a.title_es}</span></div>`).join('')}</div>`;})()}
     <div style="height:1px;background:var(--border);margin-bottom:clamp(16px,4vw,20px);"></div>
     <div class="profile-posts-hdr">${t('profile_ruinas_last')}</div>
-    <div class="feed-list">${cards||`<p style="text-align:center;color:var(--muted2);">${t('profile_no_ruinas')}</p>`}</div>
+    <div>${dayCards||`<p style="text-align:center;color:var(--muted2);">${t('profile_no_ruinas')}</p>`}</div>
   </div>`;
 }
 
@@ -1946,15 +1967,18 @@ function prevPostHTML(p,size){
   </div>`;
 }
 
-function cemRowHTML(p,showTime=false,showDelete=false){
+const VIS_COLOR={public:'#5A8FD4',friends:'var(--warm)',private:'var(--muted2)'};
+function cemRowHTML(p,showTime=false,showDelete=false,highlightVis=false){
   const d=DEATHS.find(x=>x.id===p.castigo);
   const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):dl(p.castigo);
   const dateStr=showTime
     ?new Date(p.created_at).toLocaleTimeString(lang==='en'?'en-US':'es-ES',{hour:'2-digit',minute:'2-digit'})
     :new Date(p.post_date||p.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'short',year:'numeric'});
   const vl=visLabel(p.visibility);
+  const vc=highlightVis?(VIS_COLOR[p.visibility]||'var(--muted2)'):'var(--border2)';
+  const tc=highlightVis?(VIS_COLOR[p.visibility]||'var(--muted2)'):'var(--muted2)';
   const visBadge=vl
-    ?`<span style="display:inline-flex;align-items:center;gap:4px;font-size:clamp(9px,2.3vw,10px);padding:2px 7px;border-radius:10px;border:1px solid var(--border2);color:var(--muted2);">${vl.ico} ${vl.txt}</span>`
+    ?`<span style="display:inline-flex;align-items:center;gap:4px;font-size:clamp(9px,2.3vw,10px);padding:2px 7px;border-radius:10px;border:1px solid ${vc};color:${tc};${highlightVis?'font-weight:600;':''}">${vl.ico} ${vl.txt}</span>`
     :`<span style="font-size:clamp(9px,2.3vw,10px);padding:2px 7px;border-radius:10px;border:1px solid var(--border2);color:var(--muted2);opacity:.4;">—</span>`;
   return `<div class="cemetery-row" data-cemid="${p.id}">
     <div style="flex-shrink:0;">${dollWithDraw(p.doll_color||profile.doll_color,p.castigo,p.dibujo_trazos,true,d?.pose||'idle',clamp(44,54))}</div>
@@ -1990,14 +2014,22 @@ function renderHome(){
     const hero=todayPost;
     const hd=DEATHS.find(x=>x.id===hero.castigo);
     const hlbl=hero.castigo==='dibujo'?esc(hero.dibujo_descripcion):dl(hero.castigo);
+    const hvc=VIS_COLOR[hero.visibility]||'var(--muted2)';
     const hvl=visLabel(hero.visibility);
+    // Compute latest post per visibility category for highlighted badges
+    const latestByVis={};
+    for(const p of todayAllPosts){
+      const v=p.visibility||'friends';
+      if(!latestByVis[v]||new Date(p.created_at)>new Date(latestByVis[v].created_at))latestByVis[v]=p;
+    }
+    const latestIds=new Set(Object.values(latestByVis).map(p=>p.id));
     const olderToday=[...todayAllPosts].filter(p=>p.id!==hero.id).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
     return `<div class="screen">
       <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:10px;text-align:center;">${t('home_done')}</div>
       <div style="text-align:center;">
         <div style="display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:8px;">
           <span style="font-size:clamp(10px,2.5vw,11px);color:var(--warm);font-weight:700;text-transform:uppercase;letter-spacing:.5px;">${hlbl}</span>
-          ${hvl?`<span style="display:inline-flex;align-items:center;gap:3px;font-size:clamp(9px,2.3vw,10px);padding:2px 8px;border-radius:10px;border:1px solid var(--border2);color:var(--muted2);">${hvl.ico} ${hvl.txt}</span>`:''}
+          ${hvl?`<span style="display:inline-flex;align-items:center;gap:3px;font-size:clamp(9px,2.3vw,10px);padding:2px 8px;border-radius:10px;border:1px solid ${hvc};color:${hvc};font-weight:600;">${hvl.ico} ${hvl.txt}</span>`:''}
         </div>
         <div style="display:flex;justify-content:center;margin:0 0 10px;">
           ${dollWithDraw(hero.doll_color,hero.castigo,hero.dibujo_trazos,true,hd?.pose||'idle',clamp(140,170))}
@@ -2011,7 +2043,7 @@ function renderHome(){
         <button class="action-btn warm" id="btnShare" style="flex:1;"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="15" cy="4" r="2.2" stroke="currentColor" stroke-width="1.6"/><circle cx="15" cy="16" r="2.2" stroke="currentColor" stroke-width="1.6"/><circle cx="5" cy="10" r="2.2" stroke="currentColor" stroke-width="1.6"/><path d="M7 8.8l6-3.4M7 11.2l6 3.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>${t('btn_share_short')}</button>
         <button class="action-btn" id="btnPeor" style="flex:1;"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 3v10M5 9l5 5 5-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>${t('btn_worse_short')}</button>
       </div>
-      ${olderToday.length?`<div class="feed-older-hdr" style="margin-top:clamp(16px,4vw,22px);">${ICO.skull} ${lang==='en'?'Earlier today':'Antes hoy'}</div><div>${olderToday.map(p=>cemRowHTML(p,true,true)).join('')}</div>`:''}
+      ${olderToday.length?`<div class="feed-older-hdr" style="margin-top:clamp(16px,4vw,22px);">${ICO.skull} ${lang==='en'?'Earlier today':'Antes hoy'}</div><div>${olderToday.map(p=>cemRowHTML(p,true,true,latestIds.has(p.id))).join('')}</div>`:''}
       ${cemSection}
     </div>`;
   }
@@ -2695,6 +2727,7 @@ function attachListeners(){
   }
   if(view==='profile'){
     if(ge('volverProfile'))ge('volverProfile').onclick=()=>{view=profileReturnView||'amigos';paint();};
+    document.querySelectorAll('[data-profprev]').forEach(btn=>{btn.onclick=()=>{const k='prof_'+btn.getAttribute('data-profprev');if(expandedPrev.has(k))expandedPrev.delete(k);else expandedPrev.add(k);paint();};});
     const fb=ge('profileFollow');
     if(fb)fb.onclick=async()=>{
       const uid=fb.getAttribute('data-uid');

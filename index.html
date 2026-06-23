@@ -486,7 +486,7 @@ const STRINGS={
     ob_skip:'Saltar',ob_next:'Siguiente →',ob_start:'¡Empezar!',
     ob1_title:'kill.me',ob1_body:`¿Alguna vez has dicho <em>"pues me mato"</em> después de un día de mierda?\n\nEsta app es exactamente eso. Suelta tu <em>ruina del día</em>, mata a tu muñeco, y sigue adelante.`,
     ob2_title:'¿Qué es un DEP?',ob2_body:`Tus amigos ven tu ruina en el feed y te mandan un <em>DEP</em> — Descanse En Paz.\n\nComo un like, pero para lo peor de tu día. Cuantos más DEPs, más se solidarizan con tu tragedia.`,
-    ob3_title:'Las muertes',ob3_body:`Cada día que publicas tu ruina, desbloqueas nuevas formas de matar a tu muñeco: quemado, acribillado, electrocutado...\n\nMantén la <em>racha</em> y acumula DEPs para desbloquearlas todas.`,
+    ob3_title:'Tú eliges quién ve qué',ob3_body:`Cada desgracia puede ser <em>pública</em> (la ve todo el mundo), <em>amigos</em> (solo quienes te siguen) o <em>privada</em> (solo tú).\n\nPrivado es tu diario personal: desahógate sin filtros, sin audiencia. Nadie lo ve.`,
     ob4_title:'Una al día',ob4_body:`Solo puedes publicar <em>una ruina al día</em>. Si el día mejora (o empeora), puedes actualizarla.\n\nRecuerda que la vida da para un "pues me mato" al día — no más.`,
     ajustes_title:'Ajustes',
     safety_note:'Esto es humor dramático, no literal. Si algo se siente real,',safety_link:'hay ayuda disponible',
@@ -554,7 +554,7 @@ const STRINGS={
     ob_skip:'Skip',ob_next:'Next →',ob_start:"Let's go!",
     ob1_title:'kill.me',ob1_body:`Ever said <em>"ugh, kill me"</em> after a terrible day?\n\nThis app is exactly that. Vent your daily <em>ruina</em>, kill your figure, and move on.`,
     ob2_title:'What is a DEP?',ob2_body:`Your friends see your ruina in the feed and send you a <em>DEP</em> — Descanse En Paz (Rest in Peace).\n\nLike a like, but for the worst part of your day. More DEPs = more solidarity.`,
-    ob3_title:'Deaths',ob3_body:`Every day you post your ruina, you unlock new ways to kill your figure: burned, needled, electrocuted...\n\nKeep your <em>streak</em> and collect DEPs to unlock them all.`,
+    ob3_title:'You choose who sees what',ob3_body:`Each ruina can be <em>public</em> (everyone sees it), <em>friends</em> (only people who follow you) or <em>private</em> (only you).\n\nPrivate is your personal diary: vent without filters, without an audience. Nobody sees it.`,
     ob4_title:'Once a day',ob4_body:`You can only post <em>one ruina a day</em>. If things get better (or worse), you can update it.\n\nRemember: life fits exactly one "kill me" a day — no more.`,
     ajustes_title:'Settings',
     safety_note:'This is dramatic humor, not literal. If something feels real,',safety_link:'help is available',
@@ -1379,6 +1379,7 @@ const DEAD_FACE_ICO=`<svg width="48" height="48" viewBox="0 0 48 48" fill="none"
 function getSlides(){return[
   {icon:()=>DEAD_FACE_ICO,          title:t('ob1_title'),body:t('ob1_body')},
   {icon:()=>icoStat(ICO.candle,48), title:t('ob2_title'),body:t('ob2_body')},
+  {icon:()=>VIS_ICO.private,        title:t('ob3_title'),body:t('ob3_body')},
   {icon:()=>icoStat(ICO.flame,48),  title:t('ob4_title'),body:t('ob4_body')},
 ];}
 function showDollModal(item){

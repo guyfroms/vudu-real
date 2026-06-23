@@ -2225,7 +2225,7 @@ function feedCardHTML(item,older=false){
   const d=DEATHS.find(x=>x.id===item.castigo);
   const hasPrev=item.user_id!==user.id&&!!item._prevChain&&item._prevChain.length>0,isOpen=expandedPrev.has(item.id);
   const depCount=item.dep_count||0;
-  const dateStr=timeAgo(item.created_at);
+  const _d=new Date(item.created_at);const dateStr=_d.toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'short'})+' · '+_d.toLocaleTimeString(lang==='en'?'en-US':'es-ES',{hour:'2-digit',minute:'2-digit'});
   const dollPx=clamp(52,64);
   return `<div class="feed-card${older?' older-card':''}">
     <div style="display:flex;gap:12px;align-items:flex-start;">

@@ -1688,6 +1688,7 @@ function shell(content){
     <div class="topbar-r">
       ${streak>0?`<div class="streak-pill">${ICO.flame}<span>${streak}</span></div>`:''}
       <button class="gear-btn" id="btnSearch" style="margin-right:2px;">${ICO.search}</button>
+      <button class="gear-btn" id="btnAmigos" style="margin-right:2px;">${ICO.people}</button>
       <button class="gear-btn" id="btnGear">${ICO.gear}</button>
     </div>
   </div>
@@ -1696,7 +1697,6 @@ function shell(content){
     <div class="navbtn-wrap"><button class="navbtn ${inMain?'on':''}" id="navHoy"><div class="navbtn-ico">${ICO.doll}</div><span>${t('nav_hoy')}</span></button></div>
     <div class="navbtn-wrap"><button class="navbtn ${view==='feed'?'on':''}" id="navFeed"><div class="navbtn-ico">${ICO.feed}</div><span>${t('nav_feed')}</span></button></div>
     <div class="navbtn-wrap"><button class="navbtn ${view==='señales'?'on':''}" id="navSeñales"><div class="navbtn-ico">${ICO.bell}</div><span>${t('nav_senales')}</span></button>${señalesBadge?'<div class="nav-badge"></div>':''}</div>
-    <div class="navbtn-wrap"><button class="navbtn ${view==='amigos'?'on':''}" id="navAmigos"><div class="navbtn-ico">${ICO.people}</div><span>${lang==='en'?'Friends':'Amigos'}</span></button></div>
     <div class="navbtn-wrap"><button class="navbtn ${view==='muertes'?'on':''}" id="navMuertes"><div class="navbtn-ico">${ICO.skull}</div><span>${t('nav_muertes')}</span></button></div>
   </div>`;
   ge('btnGear').onclick=()=>{view='ajustes';paint();};
@@ -1704,7 +1704,7 @@ function shell(content){
   ge('navHoy').onclick=()=>{view='home';paint();};
   ge('navFeed').onclick=async()=>{await loadFeed();view='feed';paint();};
   ge('navSeñales').onclick=async()=>{señalesBadge=false;try{window._señalesItems=await loadSeñales();}catch(e){window._señalesItems=[];}view='señales';paint();};
-  ge('navAmigos').onclick=async()=>{view='amigos';paint();};
+  ge('btnAmigos').onclick=async()=>{view='amigos';paint();};
   ge('navMuertes').onclick=()=>{view='muertes';paint()};
   ge('logoBtn').onclick=async()=>{await loadFeed();view='feed';paint();};
   attachListeners();

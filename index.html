@@ -849,16 +849,26 @@ function dollSVG(color,death,dead,poseName,px){
   px=px||110;
   let fx="",preFx="";
   if(death==="fuego"){
-    // Flames go behind the doll (preFx), char marks go on top (fx)
-    let preFuego=`<ellipse cx="${w*.5}" cy="${h}" rx="${w*.54}" ry="${h*.09}" fill="#0B0303" opacity=".96"/>`;
-    preFuego+=`<path d="M${w*.22} ${h} C${w*.19} ${h*.89} ${w*.24} ${h*.79} ${w*.23} ${h*.72} C${w*.24} ${h*.77} ${w*.27} ${h*.8} ${w*.28} ${h*.76} C${w*.28} ${h*.84} ${w*.3} ${h*.91} ${w*.29} ${h}Z" fill="#520C0C" opacity=".88"/>`;
-    preFuego+=`<path d="M${w*.35} ${h} C${w*.31} ${h*.84} ${w*.37} ${h*.7} ${w*.36} ${h*.59} C${w*.37} ${h*.66} ${w*.41} ${h*.71} ${w*.42} ${h*.66} C${w*.42} ${h*.76} ${w*.45} ${h*.86} ${w*.43} ${h}Z" fill="#7A1414" opacity=".94"/>`;
-    preFuego+=`<path d="M${w*.46} ${h} C${w*.42} ${h*.82} ${w*.5} ${h*.65} ${w*.5} ${h*.52} C${w*.5} ${h*.61} ${w*.55} ${h*.67} ${w*.56} ${h*.62} C${w*.56} ${h*.73} ${w*.59} ${h*.84} ${w*.57} ${h}Z" fill="#8A1818" opacity=".97"/>`;
-    preFuego+=`<path d="M${w*.58} ${h} C${w*.56} ${h*.85} ${w*.61} ${h*.71} ${w*.61} ${h*.6} C${w*.61} ${h*.67} ${w*.64} ${h*.72} ${w*.65} ${h*.67} C${w*.65} ${h*.76} ${w*.67} ${h*.86} ${w*.66} ${h}Z" fill="#7A1414" opacity=".92"/>`;
-    preFuego+=`<path d="M${w*.7} ${h} C${w*.68} ${h*.9} ${w*.72} ${h*.8} ${w*.72} ${h*.73} C${w*.72} ${h*.78} ${w*.75} ${h*.81} ${w*.76} ${h*.77} C${w*.76} ${h*.85} ${w*.78} ${h*.92} ${w*.77} ${h}Z" fill="#520C0C" opacity=".85"/>`;
-    preFx=preFuego;
-    // char marks on body (in front of doll)
-    fx=`<line x1="${w*.3}" y1="${h*.52}" x2="${w*.44}" y2="${h*.54}" stroke="#1E0606" stroke-width="3" stroke-linecap="round" opacity=".7"/>`;
+    // Only the dark shadow ellipse goes behind the doll
+    preFx=`<ellipse cx="${w*.5}" cy="${h}" rx="${w*.54}" ry="${h*.09}" fill="#0B0303" opacity=".96"/>`;
+    // Animated flames in FRONT of the doll
+    const fl=(cx,tipY,fill,op,dur,beg,sx,sy)=>{
+      const x0=w*cx,lw=w*.07;
+      return `<path d="M${x0-lw} ${h} C${x0-lw*.9} ${h-(h-tipY)*.35} ${x0-lw*.3} ${tipY+h*.1} ${x0} ${tipY} C${x0+lw*.3} ${tipY+h*.1} ${x0+lw*.9} ${h-(h-tipY)*.35} ${x0+lw} ${h}Z" fill="${fill}" opacity="${op}">
+        <animateTransform attributeName="transform" type="translate" values="${sx} ${sy};${-sx} ${sy*.4};${sx*.4} ${sy*.7};${sx} ${sy}" dur="${dur}" begin="${beg}" repeatCount="indefinite" calcMode="spline" keySplines=".42 0 .58 1;.42 0 .58 1;.42 0 .58 1"/>
+      </path>`;
+    };
+    fx+=fl(.22, h*.77, '#6B0C0C', '.82', '1.1s', '0s',  1.2, -1.5);
+    fx+=fl(.35, h*.60, '#A01818', '.91', '0.78s','0.15s',1.8, -2.5);
+    fx+=fl(.50, h*.48, '#C42222', '.96', '0.92s','0.05s',2.2, -3.5);
+    fx+=fl(.63, h*.58, '#A01818', '.90', '0.74s','0.22s',1.8, -2.5);
+    fx+=fl(.76, h*.74, '#6B0C0C', '.80', '1.05s','0.12s',1.2, -1.5);
+    // Bright orange tips layer — same flames slightly smaller, hotter color
+    fx+=fl(.35, h*.66, '#E05010', '.55', '0.78s','0.15s',1.5, -2);
+    fx+=fl(.50, h*.54, '#FF6020', '.60', '0.92s','0.05s',1.8, -3);
+    fx+=fl(.63, h*.64, '#E05010', '.52', '0.74s','0.22s',1.5, -2);
+    // char marks on body (on top of flames)
+    fx+=`<line x1="${w*.3}" y1="${h*.52}" x2="${w*.44}" y2="${h*.54}" stroke="#1E0606" stroke-width="3" stroke-linecap="round" opacity=".7"/>`;
     fx+=`<line x1="${w*.56}" y1="${h*.62}" x2="${w*.7}" y2="${h*.59}" stroke="#1E0606" stroke-width="2.5" stroke-linecap="round" opacity=".6"/>`;
     fx+=`<line x1="${w*.34}" y1="${h*.73}" x2="${w*.5}" y2="${h*.75}" stroke="#1E0606" stroke-width="2" stroke-linecap="round" opacity=".5"/>`;
   }

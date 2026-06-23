@@ -1946,7 +1946,7 @@ function prevPostHTML(p,size){
   </div>`;
 }
 
-function cemRowHTML(p,showTime=false){
+function cemRowHTML(p,showTime=false,showDelete=false){
   const d=DEATHS.find(x=>x.id===p.castigo);
   const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):dl(p.castigo);
   const dateStr=showTime
@@ -1961,7 +1961,7 @@ function cemRowHTML(p,showTime=false){
     <div style="flex:1;min-width:0;">
       <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">${lbl} <span style="opacity:.5;font-weight:400;text-transform:none;">· ${dateStr}</span></div>
       <div style="font-size:clamp(13px,3.5vw,14px);color:var(--text2);font-style:italic;line-height:1.5;">"${esc(p.razon)}"</div>
-      <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${p.visibility!=='private'?`${ICO.candle} ${p.dep_count||0}`:''} ${visBadge}</div>
+      <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${p.visibility!=='private'?`${ICO.candle} ${p.dep_count||0}`:''} ${visBadge}${showDelete?`<button class="btn-link cem-delete-btn" data-delid="${p.id}" data-isprimary="${p.is_primary?'1':'0'}" style="margin-left:auto;font-size:clamp(9px,2.2vw,10px);color:var(--muted);opacity:.45;padding:2px 0;"><svg width="11" height="13" viewBox="0 0 14 16" fill="none" style="vertical-align:middle;margin-right:2px;"><path d="M1 4h12M5 4V2h4v2M3 4l1 10h6l1-10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>${t('btn_delete')}</button>`:''}</div>
     </div>
   </div>`;
 }
@@ -1989,14 +1989,11 @@ function renderHome(){
     const sorted=[...todayAllPosts].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
     return `<div class="screen">
       <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:12px;text-align:center;">${t('home_done')}</div>
-      <div>${sorted.map(p=>cemRowHTML(p,true)).join('')}</div>
+      <div>${sorted.map(p=>cemRowHTML(p,true,true)).join('')}</div>
       <div class="action-row" style="margin-top:16px;">
         <button class="action-btn" id="goFeed" style="flex:1.2;">${ICO.skull} ${t('btn_feed')}</button>
         <button class="action-btn warm" id="btnShare" style="flex:1;"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="15" cy="4" r="2.2" stroke="currentColor" stroke-width="1.6"/><circle cx="15" cy="16" r="2.2" stroke="currentColor" stroke-width="1.6"/><circle cx="5" cy="10" r="2.2" stroke="currentColor" stroke-width="1.6"/><path d="M7 8.8l6-3.4M7 11.2l6 3.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>${t('btn_share_short')}</button>
         <button class="action-btn" id="btnPeor" style="flex:1;"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 3v10M5 9l5 5 5-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>${t('btn_worse_short')}</button>
-      </div>
-      <div style="display:flex;justify-content:center;margin-top:8px;">
-        <button class="btn-link" id="btnDeletePost" style="font-size:clamp(10px,2.5vw,11px);color:var(--muted);opacity:.5;"><svg width="12" height="14" viewBox="0 0 14 16" fill="none" style="vertical-align:middle;margin-right:3px;"><path d="M1 4h12M5 4V2h4v2M3 4l1 10h6l1-10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>${t('btn_delete')}</button>
       </div>
       ${cemSection}
     </div>`;
@@ -2447,30 +2444,36 @@ function attachListeners(){
     if(ge('goFeed'))ge('goFeed').onclick=async()=>{await loadFeed();view='feed';paint();};
     if(ge('btnPeor'))ge('btnPeor').onclick=()=>{draftRazon='';view='razon';paint();};
     if(ge('btnShare'))ge('btnShare').onclick=()=>showShareMenu(todayPost);
-    if(ge('btnDeletePost'))ge('btnDeletePost').onclick=async()=>{
-      if(!confirm(t('confirm_delete')))return;
-      const deletingId=todayPost.id;
-      const prevId=todayPost.previous_post_id||null;
-      const {error}=await sb.from('posts').delete().eq('id',deletingId).eq('user_id',user.id);
+    document.querySelectorAll('.cem-delete-btn').forEach(btn=>{ btn.onclick=async(e)=>{
+      e.stopPropagation();
+      const delId=btn.getAttribute('data-delid');
+      const isPrimary=btn.getAttribute('data-isprimary')==='1';
+      const isLast=todayAllPosts.length===1;
+      const msg=lang==='en'
+        ?`Delete this ruina? This cannot be undone.${isLast?' Your streak will reset.':''}`
+        :`¿Borrar esta desgracia? No podrás recuperarla.${isLast?' Si la borras, no contará para la racha.':''}`;
+      if(!confirm(msg))return;
+      const {error}=await sb.from('posts').delete().eq('id',delId).eq('user_id',user.id);
       if(error){alert('Error al borrar: '+(error.message||'inténtalo de nuevo'));return;}
       cemeteryPosts=null;feedData=null;
-      if(prevId){
-        // Restore previous post as the primary for today
-        try{await sb.from('posts').update({is_primary:true}).eq('id',prevId);}catch(e){}
-        let restored=null;
-        try{({data:restored}=await sb.from('posts').select('*').eq('id',prevId).single());}catch(e){}
-        todayPost=restored||null;
-        todayPrevPost=null;
-        view='home';paint();
-      }else{
-        // No previous post — roll back streak but keep last_post_date=yesterday so tomorrow still continues
-        const prevStreak=Math.max(0,(profile.streak||1)-1);
-        const prevDate=prevStreak>0?yesterS():null;
-        try{await sb.from('profiles').update({streak:prevStreak,last_post_date:prevDate}).eq('id',user.id);}catch(e){}
-        profile.streak=prevStreak;
-        todayPost=null;todayPrevPost=null;view='home';paint();
+      if(isPrimary){
+        const prevId=todayPost.previous_post_id||null;
+        if(prevId){
+          try{await sb.from('posts').update({is_primary:true}).eq('id',prevId);}catch(e){}
+        } else if(isLast){
+          const prevStreak=Math.max(0,(profile.streak||1)-1);
+          const prevDate=prevStreak>0?yesterS():null;
+          try{await sb.from('profiles').update({streak:prevStreak,last_post_date:prevDate}).eq('id',user.id);}catch(e){}
+          profile.streak=prevStreak;
+        }
       }
-    };
+      // Reload today's posts fresh
+      const {data:fresh}=await sb.from('posts').select('*').eq('user_id',user.id).eq('post_date',todayS()).order('created_at',{ascending:false});
+      todayAllPosts=fresh||[];
+      todayPost=todayAllPosts.find(p=>p.is_primary)||todayAllPosts[0]||null;
+      todayPrevPost=todayPost?.previous_post_id?todayAllPosts.find(p=>p.id===todayPost.previous_post_id)||null:null;
+      view='home';paint();
+    };});
   }
   if(view==='razon'){
     const ta=ge('razonInput'),btn=ge('btnElegirCastigo'),cnt=ge('razonInputCount');

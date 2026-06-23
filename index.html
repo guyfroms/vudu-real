@@ -1197,7 +1197,7 @@ async function loadFeed(){
   const cutoff=new Date(Date.now()-86400000*30).toISOString().slice(0,10);
   const [{data:todayRaw},{data:pastRaw}]=await Promise.all([
     sb.from('posts').select('*').eq('post_date',todayS()).in('user_id',visibleIds).order('created_at',{ascending:false}),
-    sb.from('posts').select('*').lt('post_date',todayS()).gte('post_date',cutoff).in('user_id',visibleIds).order('post_date',{ascending:false}).order('created_at',{ascending:false}).limit(60),
+    sb.from('posts').select('*').lt('post_date',todayS()).gte('post_date',cutoff).in('user_id',visibleIds).order('post_date',{ascending:false}).order('created_at',{ascending:false}).limit(200),
   ]);
   // Today: one per user (latest, already ordered)
   const byUser={};
@@ -1207,12 +1207,20 @@ async function loadFeed(){
     const bf=b.user_id===user.id?-1:myFollowing.has(b.user_id)?0:1;
     return af-bf||(new Date(b.created_at)-new Date(a.created_at));
   });
-  // Past: one per user per day
+  // Past: group all posts by user+day, pick latest as primary, rest as chain
+  const allPast=(pastRaw||[]).filter(p=>p.user_id===user.id||p.visibility!=='private');
   const byUserDate={};
-  for(const p of pastRaw||[]){const k=p.user_id+'_'+p.post_date;if(!byUserDate[k])byUserDate[k]=p;}
-  const past=Object.values(byUserDate);
-  feedYesterday=past.filter(p=>p.post_date===yesterS()).sort((a,b)=>(myFollowing.has(a.user_id)?0:1)-(myFollowing.has(b.user_id)?0:1));
-  feedOlder=past.filter(p=>p.post_date<yesterS()).sort((a,b)=>b.post_date.localeCompare(a.post_date));
+  for(const p of allPast){
+    const k=p.user_id+'_'+p.post_date;
+    if(!byUserDate[k])byUserDate[k]={primary:p,chain:[]};
+    else byUserDate[k].chain.push(p);
+  }
+  const pastGroups=Object.values(byUserDate).map(g=>{
+    g.primary._prevChain=g.chain;
+    return g.primary;
+  });
+  feedYesterday=pastGroups.filter(p=>p.post_date===yesterS()).sort((a,b)=>(myFollowing.has(a.user_id)?0:1)-(myFollowing.has(b.user_id)?0:1));
+  feedOlder=pastGroups.filter(p=>p.post_date<yesterS()).sort((a,b)=>b.post_date.localeCompare(a.post_date));
   feedPreviousShown=10;
 }
 async function submitPost(pd){
@@ -2444,6 +2452,7 @@ function tombstoneCardHTML(item){
       </button>
     </div>
     ${isOpen?`<div style="margin-top:10px;padding:12px;background:var(--bg2);border-radius:8px;animation:fadeUp .18s ease;text-align:center;">${dollWithDraw(item.doll_color,item.castigo,item.dibujo_trazos,true,item?.pose||d?.pose||'idle',clamp(80,100))}</div>`:''}
+    ${(item._prevChain&&item._prevChain.length)?`<button class="prev-toggle" data-tombprev="${item.id}" style="margin-top:6px;font-size:clamp(9px,2.2vw,10px);"><svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> ${t('prev_btn')}</button><div class="prev-panel">${item._prevChain.map((p,i)=>prevPostHTML(p,44,i)).join('')}</div>`:''}
   </div>`;
 }
 
@@ -2635,6 +2644,13 @@ function attachListeners(){
         const id=btn.getAttribute('data-tomb');
         if(expandedTombstone.has(id))expandedTombstone.delete(id);else expandedTombstone.add(id);
         paint();
+      };
+    });
+    document.querySelectorAll('[data-tombprev]').forEach(btn=>{
+      btn.onclick=()=>{
+        btn.classList.toggle('open');
+        const panel=btn.nextElementSibling;
+        if(panel)panel.classList.toggle('open');
       };
     });
     if(ge('btnLoadMorePrev'))ge('btnLoadMorePrev').onclick=()=>{feedPreviousShown+=10;paint();};

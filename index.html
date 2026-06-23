@@ -704,17 +704,17 @@ function icoStat(svg,targetH=20){
 }
 
 // ── State ──────────────────────────────────────────────
-let user=null,profile=null,view="loading",todayPost=null,todayAllPosts=[];
+let user=null,profile=null,view="loading",todayPost=null;
 let feedData=[],myDeps=new Set(),myFollowing=new Set();
-let todayPrevPost=null,expandedPrev=new Set(),expandedDollItem=null;
+let expandedDollItem=null;
 let authTab="login",authStep="form",pendingVerifyEmail="",recoverySession=false;
 let feedOlder=[],feedYesterday=[],señalesBadge=false,viewingProfile=null,friendsList=null;
 let draftPose='idle',draftDeath=null;
 let searchQuery='',searchResults=null,expandedTombstone=new Set(),profileReturnView='amigos';
-let feedPreviousShown=10,expandedCemetery=new Set(),homeCemFilter='all';
+let feedPreviousShown=10,expandedCemetery=new Set();
 let pendingSignup={username:"",email:"",pass:"",color:DOLL_COLORS[0]};
 let draftRazon="",totalDeps=0,navigating=false;
-let cemeteryPosts=null,muertesTab='castigos',cemeteryVisFilter='all';
+let cemeteryPosts=null,muertesTab='castigos';
 let pinnedLogros=JSON.parse(localStorage.getItem('pinnedLogros')||'[]');
 let followersList=null,amigosTab='following';
 let myFriends=new Set(),pendingFriendReqs=[],sentFriendReqs=new Set();
@@ -1101,18 +1101,12 @@ async function loadProfile(){
   }
 }
 async function loadTodayPost(){
-  const {data}=await sb.from('posts').select('*').eq('user_id',user.id).eq('post_date',todayS()).order('created_at',{ascending:false});
-  const all=data||[];
-  if(all.length){
-    const ids=all.map(p=>p.id);
-    const {data:depRows}=await sb.from('deps').select('post_id').in('post_id',ids);
-    const depMap={};
-    (depRows||[]).forEach(r=>{depMap[r.post_id]=(depMap[r.post_id]||0)+1;});
-    all.forEach(p=>{p.dep_count=depMap[p.id]||0;});
+  const {data}=await sb.from('posts').select('*').eq('user_id',user.id).eq('post_date',todayS()).order('created_at',{ascending:false}).limit(1).maybeSingle();
+  todayPost=data||null;
+  if(todayPost){
+    const {data:depRows}=await sb.from('deps').select('post_id').eq('post_id',todayPost.id);
+    todayPost.dep_count=(depRows||[]).length;
   }
-  todayAllPosts=all;
-  todayPost=all.find(p=>p.is_primary)||all[0]||null;
-  todayPrevPost=todayPost?.previous_post_id ? all.find(p=>p.id===todayPost.previous_post_id)||null : null;
 }
 async function loadFollows(){
   try{
@@ -1186,68 +1180,57 @@ async function removeFriend(uid){
   }catch(e){alert('Error: '+e.message);}
 }
 async function loadFeed(){
-  const [{data:todayRaw},{data:deps},{data:follows},{data:yPosts}]=await Promise.all([
-    sb.from('posts').select('*').eq('post_date',todayS()).order('created_at',{ascending:false}),
+  const [{data:deps},{data:follows},{data:publicProfs}]=await Promise.all([
     sb.from('deps').select('post_id').eq('user_id',user.id),
     sb.from('follows').select('following_id').eq('follower_id',user.id),
-    sb.from('posts').select('*').lt('post_date',todayS()).gte('post_date',new Date(Date.now()-86400000*30).toISOString().slice(0,10)).eq('is_primary',true).order('post_date',{ascending:false}).order('created_at',{ascending:false}).limit(60),
+    sb.from('profiles').select('id').eq('is_private',false),
   ]);
   myDeps=new Set((deps||[]).map(d=>d.post_id));
   myFollowing=new Set((follows||[]).map(f=>f.following_id));
-  // Group today's posts by user
+  // Visible users: public profiles + friends + self
+  const visibleIds=[...new Set([
+    ...(publicProfs||[]).map(p=>p.id),
+    ...myFriends,
+    user.id,
+  ])];
+  const cutoff=new Date(Date.now()-86400000*30).toISOString().slice(0,10);
+  const [{data:todayRaw},{data:pastRaw}]=await Promise.all([
+    sb.from('posts').select('*').eq('post_date',todayS()).in('user_id',visibleIds).order('created_at',{ascending:false}),
+    sb.from('posts').select('*').lt('post_date',todayS()).gte('post_date',cutoff).in('user_id',visibleIds).order('post_date',{ascending:false}).order('created_at',{ascending:false}).limit(60),
+  ]);
+  // Today: one per user (latest, already ordered)
   const byUser={};
-  for(const p of todayRaw||[]){if(!byUser[p.user_id])byUser[p.user_id]=[];byUser[p.user_id].push(p);}
-  const ownFeed=[],othersFeed=[];
-  for(const [uid,posts] of Object.entries(byUser)){
-    const sorted=[...posts].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-    if(uid===user.id){
-      // Own: show latest per visibility category (up to 3 separate cards, no privates hidden)
-      const latestByVis={};
-      for(const p of sorted){const v=p.visibility||'friends';if(!latestByVis[v])latestByVis[v]=p;}
-      ['private','friends','public'].forEach(v=>{if(latestByVis[v])ownFeed.push({...latestByVis[v],_prevChain:[]});});
-    } else {
-      // Others: 1 per day — latest of most restrictive accessible category
-      const isFriend=myFriends.has(uid);
-      const accessible=sorted.filter(p=>{
-        const v=p.visibility||'friends';
-        if(v==='private')return false;
-        if(v==='friends')return isFriend;
-        return true;
-      });
-      if(!accessible.length)continue;
-      // Most restrictive first (friends > public), then latest
-      const vRank={friends:0,public:1};
-      accessible.sort((a,b)=>(vRank[a.visibility||'friends']??1)-(vRank[b.visibility||'friends']??1)||new Date(b.created_at)-new Date(a.created_at));
-      othersFeed.push({...accessible[0],_prevChain:accessible.slice(1)});
-    }
-  }
-  feedData=[...ownFeed,...othersFeed]
-    .sort((a,b)=>{const af=a.user_id===user.id?-1:myFollowing.has(a.user_id)?0:1,bf=b.user_id===user.id?-1:myFollowing.has(b.user_id)?0:1;return af-bf||(new Date(b.created_at)-new Date(a.created_at));});
-  feedYesterday=(yPosts||[]).sort((a,b)=>{const af=myFollowing.has(a.user_id)?0:1,bf=myFollowing.has(b.user_id)?0:1;return af-bf||(new Date(b.created_at)-new Date(a.created_at));});
-  feedOlder=[];feedPreviousShown=10;
+  for(const p of todayRaw||[]){if(!byUser[p.user_id])byUser[p.user_id]=p;}
+  feedData=Object.values(byUser).sort((a,b)=>{
+    const af=a.user_id===user.id?-1:myFollowing.has(a.user_id)?0:1;
+    const bf=b.user_id===user.id?-1:myFollowing.has(b.user_id)?0:1;
+    return af-bf||(new Date(b.created_at)-new Date(a.created_at));
+  });
+  // Past: one per user per day
+  const byUserDate={};
+  for(const p of pastRaw||[]){const k=p.user_id+'_'+p.post_date;if(!byUserDate[k])byUserDate[k]=p;}
+  const past=Object.values(byUserDate);
+  feedYesterday=past.filter(p=>p.post_date===yesterS()).sort((a,b)=>(myFollowing.has(a.user_id)?0:1)-(myFollowing.has(b.user_id)?0:1));
+  feedOlder=past.filter(p=>p.post_date<yesterS()).sort((a,b)=>b.post_date.localeCompare(a.post_date));
+  feedPreviousShown=10;
 }
 async function submitPost(pd){
-  const t=todayS(),y=yesterS();
-  const prevId=todayPost?.id||null;
-  await sb.from('posts').update({is_primary:false}).eq('user_id',user.id).eq('post_date',t);
+  const t=todayS();
+  // Replace today's tragedy if one exists
+  await sb.from('posts').delete().eq('user_id',user.id).eq('post_date',t);
   const postPayload={
     user_id:user.id,username:profile.username,razon:pd.razon,castigo:pd.castigo,
     dibujo_trazos:pd.dibujo?.trazos||null,dibujo_descripcion:pd.dibujo?.descripcion||null,
     doll_color:profile.doll_color,
-    post_date:t,is_primary:true,previous_post_id:prevId,
-    visibility:profile.is_private?'friends':'public',
+    post_date:t,
     pose:draftPose||'idle',
   };
-  let {data,error}=await sb.from('posts').insert(postPayload).select().single();
-  if(error&&error.message&&error.message.includes('visibility')){
-    const {visibility:_v,...payloadNoVis}=postPayload;
-    ({data,error}=await sb.from('posts').insert(payloadNoVis).select().single());
-  }
+  const {data,error}=await sb.from('posts').insert(postPayload).select().single();
   if(error){alert('Error: '+error.message);return;}
   if(!profile.last_post_date||profile.last_post_date!==t){
     await recalcStreak();
   }
-  todayPrevPost=todayPost;todayPost=data;view='posted';paint();
+  todayPost=data;todayPost.dep_count=0;cemeteryPosts=null;feedData=[];view='posted';paint();
 }
 async function toggleDep(pid){
   if(myDeps.has(pid)){
@@ -1435,7 +1418,7 @@ const DEAD_FACE_ICO=`<svg width="48" height="48" viewBox="0 0 48 48" fill="none"
 function getSlides(){return[
   {icon:()=>DEAD_FACE_ICO,          title:t('ob1_title'),body:t('ob1_body')},
   {icon:()=>icoStat(ICO.candle,48), title:t('ob2_title'),body:t('ob2_body')},
-  {icon:()=>VIS_ICO.private,        title:t('ob3_title'),body:t('ob3_body')},
+  {icon:()=>icoStat(ICO.skull,48),   title:t('ob3_title'),body:t('ob3_body')},
   {icon:()=>icoStat(ICO.flame,48),  title:t('ob4_title'),body:t('ob4_body')},
 ];}
 function showDollModal(item){
@@ -1822,7 +1805,6 @@ function paint(){
   try{
     let c='';
     if(view==='home')c=renderHome();
-    else if(view==='peor_vis')c=renderPeorVis();
     else if(view==='razon')c=renderRazon();
     else if(view==='muerte')c=renderMuerte();
     else if(view==='dibujo')c=renderDibujo();
@@ -1929,8 +1911,6 @@ function renderProfile(){
   const isFollowing=myFollowing.has(prof.id);
   const isFriend=myFriends.has(prof.id);
   const since=prof.created_at?new Date(prof.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'long',year:'numeric'}):'—';
-  // Group posts by day, pick 1 per day (most restrictive accessible), chain = rest
-  const vRank={friends:0,public:1};
   const byDay={};
   for(const p of posts){
     const day=p.post_date||p.created_at?.slice(0,10);
@@ -1939,37 +1919,27 @@ function renderProfile(){
   }
   const todayDate=todayS();
   const isPrivateLocked=!!(prof.is_private&&!isFriend&&!isSelf);
+  // One post per day: pick the latest
   const dayCards=Object.keys(byDay).sort((a,b)=>b.localeCompare(a)).slice(0,20).map(day=>{
     const isToday=day===todayDate;
-    const all=byDay[day].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-    const accessible=isSelf?all:all.filter(p=>{
-      const v=p.visibility||'friends';
-      if(v==='private')return false;
-      if(v==='friends')return isFriend;
-      return true;
-    });
-    if(!accessible.length)return'';
-    if(!isSelf)accessible.sort((a,b)=>(vRank[a.visibility||'friends']??1)-(vRank[b.visibility||'friends']??1)||new Date(b.created_at)-new Date(a.created_at));
-    const primary=accessible[0];
-    const chain=accessible.slice(1);
-    const d=DEATHS.find(x=>x.id===primary.castigo);
-    const lbl=primary.castigo==='dibujo'?esc(primary.dibujo_descripcion):dl(primary.castigo);
-    const dateStr=new Date(primary.post_date||primary.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'short',year:'numeric'});
-    const isOpen=expandedPrev.has('prof_'+primary.id);
+    const sorted=byDay[day].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+    const p=sorted[0];
+    const d=DEATHS.find(x=>x.id===p.castigo);
+    const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):dl(p.castigo);
+    const dateStr=new Date(p.post_date||p.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'short',year:'numeric'});
     return `<div style="padding:clamp(10px,2.5vw,14px) 0;border-bottom:1px solid var(--border);${isToday?'border-left:2px solid var(--warm);padding-left:10px;margin-left:-10px;':''}">
       ${isToday?`<div style="font-size:clamp(9px,2.2vw,10px);color:var(--warm);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:6px;">☠ ${lang==='en'?'TODAY':'HOY'}</div>`:''}
       <div style="display:flex;gap:12px;align-items:flex-start;">
-        <div style="flex-shrink:0;">${dollWithDraw(primary.doll_color||prof.doll_color,primary.castigo,primary.dibujo_trazos,true,primary?.pose||d?.pose||'idle',clamp(44,54))}</div>
+        <div style="flex-shrink:0;">${dollWithDraw(p.doll_color||prof.doll_color,p.castigo,p.dibujo_trazos,true,p?.pose||d?.pose||'idle',clamp(44,54))}</div>
         <div style="flex:1;min-width:0;">
           <div style="font-size:clamp(10px,2.5vw,11px);color:var(--warm);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">${lbl} <span style="color:var(--muted2);font-weight:400;text-transform:none;">· ${dateStr}</span></div>
-          <p style="font-size:clamp(13px,3.5vw,14px);color:var(--text2);font-style:italic;line-height:1.6;margin:4px 0 6px;">"${esc(primary.razon)}"</p>
-          <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);">${primary.visibility!=='private'?`${ICO.candle} ${primary.dep_count||0} DEPs`:''}</div>
+          <p style="font-size:clamp(13px,3.5vw,14px);color:var(--text2);font-style:italic;line-height:1.6;margin:4px 0 6px;">"${esc(p.razon)}"</p>
+          <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);">${ICO.candle} ${p.dep_count||0} DEPs</div>
         </div>
       </div>
-      ${chain.length?`<button class="prev-toggle ${isOpen?'open':''}" data-profprev="${primary.id}" style="margin-top:6px;"><svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> ${t('prev_btn')}</button><div class="prev-panel ${isOpen?'open':''}">${chain.map((c,i)=>prevPostHTML(c,54,i)).join('')}</div>`:''}
     </div>`;
   }).join('');
-  const postCount=Object.values(byDay).flat().filter(p=>isSelf||p.visibility!=='private').length;
+  const postCount=Object.keys(byDay).length;
   // Richer stats
   const sortedDates=posts.map(p=>p.post_date||p.created_at?.slice(0,10)).filter(Boolean).sort();
   const firstYear=sortedDates.length?new Date(sortedDates[0]+'T12:00:00').getFullYear():'—';
@@ -2072,49 +2042,19 @@ function renderSeñales(){
   </div>`;
 }
 
-function prevPostHTML(p,size,idx=0){
-  if(!p)return'';
-  const d=DEATHS.find(x=>x.id===p.castigo);
-  const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):dl(p.castigo);
-  const timeStr=new Date(p.created_at).toLocaleTimeString(lang==='en'?'en-US':'es-ES',{hour:'2-digit',minute:'2-digit'});
-  const label=idx===0?(lang==='en'?'BEFORE THIS':'LO DE ANTES'):(lang==='en'?'AND BEFORE...':'Y ANTES...');
-  const vl=visLabel(p.visibility);
-  const vc=VIS_COLOR[p.visibility]||'var(--border2)';
-  return `<div style="opacity:.65;margin:6px 0 2px;padding:10px 0 10px 12px;border-left:2px solid var(--border2);">
-    <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:8px;">${label}</div>
-    <div style="display:flex;gap:12px;align-items:flex-start;">
-      <div style="flex-shrink:0;">${dollWithDraw(p.doll_color||profile?.doll_color,p.castigo,p.dibujo_trazos,true,p?.pose||d?.pose||'idle',clamp(44,54))}</div>
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">${lbl} <span style="opacity:.5;font-weight:400;text-transform:none;">· ${timeStr}</span></div>
-        <div style="font-size:clamp(13px,3.5vw,14px);color:var(--text2);font-style:italic;line-height:1.5;">"${esc(p.razon)}"</div>
-        <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-          ${p.visibility!=='private'?`${ICO.candle} ${p.dep_count||0}`:''}
-          ${vl?`<span style="display:inline-flex;align-items:center;gap:4px;font-size:clamp(9px,2.3vw,10px);padding:2px 7px;border-radius:10px;border:1px solid ${vc};color:${vc};">${vl.ico} ${vl.txt}</span>`:''}
-        </div>
-      </div>
-    </div>
-  </div>`;
-}
 
-const VIS_COLOR={public:'#5A8FD4',friends:'var(--warm)',private:'#8B1A2A'};
-function cemRowHTML(p,showTime=false,showDelete=false,highlightVis=false){
+function cemRowHTML(p,showTime=false,showDelete=false){
   const d=DEATHS.find(x=>x.id===p.castigo);
   const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):dl(p.castigo);
   const dateStr=showTime
     ?new Date(p.created_at).toLocaleTimeString(lang==='en'?'en-US':'es-ES',{hour:'2-digit',minute:'2-digit'})
     :new Date(p.post_date||p.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'short',year:'numeric'});
-  const vl=visLabel(p.visibility);
-  const vc=highlightVis?(VIS_COLOR[p.visibility]||'var(--muted2)'):'var(--border2)';
-  const tc=highlightVis?(VIS_COLOR[p.visibility]||'var(--muted2)'):'var(--muted2)';
-  const visBadge=vl
-    ?`<span style="display:inline-flex;align-items:center;gap:4px;font-size:clamp(9px,2.3vw,10px);padding:2px 7px;border-radius:10px;border:1px solid ${vc};color:${tc};${highlightVis?'font-weight:600;':''}">${vl.ico} ${vl.txt}</span>`
-    :'';
   return `<div class="cemetery-row" data-cemid="${p.id}">
     <div style="flex-shrink:0;">${dollWithDraw(p.doll_color||profile.doll_color,p.castigo,p.dibujo_trazos,true,p?.pose||d?.pose||'idle',clamp(44,54))}</div>
     <div style="flex:1;min-width:0;">
       <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">${lbl} <span style="opacity:.5;font-weight:400;text-transform:none;">· ${dateStr}</span></div>
       <div style="font-size:clamp(13px,3.5vw,14px);color:var(--text2);font-style:italic;line-height:1.5;">"${esc(p.razon)}"</div>
-      <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-top:4px;display:flex;align-items:center;gap:6px;min-width:0;">${(showDelete||p.visibility!=='private')?`${ICO.candle} ${p.dep_count||0}`:''} ${visBadge}${showDelete?`<button class="btn-link cem-delete-btn" data-delid="${p.id}" data-isprimary="${p.is_primary?'1':'0'}" style="margin-left:auto;flex-shrink:0;font-size:clamp(9px,2.2vw,10px);color:var(--muted);opacity:.65;padding:2px 0;">${lang==='en'?'Delete':'Borrar'}</button>`:''}</div>
+      <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-top:4px;display:flex;align-items:center;gap:6px;min-width:0;">${ICO.candle} ${p.dep_count||0}${showDelete?` <button class="btn-link cem-delete-btn" data-delid="${p.id}" style="margin-left:auto;flex-shrink:0;font-size:clamp(9px,2.2vw,10px);color:var(--muted);opacity:.65;padding:2px 0;">${lang==='en'?'Delete':'Borrar'}</button>`:''}</div>
     </div>
   </div>`;
 }
@@ -2122,51 +2062,35 @@ function cemRowHTML(p,showTime=false,showDelete=false,highlightVis=false){
 function renderHome(){
   if(cemeteryPosts===null){
     (async()=>{
-      let data;try{({data}=await sb.from('posts').select('*').eq('user_id',user.id).eq('is_primary',true).order('created_at',{ascending:false}).limit(50));}catch(e){data=[];}
+      let data;try{({data}=await sb.from('posts').select('*').eq('user_id',user.id).order('created_at',{ascending:false}).limit(60));}catch(e){data=[];}
       cemeteryPosts=data||[];paint();
     })();
   }
   const pastPosts=(cemeteryPosts||[]).filter(p=>(p.post_date||p.created_at?.slice(0,10))!==todayS());
-  const homeCemFilters=[['all',lang==='en'?'All':'Todas'],['public',lang==='en'?'Public':'Público'],['friends',lang==='en'?'Friends':'Amigos'],['private',lang==='en'?'Private':'Privado']];
-  const filteredPast=homeCemFilter==='all'?pastPosts:pastPosts.filter(p=>p.visibility===homeCemFilter);
-  const cemFilterBar=`<div style="display:flex;gap:6px;margin:8px 0 12px;flex-wrap:wrap;">${homeCemFilters.map(([val,lbl])=>`<button class="cem-filter home-cem-filter ${homeCemFilter===val?'on':''}" data-hcf="${val}" style="padding:4px 10px;font-size:clamp(9px,2.3vw,10px);border-radius:20px;border:1px solid ${homeCemFilter===val?'var(--warm)':'var(--border2)'};background:${homeCemFilter===val?'rgba(176,120,48,.1)':'transparent'};color:${homeCemFilter===val?'var(--warm)':'var(--muted2)'};cursor:pointer;font-family:inherit;">${lbl}</button>`).join('')}</div>`;
   const cemSection=`
     <div class="feed-older-hdr" style="margin-top:clamp(20px,5vw,28px);">${ICO.tombstone} ${t('cemetery_title')}</div>
     ${cemeteryPosts===null
       ?`<p style="text-align:center;color:var(--muted2);font-size:clamp(12px,3vw,13px);">${t('amigos_loading')}</p>`
-      :`${cemFilterBar}${filteredPast.length
-        ?filteredPast.map(p=>cemRowHTML(p,false)).join('')
-        :`<p style="text-align:center;color:var(--muted2);font-size:clamp(12px,3vw,13px);">${t('cemetery_empty')}</p>`}`
+      :pastPosts.length
+        ?pastPosts.map(p=>cemRowHTML(p,false,true)).join('')
+        :`<p style="text-align:center;color:var(--muted2);font-size:clamp(12px,3vw,13px);">${t('cemetery_empty')}</p>`
     }`;
 
   if(todayPost){
     const hero=todayPost;
     const hd=DEATHS.find(x=>x.id===hero.castigo);
     const hlbl=hero.castigo==='dibujo'?esc(hero.dibujo_descripcion):dl(hero.castigo);
-    const hvc=VIS_COLOR[hero.visibility]||'var(--muted2)';
-    const hvl=visLabel(hero.visibility);
-    // Compute latest post per visibility category for highlighted badges
-    const latestByVis={};
-    for(const p of todayAllPosts){
-      const v=p.visibility||'friends';
-      if(!latestByVis[v]||new Date(p.created_at)>new Date(latestByVis[v].created_at))latestByVis[v]=p;
-    }
-    const latestIds=new Set(Object.values(latestByVis).map(p=>p.id));
-    const olderToday=[...todayAllPosts].filter(p=>p.id!==hero.id).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
     return `<div class="screen">
       <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:10px;text-align:center;">${t('home_done')}</div>
       <div style="text-align:center;">
-        <div style="display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:8px;">
-          <span style="font-size:clamp(10px,2.5vw,11px);color:var(--warm);font-weight:700;text-transform:uppercase;letter-spacing:.5px;">${hlbl}</span>
-          ${hvl?`<span style="display:inline-flex;align-items:center;gap:3px;font-size:clamp(9px,2.3vw,10px);padding:2px 8px;border-radius:10px;border:1px solid ${hvc};color:${hvc};font-weight:600;">${hvl.ico} ${hvl.txt}</span>`:''}
-        </div>
+        <div style="font-size:clamp(10px,2.5vw,11px);color:var(--warm);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">${hlbl}</div>
         <div style="display:flex;justify-content:center;margin:0 0 10px;">
           ${dollWithDraw(hero.doll_color,hero.castigo,hero.dibujo_trazos,true,hero?.pose||hd?.pose||'idle',clamp(140,170))}
         </div>
         <div style="font-size:clamp(13px,3.5vw,15px);color:var(--text2);font-style:italic;margin:0 clamp(12px,4vw,24px) 10px;line-height:1.6;">"${esc(hero.razon)}"</div>
-        ${hero.visibility!=='private'?`<div style="font-size:clamp(11px,2.8vw,12px);color:var(--muted2);margin-bottom:8px;">${ICO.candle} ${hero.dep_count||0} DEPs</div>`:''}
+        <div style="font-size:clamp(11px,2.8vw,12px);color:var(--muted2);margin-bottom:8px;">${ICO.candle} ${hero.dep_count||0} DEPs</div>
         <div style="display:flex;justify-content:flex-end;padding:0 4px;margin-bottom:4px;">
-          <button class="btn-link cem-delete-btn" data-delid="${hero.id}" data-isprimary="1" style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);opacity:.4;"><svg width="11" height="13" viewBox="0 0 14 16" fill="none" style="vertical-align:middle;margin-right:2px;"><path d="M1 4h12M5 4V2h4v2M3 4l1 10h6l1-10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>${t('btn_delete')}</button>
+          <button class="btn-link cem-delete-btn" data-delid="${hero.id}" style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);opacity:.4;"><svg width="11" height="13" viewBox="0 0 14 16" fill="none" style="vertical-align:middle;margin-right:2px;"><path d="M1 4h12M5 4V2h4v2M3 4l1 10h6l1-10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>${t('btn_delete')}</button>
         </div>
       </div>
       <div class="action-row" style="margin-top:12px;">
@@ -2174,7 +2098,6 @@ function renderHome(){
         <button class="action-btn warm" id="btnShare" style="flex:1;"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="15" cy="4" r="2.2" stroke="currentColor" stroke-width="1.6"/><circle cx="15" cy="16" r="2.2" stroke="currentColor" stroke-width="1.6"/><circle cx="5" cy="10" r="2.2" stroke="currentColor" stroke-width="1.6"/><path d="M7 8.8l6-3.4M7 11.2l6 3.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>${t('btn_share_short')}</button>
         <button class="action-btn" id="btnPeor" style="flex:1;"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 3v10M5 9l5 5 5-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>${t('btn_worse_short')}</button>
       </div>
-      ${olderToday.length?`<div class="feed-older-hdr" style="margin-top:clamp(16px,4vw,22px);">${ICO.skull} ${lang==='en'?'Earlier today':'Antes hoy'}</div><div>${olderToday.map(p=>cemRowHTML(p,true,true,latestIds.has(p.id))).join('')}</div>`:''}
       ${cemSection}
     </div>`;
   }
@@ -2316,7 +2239,7 @@ function renderLogrosContent(){
   const loadingMsg=`<p style="text-align:center;color:var(--muted2);">${t('amigos_loading')}</p>`;
   if(!cemeteryPosts){
     (async()=>{
-      let data;try{({data}=await sb.from('posts').select('*').eq('user_id',user.id).eq('is_primary',true).order('created_at',{ascending:false}).limit(50));}catch(e){data=[];}
+      let data;try{({data}=await sb.from('posts').select('*').eq('user_id',user.id).order('created_at',{ascending:false}).limit(60));}catch(e){data=[];}
       cemeteryPosts=data||[];paint();
     })();
   }
@@ -2425,7 +2348,6 @@ function feedCardHTML(item,older=false){
   const given=myDeps.has(item.id),own=item.user_id===user.id;
   const friend=myFollowing.has(item.user_id);
   const d=DEATHS.find(x=>x.id===item.castigo);
-  const hasPrev=item.user_id!==user.id&&!!item._prevChain&&item._prevChain.length>0,isOpen=expandedPrev.has(item.id);
   const depCount=item.dep_count||0;
   const _d=new Date(item.created_at);const dateStr=_d.toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'short'})+' · '+_d.toLocaleTimeString(lang==='en'?'en-US':'es-ES',{hour:'2-digit',minute:'2-digit'});
   const dollPx=clamp(52,64);
@@ -2445,49 +2367,25 @@ function feedCardHTML(item,older=false){
         ${older?'':`<div style="margin-top:7px;display:flex;align-items:center;gap:6px;">${own
           ?`<span style="font-size:clamp(11px,2.8vw,12px);color:var(--muted2);">${ICO.candle} ${depCount}</span>`
           :`<button class="dep-btn ${given?'given':''}" data-pid="${item.id}">${ICO.candle} <span class="dep-count">${depCount}</span></button>`}
-          ${(()=>{if(!own)return'';const vl=visLabel(item.visibility);return vl?`<span style="display:inline-flex;align-items:center;gap:3px;font-size:clamp(9px,2.3vw,10px);padding:2px 7px;border-radius:10px;border:1px solid var(--border2);color:var(--muted2);">${vl.ico} ${vl.txt}</span>`:'';})()}
         </div>`}
       </div>
     </div>
-    ${hasPrev&&!older?`
-      <button class="prev-toggle ${isOpen?'open':''}" data-feedprev="${item.id}" style="margin-top:8px;">
-        <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        ${t('prev_btn')}
-      </button>
-      <div class="prev-panel ${isOpen?'open':''}">${item._prevChain.map((p,i)=>prevPostHTML(p,54,i)).join('')}</div>
-    `:''}
   </div>`;
 }
 
-const VIS_ICO={
-  friends:`<svg width="14" height="14" viewBox="0 0 20 14" fill="none" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><circle cx="7" cy="5" r="3.2" stroke="currentColor" stroke-width="1.6"/><circle cx="14" cy="5" r="2.6" stroke="currentColor" stroke-width="1.5"/><path d="M1 13c0-3.3 2.7-5 6-5s6 1.7 6 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M14 8c2.2.3 4 1.7 4 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
-  public:`<svg width="14" height="14" viewBox="0 0 20 20" fill="none" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><circle cx="10" cy="10" r="8.5" stroke="currentColor" stroke-width="1.6"/><ellipse cx="10" cy="10" rx="3.5" ry="8.5" stroke="currentColor" stroke-width="1.3"/><path d="M2 7.5h16M2 12.5h16" stroke="currentColor" stroke-width="1.3"/></svg>`,
-  private:`<svg width="12" height="14" viewBox="0 0 14 18" fill="none" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><rect x="1" y="8" width="12" height="9" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M4 8V5.5a3 3 0 0 1 6 0V8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`,
-};
-function visLabel(v){
-  if(v==='public') return{ico:VIS_ICO.public,txt:lang==='en'?'Public':'Público'};
-  if(v==='private') return{ico:VIS_ICO.private,txt:lang==='en'?'Private':'Privado'};
-  if(v==='friends') return{ico:VIS_ICO.friends,txt:lang==='en'?'Friends':'Amigos'};
-  return null;
-}
 function renderCemetery(){
   if(!cemeteryPosts){
     (async()=>{
-      let data;try{({data}=await sb.from('posts').select('*').eq('user_id',user.id).eq('is_primary',true).order('created_at',{ascending:false}).limit(50));}catch(e){data=[];}
+      let data;try{({data}=await sb.from('posts').select('*').eq('user_id',user.id).order('created_at',{ascending:false}).limit(60));}catch(e){data=[];}
       cemeteryPosts=data||[];paint();
     })();
     return `<div class="screen">${hdr('🪦 '+t('cemetery_title'),'')}<p style="text-align:center;color:var(--muted2);margin-top:60px;">${t('amigos_loading')}</p></div>`;
   }
-  const filters=[['all',lang==='en'?'All':'Todas'],['public',lang==='en'?'Public':'Público'],['friends',lang==='en'?'Friends':'Amigos'],['private',lang==='en'?'Private':'Privado']];
-  const filterBar=`<div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;">${filters.map(([val,lbl])=>`<button class="cem-filter ${cemeteryVisFilter===val?'on':''}" data-vf="${val}" style="padding:5px 11px;font-size:clamp(10px,2.5vw,11px);border-radius:20px;border:1px solid ${cemeteryVisFilter===val?'var(--warm)':'var(--border2)'};background:${cemeteryVisFilter===val?'rgba(176,120,48,.1)':'transparent'};color:${cemeteryVisFilter===val?'var(--warm)':'var(--muted2)'};cursor:pointer;font-family:inherit;">${lbl}</button>`).join('')}</div>`;
   const pastPosts=cemeteryPosts.filter(p=>(p.post_date||p.created_at?.slice(0,10))!==todayS());
-  const filtered=cemeteryVisFilter==='all'?pastPosts:pastPosts.filter(p=>p.visibility===cemeteryVisFilter);
-  const total=pastPosts.length;
-  const rows=filtered.map(p=>cemRowHTML(p,false)).join('');
+  const rows=pastPosts.map(p=>cemRowHTML(p,false,true)).join('');
   return `<div class="screen">
-    ${hdr('🪦 '+t('cemetery_title'),t('cemetery_sub').replace('$n',total))}
-    ${filterBar}
-    ${filtered.length?rows:`<p style="text-align:center;color:var(--muted2);margin-top:40px;">${t('cemetery_empty')}</p>`}
+    ${hdr('🪦 '+t('cemetery_title'),t('cemetery_sub').replace('$n',pastPosts.length))}
+    ${pastPosts.length?rows:`<p style="text-align:center;color:var(--muted2);margin-top:40px;">${t('cemetery_empty')}</p>`}
     <button class="btn-link" id="volverCemetery" style="margin-top:20px;">${t('btn_back')}</button>
   </div>`;
 }
@@ -2667,33 +2565,20 @@ function attachListeners(){
     if(ge('goFeed'))ge('goFeed').onclick=async()=>{await loadFeed();view='feed';paint();};
     if(ge('btnPeor'))ge('btnPeor').onclick=()=>{draftRazon='';view='razon';paint();};
     if(ge('btnShare'))ge('btnShare').onclick=()=>showShareMenu(todayPost);
-    document.querySelectorAll('.home-cem-filter').forEach(b=>{b.onclick=()=>{homeCemFilter=b.getAttribute('data-hcf');paint();};});
     document.querySelectorAll('.cem-delete-btn').forEach(btn=>{ btn.onclick=async(e)=>{
       e.stopPropagation();
       const delId=btn.getAttribute('data-delid');
-      const isPrimary=btn.getAttribute('data-isprimary')==='1';
-      const isLast=todayAllPosts.length===1;
+      const isToday=todayPost&&todayPost.id===delId;
       const msg=lang==='en'
-        ?`Delete this ruina? This cannot be undone.${isLast?' Your streak will reset.':''}`
-        :`¿Borrar esta desgracia? No podrás recuperarla.${isLast?' Si la borras, no contará para la racha.':''}`;
+        ?`Delete this tragedy? This cannot be undone.${isToday?' Your streak will reset.':''}`
+        :`¿Borrar esta desgracia? No podrás recuperarla.${isToday?' Si la borras, no contará para la racha.':''}`;
       if(!confirm(msg))return;
       const {error}=await sb.from('posts').delete().eq('id',delId).eq('user_id',user.id);
       if(error){alert('Error al borrar: '+(error.message||'inténtalo de nuevo'));return;}
       cemeteryPosts=null;feedData=null;
-      // Reload today's posts fresh
-      const {data:fresh}=await sb.from('posts').select('*').eq('user_id',user.id).eq('post_date',todayS()).order('created_at',{ascending:false});
-      todayAllPosts=fresh||[];
-      todayPost=todayAllPosts.find(p=>p.is_primary)||todayAllPosts[0]||null;
-      todayPrevPost=todayPost?.previous_post_id?todayAllPosts.find(p=>p.id===todayPost.previous_post_id)||null:null;
-      // Recalculate streak from real post history
-      await recalcStreak();
+      if(isToday){await loadTodayPost();await recalcStreak();}
       view='home';paint();
     };});
-  }
-  if(view==='peor_vis'){
-    document.querySelectorAll('.peor-vis-opt').forEach(btn=>{btn.onclick=()=>{window._peorVis=btn.getAttribute('data-pv');paint();};});
-    if(ge('peorVisContinuar'))ge('peorVisContinuar').onclick=()=>{window._postVisibility=window._peorVis||'friends';draftRazon='';view='razon';paint();};
-    if(ge('volverPeorVis'))ge('volverPeorVis').onclick=()=>{window._peorVis=null;view='home';paint();};
   }
   if(view==='razon'){
     const ta=ge('razonInput'),btn=ge('btnElegirCastigo'),cnt=ge('razonInputCount');
@@ -2726,18 +2611,11 @@ function attachListeners(){
     document.querySelectorAll('.doll-expand-btn').forEach(b=>{b.onclick=(e)=>{
       e.stopPropagation();
       const pid=b.getAttribute('data-pid');
-      const item=[...feedData,...feedData.flatMap(x=>x._prevChain||[])].find(x=>x.id===pid);
+      const item=feedData.find(x=>x.id===pid);
       if(!item)return;
       expandedDollItem=item;
       showDollModal(item);
     };});
-    document.querySelectorAll('[data-feedprev]').forEach(btn=>{
-      btn.onclick=()=>{
-        const id=btn.getAttribute('data-feedprev');
-        if(expandedPrev.has(id))expandedPrev.delete(id);else expandedPrev.add(id);
-        btn.classList.toggle('open');btn.nextElementSibling.classList.toggle('open');
-      };
-    });
     document.querySelectorAll('[data-tomb]').forEach(btn=>{
       btn.onclick=(e)=>{
         e.stopPropagation();
@@ -2817,8 +2695,8 @@ function attachListeners(){
     };
     if(ge('btnLogout'))ge('btnLogout').onclick=async()=>{
       await sb.auth.signOut().catch(()=>{});
-      user=null;profile=null;todayPost=null;todayPrevPost=null;
-      feedData=[];myDeps=new Set();myFollowing=new Set();expandedPrev=new Set();
+      user=null;profile=null;todayPost=null;
+      feedData=[];myDeps=new Set();myFollowing=new Set();
       cemeteryPosts=null;followersList=null;friendsList=null;
       navigating=false;authStep='form';view='auth';paint();
     };
@@ -2913,7 +2791,6 @@ function attachListeners(){
   }
   if(view==='cementerio'){
     if(ge('volverCemetery'))ge('volverCemetery').onclick=()=>{view='home';paint();};
-    document.querySelectorAll('.cem-filter').forEach(b=>{b.onclick=()=>{cemeteryVisFilter=b.getAttribute('data-vf');paint();};});
   }
   if(view==='logros'){
     if(ge('volverLogros'))ge('volverLogros').onclick=()=>{view='muertes';muertesTab='castigos';paint();};
@@ -2930,7 +2807,6 @@ function attachListeners(){
   if(view==='profile'){
     if(ge('volverProfile'))ge('volverProfile').onclick=()=>{view=profileReturnView||'amigos';paint();};
     if(ge('btnAddBio'))ge('btnAddBio').onclick=()=>{view='ajustes';paint();};
-    document.querySelectorAll('[data-profprev]').forEach(btn=>{btn.onclick=()=>{const k='prof_'+btn.getAttribute('data-profprev');if(expandedPrev.has(k))expandedPrev.delete(k);else expandedPrev.add(k);paint();};});
     const fb=ge('profileFollow');
     if(fb)fb.onclick=async()=>{
       const uid=fb.getAttribute('data-uid');
@@ -3013,37 +2889,6 @@ function attachListeners(){
   });
 }
 
-function renderPeorVis(){
-  const curVis=todayPost?.visibility||'friends';
-  if(!window._peorVis)window._peorVis=curVis;
-  const sel=window._peorVis;
-  const vRankMap={public:0,friends:1,private:2};
-  const curRank=vRankMap[curVis]??0,selRank=vRankMap[sel]??0;
-  let warn='';
-  if(selRank>curRank){
-    const curLbl=curVis==='public'?(lang==='en'?'public':'pública'):(lang==='en'?'friends only':'para amigos');
-    if(sel==='private')warn=lang==='en'?`Your active ruina will become visible only to you. The previous one will stop appearing as your active ${curLbl} ruina.`:`Tu desgracia activa pasará a ser visible solo para ti. La anterior dejará de aparecer como tu ruina activa ${curLbl}.`;
-    else if(sel==='friends')warn=lang==='en'?`Your active ruina will become visible only to friends. The previous one will stop appearing as your active public ruina.`:`Tu desgracia activa pasará a ser visible solo para amigos. La anterior dejará de aparecer como tu ruina activa pública.`;
-  }
-  const opts=[
-    {v:'public',lbl:lang==='en'?'Public':'Público',ico:VIS_ICO.public},
-    {v:'friends',lbl:lang==='en'?'Friends':'Amigos',ico:VIS_ICO.friends},
-    {v:'private',lbl:lang==='en'?'Only me':'Solo yo',ico:VIS_ICO.private},
-  ];
-  return `<div class="screen">
-    ${hdr(t('btn_worse_short'))}
-    <p style="font-size:clamp(12px,3vw,13px);color:var(--muted2);text-align:center;margin-bottom:clamp(16px,4vw,22px);line-height:1.6;">${lang==='en'?'This new ruina will replace the current one as your active ruina for today.':'Esta nueva ruina enterrará la anterior como tu desgracia activa de hoy.'}</p>
-    <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">${lang==='en'?'Who can see this new ruina?':'¿Quién podrá ver esta nueva ruina?'}</div>
-    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:clamp(12px,3vw,16px);">
-      ${opts.map(o=>{const on=sel===o.v;return`<button class="peor-vis-opt" data-pv="${o.v}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid ${on?'var(--warm)':'var(--border2)'};border-radius:8px;cursor:pointer;background:${on?'rgba(176,120,48,.06)':'transparent'};color:${on?'var(--text)':'var(--text2)'};font-family:inherit;font-size:clamp(12px,3vw,13px);width:100%;text-align:left;">${o.ico} ${o.lbl}</button>`;}).join('')}
-    </div>
-    ${warn?`<div style="font-size:clamp(11px,2.8vw,12px);color:var(--muted2);background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;margin-bottom:14px;line-height:1.6;">${warn}</div>`:''}
-    <div style="display:flex;justify-content:center;margin-top:6px;">
-      <button class="btn btn-red" id="peorVisContinuar">${lang==='en'?'Continue →':'Continuar →'}</button>
-    </div>
-    <button class="btn-link" id="volverPeorVis">${t('btn_back')}</button>
-  </div>`;
-}
 
 function renderRazon(){
   return `<div class="screen">

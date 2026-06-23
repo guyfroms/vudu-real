@@ -2320,13 +2320,16 @@ function renderFeed(){
 function renderAjustes(){
   const streak=profile?.streak||0;
   return `<div class="screen">
-    ${hdr(t('ajustes_title'),`@${esc(profile.username)}`)}
-    <div style="text-align:center;color:var(--muted);font-size:clamp(10px,2.6vw,11px);margin-bottom:16px;">${esc(user?.email||'')}</div>
-    <button id="btnViewOwnProfile" style="display:flex;flex-direction:column;align-items:center;background:none;border:none;cursor:pointer;margin:8px auto 18px;gap:4px;">
-      ${dollSVG(profile.doll_color,null,false,'idle',110)}
-      <span style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);">Ver mi perfil →</span>
+    ${hdr(t('ajustes_title'),'')}
+    <button id="btnViewOwnProfile" style="display:flex;flex-direction:row;align-items:center;background:none;border:none;cursor:pointer;margin:8px auto 18px;gap:14px;padding:10px 16px;border:1px solid var(--border2);border-radius:12px;width:100%;">
+      ${dollSVG(profile.doll_color,null,false,'idle',70)}
+      <div style="text-align:left;">
+        <div style="font-size:clamp(14px,3.8vw,16px);font-weight:700;color:var(--text);">@${esc(profile.username)}</div>
+        <div style="font-size:clamp(11px,2.8vw,12px);color:var(--muted2);margin-top:2px;">${esc(user?.email||'')}</div>
+        <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-top:4px;">Ver mi perfil →</div>
+      </div>
     </button>
-    <div style="text-align:center;color:var(--muted2);font-size:clamp(9px,2.5vw,10px);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">${t('ajustes_color')}</div>
+    <div style="text-align:center;color:var(--muted2);font-size:clamp(9px,2.5vw,10px);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">${lang==='en'?'Choose a color':'Elige un color'}</div>
     <div class="colorpick">
       ${DOLL_COLORS.map(c=>`<button class="ccircle ${c===profile.doll_color?'on':''}" data-color="${c}" style="background:${c};"></button>`).join('')}
     </div>

@@ -1967,7 +1967,7 @@ function prevPostHTML(p,size){
   </div>`;
 }
 
-const VIS_COLOR={public:'#5A8FD4',friends:'var(--warm)',private:'var(--muted2)'};
+const VIS_COLOR={public:'#5A8FD4',friends:'var(--warm)',private:'#8B1A2A'};
 function cemRowHTML(p,showTime=false,showDelete=false,highlightVis=false){
   const d=DEATHS.find(x=>x.id===p.castigo);
   const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):dl(p.castigo);
@@ -2023,7 +2023,7 @@ function renderHome(){
       if(!latestByVis[v]||new Date(p.created_at)>new Date(latestByVis[v].created_at))latestByVis[v]=p;
     }
     const latestIds=new Set(Object.values(latestByVis).map(p=>p.id));
-    const olderToday=[...todayAllPosts].filter(p=>p.id!==hero.id).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+    const olderToday=[...todayAllPosts].filter(p=>p.id!==hero.id).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
     return `<div class="screen">
       <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:10px;text-align:center;">${t('home_done')}</div>
       <div style="text-align:center;">

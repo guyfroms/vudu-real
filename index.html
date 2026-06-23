@@ -435,7 +435,7 @@ const LINE_WIDTHS=[2,4,8];
 let lang=localStorage.getItem('kill_lang')||(navigator.language.startsWith('es')?'es':'en');
 const STRINGS={
   es:{
-    nav_hoy:'Hoy',nav_feed:'Funeral',nav_senales:'Actividad',nav_muertes:'Almacén',
+    nav_hoy:'Hoy',nav_feed:'Funeral',nav_senales:'Actividad',nav_muertes:'Colección',
     login_tab:'Entrar',register_tab:'Registrarse',
     auth_tagline:'"pues me mato."',auth_sub:'Hay desgracias que acaban contigo.',
     auth_beat1:'Cuenta tu ruina del día',auth_beat2:'Elige cómo muere tu muñeco',auth_beat3:'Recibe DEPs de tus amigos',
@@ -1682,7 +1682,6 @@ function shell(content){
     <div class="topbar-r">
       ${streak>0?`<div class="streak-pill">${ICO.flame}<span>${streak}</span></div>`:''}
       <button class="gear-btn" id="btnSearch" style="margin-right:2px;">${ICO.search}</button>
-      <button class="gear-btn" id="btnAmigos" style="margin-right:2px;">${ICO.people}</button>
       <button class="gear-btn" id="btnGear">${ICO.gear}</button>
     </div>
   </div>
@@ -1691,14 +1690,15 @@ function shell(content){
     <div class="navbtn-wrap"><button class="navbtn ${inMain?'on':''}" id="navHoy"><div class="navbtn-ico">${ICO.doll}</div><span>${t('nav_hoy')}</span></button></div>
     <div class="navbtn-wrap"><button class="navbtn ${view==='feed'?'on':''}" id="navFeed"><div class="navbtn-ico">${ICO.feed}</div><span>${t('nav_feed')}</span></button></div>
     <div class="navbtn-wrap"><button class="navbtn ${view==='señales'?'on':''}" id="navSeñales"><div class="navbtn-ico">${ICO.bell}</div><span>${t('nav_senales')}</span></button>${señalesBadge?'<div class="nav-badge"></div>':''}</div>
+    <div class="navbtn-wrap"><button class="navbtn ${view==='amigos'?'on':''}" id="navAmigos"><div class="navbtn-ico">${ICO.people}</div><span>${lang==='en'?'Friends':'Amigos'}</span></button></div>
     <div class="navbtn-wrap"><button class="navbtn ${view==='muertes'?'on':''}" id="navMuertes"><div class="navbtn-ico">${ICO.skull}</div><span>${t('nav_muertes')}</span></button></div>
   </div>`;
   ge('btnGear').onclick=()=>{view='ajustes';paint();};
   ge('btnSearch').onclick=()=>{searchQuery='';searchResults=null;view='buscar';paint();};
-  ge('btnAmigos').onclick=async()=>{view='amigos';paint();};
   ge('navHoy').onclick=()=>{view='home';paint();};
   ge('navFeed').onclick=async()=>{await loadFeed();view='feed';paint();};
   ge('navSeñales').onclick=async()=>{señalesBadge=false;try{window._señalesItems=await loadSeñales();}catch(e){window._señalesItems=[];}view='señales';paint();};
+  ge('navAmigos').onclick=async()=>{view='amigos';paint();};
   ge('navMuertes').onclick=()=>{view='muertes';paint()};
   ge('logoBtn').onclick=async()=>{await loadFeed();view='feed';paint();};
   attachListeners();
@@ -1796,8 +1796,8 @@ function renderAmigos(){
   const friendBadge='<span style="font-size:clamp(9px,2.2vw,10px);padding:2px 6px;border-radius:8px;background:rgba(176,120,48,.15);color:var(--warm);font-weight:700;margin-left:6px;">Amigo</span>';
 
   if(amigosTab==='following'){
-    if(!friendIds.length&&!pendingFriendReqs.length) return `<div class="screen">${hdr(t('amigos_title'),'')}<button class="btn-link" id="volverAmigos" style="margin-bottom:0;">${t('btn_back')}</button>${pendingSection}${tabBar}<p style="text-align:center;color:var(--muted2);margin-top:40px;font-size:clamp(13px,3.5vw,14px);">${t('amigos_empty')}<br><span style="font-size:clamp(11px,3vw,12px);opacity:.5;display:block;margin-top:6px;">${t('amigos_find')}</span></p></div>`;
-    if(friendsList===null) return `<div class="screen">${hdr(t('amigos_title'),'')}<button class="btn-link" id="volverAmigos" style="margin-bottom:0;">${t('btn_back')}</button>${pendingSection}${tabBar}<p style="text-align:center;color:var(--muted2);margin-top:40px;">${t('amigos_loading')}</p></div>`;
+    if(!friendIds.length&&!pendingFriendReqs.length) return `<div class="screen">${hdr(t('amigos_title'),'')}${pendingSection}${tabBar}<p style="text-align:center;color:var(--muted2);margin-top:40px;font-size:clamp(13px,3.5vw,14px);">${t('amigos_empty')}<br><span style="font-size:clamp(11px,3vw,12px);opacity:.5;display:block;margin-top:6px;">${t('amigos_find')}</span></p></div>`;
+    if(friendsList===null) return `<div class="screen">${hdr(t('amigos_title'),'')}${pendingSection}${tabBar}<p style="text-align:center;color:var(--muted2);margin-top:40px;">${t('amigos_loading')}</p></div>`;
     const rows=friendsList.map(f=>`
       <div class="amigo-row" data-uid="${f.id}">
         <div style="flex-shrink:0">${avatarDoll(f.doll_color||DOLL_COLORS[0],clamp(40,48))}</div>
@@ -1807,10 +1807,10 @@ function renderAmigos(){
         </div>
         <div class="amigo-arrow">›</div>
       </div>`).join('');
-    return `<div class="screen">${hdr(t('amigos_title'),'')}<button class="btn-link" id="volverAmigos" style="margin-bottom:0;">${t('btn_back')}</button>${pendingSection}${tabBar}<div>${rows}</div></div>`;
+    return `<div class="screen">${hdr(t('amigos_title'),'')}${pendingSection}${tabBar}<div>${rows}</div></div>`;
   } else {
-    if(followersList===null) return `<div class="screen">${hdr(t('amigos_title'),'')}<button class="btn-link" id="volverAmigos" style="margin-bottom:0;">${t('btn_back')}</button>${pendingSection}${tabBar}<p style="text-align:center;color:var(--muted2);margin-top:40px;">${t('amigos_loading')}</p></div>`;
-    if(!followersList.length) return `<div class="screen">${hdr(t('amigos_title'),'')}<button class="btn-link" id="volverAmigos" style="margin-bottom:0;">${t('btn_back')}</button>${pendingSection}${tabBar}<p style="text-align:center;color:var(--muted2);margin-top:40px;">${t('no_followers')}</p></div>`;
+    if(followersList===null) return `<div class="screen">${hdr(t('amigos_title'),'')}${pendingSection}${tabBar}<p style="text-align:center;color:var(--muted2);margin-top:40px;">${t('amigos_loading')}</p></div>`;
+    if(!followersList.length) return `<div class="screen">${hdr(t('amigos_title'),'')}${pendingSection}${tabBar}<p style="text-align:center;color:var(--muted2);margin-top:40px;">${t('no_followers')}</p></div>`;
     const rows=followersList.map(f=>`
       <div class="amigo-row" data-uid="${f.id}">
         <div style="flex-shrink:0">${avatarDoll(f.doll_color||DOLL_COLORS[0],clamp(40,48))}</div>
@@ -1820,7 +1820,7 @@ function renderAmigos(){
         </div>
         <div class="amigo-arrow">›</div>
       </div>`).join('');
-    return `<div class="screen">${hdr(t('amigos_title'),'')}<button class="btn-link" id="volverAmigos" style="margin-bottom:0;">${t('btn_back')}</button>${pendingSection}${tabBar}<div>${rows}</div></div>`;
+    return `<div class="screen">${hdr(t('amigos_title'),'')}${pendingSection}${tabBar}<div>${rows}</div></div>`;
   }
 }
 
@@ -1936,7 +1936,7 @@ function renderHome(){
       </div>
       <div class="done-card">
         <div class="done-castigo">${lbl}</div>
-        <div style="color:var(--muted);font-size:clamp(11px,2.8vw,12px);margin-top:8px;letter-spacing:.3px;display:flex;align-items:center;justify-content:center;gap:8px;">${icoStat(ICO.candle,14)} ${p.dep_count||0} ${t('deps_received')}${(()=>{const vl=visLabel(p.visibility);return vl?`<span style="opacity:.6;">·</span><span style="display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:10px;border:1px solid var(--border2);">${vl.ico} ${vl.txt}</span>`:p.visibility===null||p.visibility===undefined?'':``;})()}</div>
+        <div style="color:var(--muted);font-size:clamp(11px,2.8vw,12px);margin-top:8px;letter-spacing:.3px;display:flex;align-items:center;justify-content:center;gap:8px;">${p.visibility!=='private'?`${icoStat(ICO.candle,14)} ${p.dep_count||0} ${t('deps_received')}`:''}${(()=>{const vl=visLabel(p.visibility);return vl?`<span style="opacity:.6;">·</span><span style="display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:10px;border:1px solid var(--border2);">${vl.ico} ${vl.txt}</span>`:'';})()}</div>
         ${hasPrev?`
           <button class="prev-toggle ${isOpen?'open':''}" id="btnTogglePrev">
             <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -2063,7 +2063,7 @@ function renderPosted(){
     <div class="done-card">
       <div class="done-razon">"${esc(p.razon)}"</div>
       <div class="done-castigo">${lbl}</div>
-      <div style="color:var(--muted);font-size:clamp(11px,2.8vw,12px);margin-top:8px;display:flex;align-items:center;justify-content:center;gap:5px;">${icoStat(ICO.candle,14)} ${p.dep_count||0} ${t('deps_received')}</div>
+      ${p.visibility!=='private'?`<div style="color:var(--muted);font-size:clamp(11px,2.8vw,12px);margin-top:8px;display:flex;align-items:center;justify-content:center;gap:5px;">${icoStat(ICO.candle,14)} ${p.dep_count||0} ${t('deps_received')}</div>`:''}
     </div>
     <div style="display:flex;justify-content:center;margin-top:20px;">
       <button class="btn-warm-sm" id="irAlFeed">${t('btn_feed')}</button>
@@ -2273,7 +2273,7 @@ function renderCemetery(){
       <div style="flex:1;min-width:0;">
         <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">${lbl} <span style="opacity:.5;font-weight:400;text-transform:none;">· ${dateStr}</span></div>
         <div style="font-size:clamp(13px,3.5vw,14px);color:var(--text2);font-style:italic;line-height:1.5;">"${esc(p.razon)}"</div>
-        <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-top:4px;display:flex;align-items:center;gap:8px;">${ICO.candle} ${p.dep_count||0} DEPs ${visBadge}</div>
+        <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-top:4px;display:flex;align-items:center;gap:8px;">${p.visibility!=='private'?`${ICO.candle} ${p.dep_count||0} DEPs`:''} ${visBadge}</div>
       </div>
     </div>`;
   }).join('');
@@ -2600,7 +2600,6 @@ function attachListeners(){
     };
   }
   if(view==='amigos'){
-    if(ge('volverAmigos'))ge('volverAmigos').onclick=()=>{view=todayPost?'feed':'home';paint();};
     if(ge('tabFollowing'))ge('tabFollowing').onclick=()=>{amigosTab='following';paint();};
     if(ge('tabFollowers'))ge('tabFollowers').onclick=()=>{
       amigosTab='followers';

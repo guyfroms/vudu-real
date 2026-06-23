@@ -707,6 +707,7 @@ let feedData=[],myDeps=new Set(),myFollowing=new Set();
 let todayPrevPost=null,expandedPrev=new Set(),expandedDollItem=null;
 let authTab="login",authStep="form",pendingVerifyEmail="",recoverySession=false;
 let feedOlder=[],feedYesterday=[],señalesBadge=false,viewingProfile=null,friendsList=null;
+let draftPose='idle',draftDeath=null;
 let searchQuery='',searchResults=null,expandedTombstone=new Set(),profileReturnView='amigos';
 let feedPreviousShown=10,expandedCemetery=new Set(),homeCemFilter='all';
 let pendingSignup={username:"",email:"",pass:"",color:DOLL_COLORS[0]};
@@ -797,6 +798,25 @@ function getPose(name,w,h){
     aL:`M${cx-bHW} ${aY} Q${w*.03} ${aY} ${w*.02} ${hcy+hr*.65}`,
     aR:`M${cx+bHW} ${aY} Q${w*.97} ${aY} ${w*.98} ${hcy+hr*.65}`,
   };
+  if(name==='running') return{...D,
+    aL:`M${cx-bHW} ${aY} Q${w*.08} ${aY-22} ${w*.12} ${hcy-hr*.4}`,
+    aR:`M${cx+bHW} ${aY} Q${w*.90} ${aY+18} ${w*.86} ${aY+38}`,
+    lL:`M${cx-lW} ${bB} Q${cx-lW-10} ${h*.88} ${cx-lW-14} ${h*.98}`,
+    lR:`M${cx+lW} ${bB} Q${cx+lW+18} ${h*.68} ${cx+lW+14} ${h*.55}`,
+  };
+  if(name==='exploded') return{...D,
+    hcyOff:Math.round(h*-.06),
+    aL:`M${cx-bHW} ${aY} Q${w*.04} ${aY-18} ${w*.01} ${aY-10}`,
+    aR:`M${cx+bHW} ${aY} Q${w*.96} ${aY-18} ${w*.99} ${aY-10}`,
+    lL:`M${cx-lW} ${bB} Q${cx-lW-18} ${h*.88} ${cx-lW-22} ${h*.98}`,
+    lR:`M${cx+lW} ${bB} Q${cx+lW+18} ${h*.88} ${cx+lW+22} ${h*.98}`,
+  };
+  if(name==='egyptian') return{...D,
+    aL:`M${cx-bHW} ${aY} Q${w*.04} ${aY+2} ${w*.00} ${aY}`,
+    aR:`M${cx+bHW} ${aY} Q${w*.86} ${aY+28} ${w*.82} ${aY+48}`,
+    lL:`M${cx-lW} ${bB} Q${cx-lW+6} ${h*.88} ${cx-lW+9} ${h*.97}`,
+    lR:`M${cx+lW} ${bB} Q${cx+lW-4} ${h*.88} ${cx+lW-6} ${h*.97}`,
+  };
   return D;
 }
 // dummy shim so old code that reads pose.body doesn't crash
@@ -810,7 +830,7 @@ function _dollCore(color,dead,poseName,w,h,sw,extraFx,preFx){
   const dark=color==="#C0B898"||color==="#D0C8B8"||color==="#E8E8E8";
   const ec=dark?"#2A1E38":"#080808";
   const ec2=dark?"rgba(0,0,0,.5)":"rgba(255,255,255,.6)";
-  const hr=Math.round(h*.30),hcy=Math.round(h*.35),cx=w/2;
+  const hr=Math.round(h*.30),hcy=Math.round(h*.35)+(pose.hcyOff||0),cx=w/2;
   // Eyes — wider apart, bigger radius
   const lx=cx-hr*.28,rx=cx+hr*.28,ey=hcy-hr*.21;
   const er=Math.max(5,hr*.115);
@@ -1205,6 +1225,7 @@ async function submitPost(pd){
     doll_color:profile.doll_color,
     post_date:t,is_primary:true,previous_post_id:prevId,
     visibility:window._postVisibility||'friends',
+    pose:draftPose||'idle',
   };
   let {data,error}=await sb.from('posts').insert(postPayload).select().single();
   if(error&&error.message&&error.message.includes('visibility')){
@@ -1321,7 +1342,7 @@ async function _buildShareBlob(p,format){
   ctx.beginPath();ctx.moveTo(180,160);ctx.lineTo(W-180,160);ctx.stroke();
   try{
     const svgW=220,svgH=280,scale=DOLL_PX/svgW;
-    const svgStr=dollPureSVG(p.doll_color,p.castigo,p.dibujo_trazos,true,d?.pose||'idle',svgW,svgH);
+    const svgStr=dollPureSVG(p.doll_color,p.castigo,p.dibujo_trazos,true,p?.pose||d?.pose||'idle',svgW,svgH);
     const svgBlob=new Blob([svgStr],{type:'image/svg+xml;charset=utf-8'});
     const svgUrl=URL.createObjectURL(svgBlob);
     await new Promise(res=>{
@@ -1415,7 +1436,7 @@ function showDollModal(item){
   el.id='doll-modal';
   el.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.82);cursor:zoom-out;';
   el.innerHTML=`<div style="text-align:center;padding:24px;">
-    ${dollWithDraw(item.doll_color,item.castigo,item.dibujo_trazos,true,d?.pose||'idle',180)}
+    ${dollWithDraw(item.doll_color,item.castigo,item.dibujo_trazos,true,p?.pose||d?.pose||'idle',180)}
     <div style="margin-top:12px;color:var(--warm);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.5px;">${lbl}</div>
     <div style="color:var(--muted2);font-size:12px;margin-top:4px;">@${esc(item.username)}</div>
   </div>`;
@@ -1903,7 +1924,7 @@ function renderProfile(){
     const isOpen=expandedPrev.has('prof_'+primary.id);
     return `<div style="padding:clamp(10px,2.5vw,14px) 0;border-bottom:1px solid var(--border);">
       <div style="display:flex;gap:12px;align-items:flex-start;">
-        <div style="flex-shrink:0;">${dollWithDraw(primary.doll_color||prof.doll_color,primary.castigo,primary.dibujo_trazos,true,d?.pose||'idle',clamp(44,54))}</div>
+        <div style="flex-shrink:0;">${dollWithDraw(primary.doll_color||prof.doll_color,primary.castigo,primary.dibujo_trazos,true,p?.pose||d?.pose||'idle',clamp(44,54))}</div>
         <div style="flex:1;min-width:0;">
           <div style="font-size:clamp(10px,2.5vw,11px);color:var(--warm);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">${lbl} <span style="color:var(--muted2);font-weight:400;text-transform:none;">· ${dateStr}</span></div>
           <p style="font-size:clamp(13px,3.5vw,14px);color:var(--text2);font-style:italic;line-height:1.6;margin:4px 0 6px;">"${esc(primary.razon)}"</p>
@@ -2008,7 +2029,7 @@ function prevPostHTML(p,size,idx=0){
   return `<div style="opacity:.65;margin:6px 0 2px;padding:10px 0 10px 12px;border-left:2px solid var(--border2);">
     <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:8px;">${label}</div>
     <div style="display:flex;gap:12px;align-items:flex-start;">
-      <div style="flex-shrink:0;">${dollWithDraw(p.doll_color||profile?.doll_color,p.castigo,p.dibujo_trazos,true,d?.pose||'idle',clamp(44,54))}</div>
+      <div style="flex-shrink:0;">${dollWithDraw(p.doll_color||profile?.doll_color,p.castigo,p.dibujo_trazos,true,p?.pose||d?.pose||'idle',clamp(44,54))}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">${lbl} <span style="opacity:.5;font-weight:400;text-transform:none;">· ${timeStr}</span></div>
         <div style="font-size:clamp(13px,3.5vw,14px);color:var(--text2);font-style:italic;line-height:1.5;">"${esc(p.razon)}"</div>
@@ -2035,7 +2056,7 @@ function cemRowHTML(p,showTime=false,showDelete=false,highlightVis=false){
     ?`<span style="display:inline-flex;align-items:center;gap:4px;font-size:clamp(9px,2.3vw,10px);padding:2px 7px;border-radius:10px;border:1px solid ${vc};color:${tc};${highlightVis?'font-weight:600;':''}">${vl.ico} ${vl.txt}</span>`
     :'';
   return `<div class="cemetery-row" data-cemid="${p.id}">
-    <div style="flex-shrink:0;">${dollWithDraw(p.doll_color||profile.doll_color,p.castigo,p.dibujo_trazos,true,d?.pose||'idle',clamp(44,54))}</div>
+    <div style="flex-shrink:0;">${dollWithDraw(p.doll_color||profile.doll_color,p.castigo,p.dibujo_trazos,true,p?.pose||d?.pose||'idle',clamp(44,54))}</div>
     <div style="flex:1;min-width:0;">
       <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">${lbl} <span style="opacity:.5;font-weight:400;text-transform:none;">· ${dateStr}</span></div>
       <div style="font-size:clamp(13px,3.5vw,14px);color:var(--text2);font-style:italic;line-height:1.5;">"${esc(p.razon)}"</div>
@@ -2086,7 +2107,7 @@ function renderHome(){
           ${hvl?`<span style="display:inline-flex;align-items:center;gap:3px;font-size:clamp(9px,2.3vw,10px);padding:2px 8px;border-radius:10px;border:1px solid ${hvc};color:${hvc};font-weight:600;">${hvl.ico} ${hvl.txt}</span>`:''}
         </div>
         <div style="display:flex;justify-content:center;margin:0 0 10px;">
-          ${dollWithDraw(hero.doll_color,hero.castigo,hero.dibujo_trazos,true,hd?.pose||'idle',clamp(140,170))}
+          ${dollWithDraw(hero.doll_color,hero.castigo,hero.dibujo_trazos,true,hp?.pose||d?.pose||'idle',clamp(140,170))}
         </div>
         <div style="font-size:clamp(13px,3.5vw,15px);color:var(--text2);font-style:italic;margin:0 clamp(12px,4vw,24px) 10px;line-height:1.6;">"${esc(hero.razon)}"</div>
         ${hero.visibility!=='private'?`<div style="font-size:clamp(11px,2.8vw,12px);color:var(--muted2);margin-bottom:10px;">${ICO.candle} ${hero.dep_count||0} DEPs</div>`:''}
@@ -2114,25 +2135,58 @@ function renderHome(){
 
 function clamp(a,b){return Math.min(b,Math.max(a,Math.round(window.innerWidth/480*b)));}
 
+const POSES=[
+  {id:'idle',     es:'Normal',      en:'Normal'},
+  {id:'scared',   es:'Asustado',    en:'Scared'},
+  {id:'cowering', es:'Encogido',    en:'Cowering'},
+  {id:'begging',  es:'Suplicando',  en:'Begging'},
+  {id:'dramatic', es:'Dramático',   en:'Dramatic'},
+  {id:'squish',   es:'Aplastado',   en:'Squished'},
+  {id:'ghost',    es:'Fantasmal',   en:'Ghostly'},
+  {id:'running',  es:'Corriendo',   en:'Running'},
+  {id:'exploded', es:'Destrozado',  en:'Exploded'},
+  {id:'egyptian', es:'Egipcio',     en:'Egyptian'},
+];
 function renderMuerte(){
   const streak=profile?.streak||0;
+  const previewDeath=draftDeath;
+  const previewPose=draftPose||'idle';
+  const previewDead=!!previewDeath;
+  // Live preview doll
+  const preview=`<div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:16px;">
+    <div>${dollSVG(profile.doll_color,previewDeath,previewDead,previewPose,clamp(100,130))}</div>
+    ${previewDeath?`<div style="font-size:clamp(10px,2.5vw,11px);color:var(--warm);font-weight:700;text-transform:uppercase;letter-spacing:.5px;">${dl(previewDeath)}</div>`:''}
+  </div>`;
+  // Pose picker
+  const posePicker=`<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;-webkit-overflow-scrolling:touch;">
+    ${POSES.map(p=>{
+      const on=previewPose===p.id;
+      return `<button class="pose-pick-btn" data-pose="${p.id}" style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 8px;border-radius:8px;border:1px solid ${on?'var(--warm)':'var(--border2)'};background:${on?'rgba(176,120,48,.1)':'transparent'};cursor:pointer;min-width:52px;">
+        <div>${dollSVG(profile.doll_color,null,false,p.id,clamp(36,44))}</div>
+        <span style="font-size:clamp(8px,2vw,9px);color:${on?'var(--warm)':'var(--muted2)'};font-weight:${on?'700':'400'};white-space:nowrap;">${lang==='en'?p.en:p.es}</span>
+      </button>`;
+    }).join('')}
+  </div>`;
   const cells=DEATHS.map(d=>{
     const ok=streak>=d.min&&totalDeps>=d.deps;
-    if(ok) return `<div class="dcell on" data-death="${d.id}">
-      <div style="display:flex;align-items:center;justify-content:center;">${dollSVG(profile.doll_color,d.id,true,d.pose,clamp(52,68))}</div>
+    const on=draftDeath===d.id;
+    if(ok) return `<div class="dcell on${on?' dcell-selected':''}" data-death="${d.id}" style="${on?'border-color:var(--warm);background:rgba(176,120,48,.08);':''}" >
+      <div style="display:flex;align-items:center;justify-content:center;">${dollSVG(profile.doll_color,d.id,true,previewPose,clamp(52,68))}</div>
       <span class="dlabel">${dl(d.id)}</span>
     </div>`;
     const req=d.min>0&&streak<d.min?`${icoStat(ICO.flame,10)} ${d.min}d`:`${icoStat(ICO.candle,10)} ${d.deps}`;
     return `<div class="dcell off">
-      <div style="display:flex;align-items:center;justify-content:center;">${dollSVG(profile.doll_color,d.id,true,d.pose,clamp(52,68))}</div>
+      <div style="display:flex;align-items:center;justify-content:center;">${dollSVG(profile.doll_color,d.id,true,previewPose,clamp(52,68))}</div>
       <span class="dlabel">${dl(d.id)}</span>
       <span class="dreq">${req}</span>
     </div>`;
   }).join('');
+  const confirmBtn=draftDeath?`<div style="display:flex;justify-content:center;margin-top:14px;"><button class="btn btn-red" id="btnConfirmDeath">${lang==='en'?'Confirm punishment →':'Confirmar castigo →'}</button></div>`:'';
   return `<div class="screen">
     ${hdr(t('muerte_title'),t('muerte_sub'))}
     <button class="btn-link" id="volverMuerte" style="margin-top:-8px;margin-bottom:6px;">${t('btn_back_muerte')}</button>
-    <div style="display:flex;justify-content:center;margin-bottom:12px;">${dollSVG(profile.doll_color,null,false,'scared',clamp(70,90))}</div>
+    ${preview}
+    ${posePicker}
     <div class="grid2">
       ${cells}
       <div class="draw-cell" id="drawCard">
@@ -2140,6 +2194,7 @@ function renderMuerte(){
         <div><div class="dlabel">${t('draw_label')}</div><div class="dsub">${t('draw_sub')}</div></div>
       </div>
     </div>
+    ${confirmBtn}
   </div>`;
 }
 
@@ -2182,7 +2237,7 @@ function renderPosted(){
   return `<div class="screen" style="text-align:center;">
     <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:16px;">${t('posted_label')}</div>
     <div style="display:flex;justify-content:center;margin:0 0 clamp(20px,5vw,28px);">
-      ${dollWithDraw(p.doll_color,p.castigo,p.dibujo_trazos,true,d?.pose||'idle',clamp(140,170))}
+      ${dollWithDraw(p.doll_color,p.castigo,p.dibujo_trazos,true,p?.pose||d?.pose||'idle',clamp(140,170))}
     </div>
     <div class="done-card">
       <div class="done-razon">"${esc(p.razon)}"</div>
@@ -2335,7 +2390,7 @@ function feedCardHTML(item,older=false){
   return `<div class="feed-card${older?' older-card':''}">
     <div style="display:flex;gap:12px;align-items:flex-start;">
       <button class="doll-expand-btn" data-pid="${item.id}" style="background:none;border:none;padding:0;cursor:zoom-in;flex-shrink:0;line-height:0;">
-        ${dollWithDraw(item.doll_color,item.castigo,item.dibujo_trazos,true,d?.pose||'idle',dollPx)}
+        ${dollWithDraw(item.doll_color,item.castigo,item.dibujo_trazos,true,p?.pose||d?.pose||'idle',dollPx)}
       </button>
       <div style="flex:1;min-width:0;">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
@@ -2443,7 +2498,7 @@ function tombstoneCardHTML(item){
         ${ICO.tombstone} <span>${isOpen?t('feed_tomb_hide'):lbl}</span>
       </button>
     </div>
-    ${isOpen?`<div style="margin-top:10px;padding:12px;background:var(--bg2);border-radius:8px;animation:fadeUp .18s ease;text-align:center;">${dollWithDraw(item.doll_color,item.castigo,item.dibujo_trazos,true,d?.pose||'idle',clamp(80,100))}</div>`:''}
+    ${isOpen?`<div style="margin-top:10px;padding:12px;background:var(--bg2);border-radius:8px;animation:fadeUp .18s ease;text-align:center;">${dollWithDraw(item.doll_color,item.castigo,item.dibujo_trazos,true,p?.pose||d?.pose||'idle',clamp(80,100))}</div>`:''}
   </div>`;
 }
 
@@ -2578,13 +2633,19 @@ function attachListeners(){
   if(view==='razon'){
     const ta=ge('razonInput'),btn=ge('btnElegirCastigo'),cnt=ge('razonInputCount');
     if(ta){ta.oninput=()=>{draftRazon=ta.value;cnt.textContent=`${draftRazon.length}/280`;btn.disabled=draftRazon.trim().length<2;};}
-    if(btn)btn.onclick=()=>{view='muerte';paint();};
+    if(btn)btn.onclick=()=>{draftDeath=null;view='muerte';paint();};
     if(ge('volverRazon'))ge('volverRazon').onclick=()=>{view='home';paint();};
   }
   if(view==='muerte'){
-    document.querySelectorAll('.dcell.on').forEach(c=>{c.onclick=()=>promptConfirmDeath(c.getAttribute('data-death'));});
+    document.querySelectorAll('.pose-pick-btn').forEach(btn=>{
+      btn.onclick=()=>{draftPose=btn.getAttribute('data-pose');paint();};
+    });
+    document.querySelectorAll('.dcell.on').forEach(c=>{
+      c.onclick=()=>{draftDeath=c.getAttribute('data-death');paint();};
+    });
+    if(ge('btnConfirmDeath'))ge('btnConfirmDeath').onclick=()=>promptConfirmDeath(draftDeath);
     if(ge('drawCard'))ge('drawCard').onclick=()=>{view='dibujo';paint();};
-    if(ge('volverMuerte'))ge('volverMuerte').onclick=()=>{view='razon';paint();};
+    if(ge('volverMuerte'))ge('volverMuerte').onclick=()=>{draftDeath=null;view='razon';paint();};
   }
   if(view==='dibujo'){
     ge('razonDibujo').oninput=e=>{draftRazon=e.target.value;ge('razonCount').textContent=`${draftRazon.length}/280`;checkDraw();};
@@ -2923,7 +2984,7 @@ function promptConfirmDeath(death){
     return `<div class="screen" style="text-align:center;">
     <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:12px;">${t('confirm_title')}</div>
     <div style="display:flex;justify-content:center;margin:0 0 clamp(16px,4vw,24px);">
-      ${dollSVG(profile.doll_color,death,true,d?.pose||'idle',clamp(130,160))}
+      ${dollSVG(profile.doll_color,death,true,draftPose||p?.pose||d?.pose||'idle',clamp(130,160))}
     </div>
     <div class="done-card" style="margin-bottom:20px;text-align:left;">
       <div class="done-razon" style="text-align:center;">"${esc(draftRazon)}"</div>

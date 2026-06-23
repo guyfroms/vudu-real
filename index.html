@@ -45,6 +45,11 @@ button,a,input,label,select,textarea{touch-action:manipulation;}
 .logro-t4{color:#89CFF0;animation:diamondShimmer 2.5s ease-in-out infinite;}
 .logro-t5{color:#C0392B;animation:garnetPulse 2s ease-in-out infinite;}
 .logro-special{color:#FFD700;animation:iridShift 2.5s ease-in-out infinite;}
+.logro-badge{position:relative;cursor:default;}
+.logro-badge::after{content:attr(data-desc);position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--border2);color:var(--text2);font-size:clamp(10px,2.5vw,11px);padding:6px 9px;border-radius:7px;white-space:normal;width:max-content;max-width:180px;text-align:center;pointer-events:none;opacity:0;transition:opacity .15s;z-index:200;line-height:1.4;box-shadow:0 3px 10px rgba(0,0,0,.4);}
+.logro-badge::before{content:'';position:absolute;bottom:calc(100% + 1px);left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--border2);pointer-events:none;opacity:0;transition:opacity .15s;z-index:201;}
+@media(hover:hover){.logro-badge:hover::after,.logro-badge:hover::before{opacity:1;}}
+.logro-badge.tip-open::after,.logro-badge.tip-open::before{opacity:1;}
 @keyframes flicker{0%,100%{opacity:.9;transform:scaleY(1)}45%{opacity:1;transform:scaleY(1.1) scaleX(.95)}70%{opacity:.85;transform:scaleY(.95)}}
 @keyframes shockPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.5) saturate(1.3)}}
 @keyframes glow{0%,100%{opacity:.18}50%{opacity:.32}}
@@ -1864,7 +1869,7 @@ function renderProfile(){
       <div class="profile-stat"><div class="profile-stat-num" style="color:#5A8FD4">${td}</div><div class="profile-stat-lbl">${ICO.candle} ${t('profile_deps')}</div></div>
       <div class="profile-stat"><div class="profile-stat-num">${postCount}</div><div class="profile-stat-lbl">${t('profile_ruinas_lbl')}</div></div>
     </div>
-${(()=>{const profState={totalDeps:td,streak:prof.streak||0,postCount:posts.length,posts,birthDate:prof.birth_date||null,drawCount:posts.filter(p=>p.castigo==='dibujo').length};const toShow=isSelf?pinnedLogros.map(aid=>ACHIEVEMENTS.find(x=>x.id===aid)).filter(a=>a&&a.check(profState)):ACHIEVEMENTS.filter(a=>!a.secret&&a.check(profState));if(!toShow.length)return'';return`<div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:clamp(14px,3.5vw,18px);">${toShow.map(a=>`<div class="${logroClass(a)}" title="${lang==='en'?a.title_en:a.title_es}" style="display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:clamp(10px,2.5vw,11px);">${a.icon} <span style="color:var(--text2);">${lang==='en'?a.title_en:a.title_es}</span></div>`).join('')}</div>`;})()}
+${(()=>{const profState={totalDeps:td,streak:prof.streak||0,postCount:posts.length,posts,birthDate:prof.birth_date||null,drawCount:posts.filter(p=>p.castigo==='dibujo').length};const toShow=isSelf?pinnedLogros.map(aid=>ACHIEVEMENTS.find(x=>x.id===aid)).filter(a=>a&&a.check(profState)):ACHIEVEMENTS.filter(a=>!a.secret&&a.check(profState));if(!toShow.length)return'';return`<div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:clamp(14px,3.5vw,18px);">${toShow.map(a=>`<div class="logro-badge ${logroClass(a)}" data-desc="${esc(lang==='en'?a.desc_en:a.desc_es)}" style="display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:clamp(10px,2.5vw,11px);">${a.icon} <span style="color:var(--text2);">${lang==='en'?a.title_en:a.title_es}</span></div>`).join('')}</div>`;})()}
     <div style="height:1px;background:var(--border);margin-bottom:clamp(16px,4vw,20px);"></div>
     <div class="profile-posts-hdr">${t('profile_ruinas_last')}</div>
     <div class="feed-list">${cards||`<p style="text-align:center;color:var(--muted2);">${t('profile_no_ruinas')}</p>`}</div>
@@ -2688,6 +2693,19 @@ function attachListeners(){
       };
     });
   }
+  // Logro badges: tap to toggle tooltip on touch devices
+  document.querySelectorAll('.logro-badge').forEach(b=>{
+    b.addEventListener('touchend',e=>{
+      e.preventDefault();
+      const open=b.classList.contains('tip-open');
+      document.querySelectorAll('.logro-badge.tip-open').forEach(x=>x.classList.remove('tip-open'));
+      if(!open)b.classList.add('tip-open');
+    },{passive:false});
+  });
+  document.addEventListener('touchstart',e=>{
+    if(!e.target.closest('.logro-badge'))document.querySelectorAll('.logro-badge.tip-open').forEach(x=>x.classList.remove('tip-open'));
+  },{passive:true});
+
   if(view==='profile'){
     const afb=ge('profileAcceptFriend');
     if(afb)afb.onclick=async()=>{

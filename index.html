@@ -2495,6 +2495,10 @@ function attachListeners(){
       btn.disabled=true;btn.textContent='...';
       try{
         const {error}=await sb.from('profiles').update({birth_date:val}).eq('id',user.id);
+        if(error&&error.message&&error.message.includes('birth_date')){
+          // Column doesn't exist yet — save locally only
+          profile.birth_date=val;paint();return;
+        }
         if(error)throw error;
         profile.birth_date=val;
         paint();

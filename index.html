@@ -435,7 +435,7 @@ const LINE_WIDTHS=[2,4,8];
 let lang=localStorage.getItem('kill_lang')||(navigator.language.startsWith('es')?'es':'en');
 const STRINGS={
   es:{
-    nav_hoy:'Hoy',nav_feed:'Funeral',nav_senales:'Actividad',nav_muertes:'Colección',
+    nav_hoy:'Hoy',nav_feed:'Cementerio público',nav_senales:'Actividad',nav_muertes:'Colección',
     login_tab:'Entrar',register_tab:'Registrarse',
     auth_tagline:'"pues me mato."',auth_sub:'Hay desgracias que acaban contigo.',
     auth_beat1:'Cuenta tu ruina del día',auth_beat2:'Elige cómo muere tu muñeco',auth_beat3:'Recibe DEPs de tus amigos',
@@ -465,7 +465,7 @@ const STRINGS={
     posted_label:'Publicado',
     dibujo_title:'Modo libre',dibujo_sub:'Escribe qué pasó y dibuja qué le haces',
     ph_razon_draw:'¿qué te ha pasado hoy?',ph_desc_draw:'¿qué le has hecho?',btn_clear:'limpiar',btn_back_draw:'← volver a los castigos',
-    feed_sub:'Los funerales de hoy',feed_empty:'Nadie ha publicado hoy',feed_empty_sub:'sé el primero',feed_older:'Días anteriores',
+    feed_sub:'Las desgracias de hoy',feed_empty:'Nadie ha publicado hoy',feed_empty_sub:'sé el primero',feed_older:'Días anteriores',
     btn_follow:' seguir',btn_following:' siguiendo',prev_label:'Lo de antes',
     senales_title:'Actividad',sig_dep:'te ha mandado un DEP',sig_follow:'ha empezado a seguirte',
     senales_empty_post:'No hay señales nuevas desde tu última visita',senales_empty_no_post:'Publica tu ruina de hoy para recibir señales',
@@ -493,7 +493,7 @@ const STRINGS={
     dep_velado_1:'1 persona ha velado tu ruina',dep_velado_n:'$n personas han velado tu ruina',
     btn_delete:'Borrar desgracia',confirm_delete:'¿Seguro? Perderás los DEPs de hoy y no contará para la racha.',
     vis_label:'Visibilidad',vis_public:'Público — aparece en el funeral global',vis_friends:'Amigos — solo tus seguidores',vis_private:'Privado — solo tú',
-    cemetery_title:'Cementerio',cemetery_sub:'$n desgracias enterradas',cemetery_empty:'Aún no tienes ninguna desgracia enterrada.',cemetery_loading:'Cargando...',btn_cemetery:'Ver cementerio',
+    cemetery_title:'Mi cementerio',cemetery_sub:'$n desgracias enterradas',cemetery_empty:'Aún no tienes ninguna desgracia enterrada.',cemetery_loading:'Cargando...',btn_cemetery:'Ver mi cementerio',
     following_tab:'Siguiendo',followers_tab:'Seguidores',no_followers:'Todavía nadie te sigue.',
     logros_title:'Logros',castigos_tab:'Castigos',logros_tab:'Logros',
     lbl_birthday:'Fecha de nacimiento',btn_save_birthday:'Guardar',
@@ -503,7 +503,7 @@ const STRINGS={
     btn_load_more:'Ver más →',btn_worse_short:'Ha ido a peor',btn_share_short:'Compartir',
   },
   en:{
-    nav_hoy:'Today',nav_feed:'Funeral',nav_senales:'Activity',nav_muertes:'Collection',
+    nav_hoy:'Today',nav_feed:'Public cemetery',nav_senales:'Activity',nav_muertes:'Collection',
     login_tab:'Log in',register_tab:'Sign up',
     auth_tagline:'"ugh, kill me."',auth_sub:'Some days just wreck you.',
     auth_beat1:'Share your daily disaster',auth_beat2:'Choose how your figure dies',auth_beat3:'Get DEPs from your friends',
@@ -533,7 +533,7 @@ const STRINGS={
     posted_label:'Published',
     dibujo_title:'Free mode',dibujo_sub:'Write what happened and draw what you do',
     ph_razon_draw:'what happened today?',ph_desc_draw:'what did you do to it?',btn_clear:'clear',btn_back_draw:'← back to punishments',
-    feed_sub:"Today's funerals",feed_empty:'Nobody has posted today',feed_empty_sub:'be the first',feed_older:'Previous days',
+    feed_sub:"Today's ruinas",feed_empty:'Nobody has posted today',feed_empty_sub:'be the first',feed_older:'Previous days',
     btn_follow:' follow',btn_following:' following',prev_label:'Before that',
     senales_title:'Activity',sig_dep:'sent you a DEP',sig_follow:'started following you',
     senales_empty_post:'No new signals since your last visit',senales_empty_no_post:"Post your ruina today to receive signals",
@@ -561,7 +561,7 @@ const STRINGS={
     dep_velado_1:'1 person mourned your ruina',dep_velado_n:'$n people mourned your ruina',
     btn_delete:'Delete ruina',confirm_delete:"Are you sure? You'll lose today's DEPs and streak.",
     vis_label:'Visibility',vis_public:'Public — appears in the global funeral',vis_friends:'Friends — only your followers',vis_private:'Private — only you',
-    cemetery_title:'Cemetery',cemetery_sub:'$n ruinas buried',cemetery_empty:"You don't have any buried ruinas yet.",cemetery_loading:'Loading...',btn_cemetery:'View cemetery',
+    cemetery_title:'My cemetery',cemetery_sub:'$n ruinas buried',cemetery_empty:"You don't have any buried ruinas yet.",cemetery_loading:'Loading...',btn_cemetery:'My cemetery',
     following_tab:'Following',followers_tab:'Followers',no_followers:"Nobody is following you yet.",
     logros_title:'Achievements',castigos_tab:'Punishments',logros_tab:'Achievements',
     lbl_birthday:'Date of birth',btn_save_birthday:'Save',
@@ -1966,7 +1966,7 @@ function renderHome(){
       </div>
       <div style="height:1px;background:var(--border);margin:clamp(20px,5vw,26px) 0;"></div>
       <div style="text-align:center;">
-        <div style="font-size:clamp(10px,2.5vw,11px);text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:6px;">🪦 ${t('cemetery_title')}</div>
+        <div style="font-size:clamp(10px,2.5vw,11px);text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:6px;">🪦 ${lang==='en'?'My cemetery':'Mi cementerio'}</div>
         <div style="font-size:clamp(12px,3vw,13px);color:var(--muted2);margin-bottom:12px;" id="cemeteryCount">${t('cemetery_loading')}</div>
         <button class="btn-link" id="btnCemetery">${t('btn_cemetery')}</button>
       </div>
@@ -1981,7 +1981,7 @@ function renderHome(){
     <button class="btn-link" id="btnInstrHome" style="margin-top:10px;">${t('btn_whats_this')}</button>
     <div style="height:1px;background:var(--border);margin:clamp(16px,4vw,20px) 0;"></div>
     <div style="text-align:center;">
-      <div style="font-size:clamp(10px,2.5vw,11px);text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:6px;">🪦 ${t('cemetery_title')}</div>
+      <div style="font-size:clamp(10px,2.5vw,11px);text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:6px;">🪦 ${lang==='en'?'My cemetery':'Mi cementerio'}</div>
       <div style="font-size:clamp(12px,3vw,13px);color:var(--muted2);margin-bottom:12px;" id="cemeteryCount">${t('cemetery_loading')}</div>
       <button class="btn-link" id="btnCemetery">${t('btn_cemetery')}</button>
     </div>
@@ -2258,8 +2258,9 @@ function renderCemetery(){
   }
   const filters=[['all',lang==='en'?'All':'Todas'],['public',lang==='en'?'Public':'Público'],['friends',lang==='en'?'Friends':'Amigos'],['private',lang==='en'?'Private':'Privado']];
   const filterBar=`<div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;">${filters.map(([val,lbl])=>`<button class="cem-filter ${cemeteryVisFilter===val?'on':''}" data-vf="${val}" style="padding:5px 11px;font-size:clamp(10px,2.5vw,11px);border-radius:20px;border:1px solid ${cemeteryVisFilter===val?'var(--warm)':'var(--border2)'};background:${cemeteryVisFilter===val?'rgba(176,120,48,.1)':'transparent'};color:${cemeteryVisFilter===val?'var(--warm)':'var(--muted2)'};cursor:pointer;font-family:inherit;">${lbl}</button>`).join('')}</div>`;
-  const filtered=cemeteryVisFilter==='all'?cemeteryPosts:cemeteryPosts.filter(p=>p.visibility===cemeteryVisFilter);
-  const total=cemeteryPosts.length;
+  const pastPosts=cemeteryPosts.filter(p=>(p.post_date||p.created_at?.slice(0,10))!==todayS());
+  const filtered=cemeteryVisFilter==='all'?pastPosts:pastPosts.filter(p=>p.visibility===cemeteryVisFilter);
+  const total=pastPosts.length;
   const rows=filtered.map(p=>{
     const d=DEATHS.find(x=>x.id===p.castigo);
     const lbl=p.castigo==='dibujo'?esc(p.dibujo_descripcion):dl(p.castigo);

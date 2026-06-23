@@ -2516,7 +2516,7 @@ function attachListeners(){
     if(ge('empezar'))ge('empezar').onclick=()=>{draftRazon='';view='razon';paint();};
     if(ge('btnInstrHome'))ge('btnInstrHome').onclick=()=>showOnboarding();
     if(ge('goFeed'))ge('goFeed').onclick=async()=>{await loadFeed();view='feed';paint();};
-    if(ge('btnPeor'))ge('btnPeor').onclick=()=>{window._peorVis=todayPost?.visibility||'friends';view='peor_vis';paint();};
+    if(ge('btnPeor'))ge('btnPeor').onclick=()=>{draftRazon='';view='razon';paint();};
     if(ge('btnShare'))ge('btnShare').onclick=()=>showShareMenu(todayPost);
     document.querySelectorAll('.home-cem-filter').forEach(b=>{b.onclick=()=>{homeCemFilter=b.getAttribute('data-hcf');paint();};});
     document.querySelectorAll('.cem-delete-btn').forEach(btn=>{ btn.onclick=async(e)=>{
@@ -2865,11 +2865,23 @@ function renderRazon(){
   </div>`;
 }
 
+function _peorWarnText(selVis){
+  if(!todayPost)return'';
+  const vRank={public:0,friends:1,private:2};
+  const curRank=vRank[todayPost.visibility]??0,selRank=vRank[selVis]??0;
+  if(selRank<=curRank)return lang==='en'?'This new ruina will replace the current one as your active ruina for today.':'Esta nueva ruina enterrará la anterior como tu desgracia activa de hoy.';
+  if(selVis==='private')return lang==='en'?'Your active ruina will become visible only to you. The previous one will stop appearing as your active ruina.':'Tu desgracia activa pasará a ser visible solo para ti. La anterior dejará de aparecer como tu ruina activa.';
+  return lang==='en'?'Your active ruina will become visible only to friends. The previous one will stop appearing as your active public ruina.':'Tu desgracia activa pasará a ser visible solo para amigos. La anterior dejará de aparecer como tu ruina activa pública.';
+}
+
 function promptConfirmDeath(death){
   window._postVisibility=window._postVisibility||'friends';
   const d=DEATHS.find(x=>x.id===death);
   const lbl=dl(death);
-  ge('app').innerHTML=`<div class="screen" style="text-align:center;">
+  const isPeor=!!todayPost;
+  function buildHTML(){
+    const warn=isPeor?_peorWarnText(window._postVisibility):'';
+    return `<div class="screen" style="text-align:center;">
     <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:12px;">${t('confirm_title')}</div>
     <div style="display:flex;justify-content:center;margin:0 0 clamp(16px,4vw,24px);">
       ${dollSVG(profile.doll_color,death,true,d?.pose||'idle',clamp(130,160))}
@@ -2887,6 +2899,7 @@ function promptConfirmDeath(death){
               <span style="font-size:clamp(12px,3vw,13px);">${t('vis_'+v)}</span>
             </label>`;}).join('')}
         </div>
+        ${warn?`<div id="peorWarnBox" style="font-size:clamp(11px,2.8vw,12px);color:var(--muted2);background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;margin-top:10px;line-height:1.6;text-align:left;">${warn}</div>`:'<div id="peorWarnBox"></div>'}
       </div>
     </div>
     <div style="display:flex;justify-content:center;">
@@ -2894,18 +2907,24 @@ function promptConfirmDeath(death){
     </div>
     <button class="btn-link" id="volverConfirm">${t('btn_back_castigo')}</button>
   </div>`;
-  document.querySelectorAll('#visSelector label').forEach(lbl=>{
-    lbl.onclick=()=>{
-      window._postVisibility=lbl.querySelector('input').value;
-      document.querySelectorAll('#visSelector label').forEach(l=>{
-        const v=l.querySelector('input').value;
-        const on=v===window._postVisibility;
-        l.style.borderColor=on?'var(--warm)':'var(--border2)';
-        l.style.background=on?'rgba(176,120,48,.06)':'transparent';
-        l.querySelector('span').style.color=on?'var(--text)':'var(--text2)';
-      });
-    };
-  });
+  }
+  ge('app').innerHTML=buildHTML();
+  function attachVis(){
+    document.querySelectorAll('#visSelector label').forEach(lbl=>{
+      lbl.onclick=()=>{
+        window._postVisibility=lbl.querySelector('input').value;
+        document.querySelectorAll('#visSelector label').forEach(l=>{
+          const v=l.querySelector('input').value;
+          const on=v===window._postVisibility;
+          l.style.borderColor=on?'var(--warm)':'var(--border2)';
+          l.style.background=on?'rgba(176,120,48,.06)':'transparent';
+          l.querySelector('span').style.color=on?'var(--text)':'var(--text2)';
+        });
+        if(isPeor){const wb=ge('peorWarnBox');if(wb)wb.innerHTML=_peorWarnText(window._postVisibility);}
+      };
+    });
+  }
+  attachVis();
   ge('btnPublicarFinal').onclick=async()=>{
     const btn=ge('btnPublicarFinal');
     btn.disabled=true;btn.textContent='...';

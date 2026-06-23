@@ -1147,13 +1147,18 @@ async function submitPost(pd){
   const t=todayS(),y=yesterS();
   const prevId=todayPost?.id||null;
   await sb.from('posts').update({is_primary:false}).eq('user_id',user.id).eq('post_date',t);
-  const {data,error}=await sb.from('posts').insert({
+  const postPayload={
     user_id:user.id,username:profile.username,razon:pd.razon,castigo:pd.castigo,
     dibujo_trazos:pd.dibujo?.trazos||null,dibujo_descripcion:pd.dibujo?.descripcion||null,
-    doll_color:profile.doll_color,  // always use current profile color for new posts
+    doll_color:profile.doll_color,
     post_date:t,is_primary:true,previous_post_id:prevId,
     visibility:window._postVisibility||'friends',
-  }).select().single();
+  };
+  let {data,error}=await sb.from('posts').insert(postPayload).select().single();
+  if(error&&error.message&&error.message.includes('visibility')){
+    const {visibility:_v,...payloadNoVis}=postPayload;
+    ({data,error}=await sb.from('posts').insert(payloadNoVis).select().single());
+  }
   if(error){alert('Error: '+error.message);return;}
   if(!profile.last_post_date||profile.last_post_date!==t){
     const newStreak=(profile.last_post_date===y)?(profile.streak||0)+1:1;
@@ -2017,6 +2022,16 @@ function renderDibujo(){
       <button class="clearbtn" id="clearCanvas">${t('btn_clear')}</button>
     </div>
     <div style="margin-top:14px;"><input type="text" id="descDibujo" placeholder="${t('ph_desc_draw')}" maxlength="80"/></div>
+    <div style="margin-top:14px;">
+      <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">${t('vis_label')}</div>
+      <div id="visDrawSelector" style="display:flex;flex-direction:column;gap:6px;">
+        ${['friends','public','private'].map(v=>`
+          <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid ${(window._postVisibility||'friends')===v?'var(--warm)':'var(--border2)'};border-radius:8px;cursor:pointer;background:${(window._postVisibility||'friends')===v?'rgba(176,120,48,.06)':'transparent'};">
+            <input type="radio" name="visDraw" value="${v}" ${(window._postVisibility||'friends')===v?'checked':''} style="display:none;">
+            <span style="font-size:clamp(12px,3vw,13px);color:${(window._postVisibility||'friends')===v?'var(--text)':'var(--text2)'};">${t('vis_'+v)}</span>
+          </label>`).join('')}
+      </div>
+    </div>
     <div style="display:flex;justify-content:center;margin-top:16px;"><button class="btn-warm-sm" id="guardarDibujo" disabled>${t('btn_publish')}</button></div>
     <button class="btn-link" id="volverFormas">${t('btn_back_draw')}</button>
   </div>`;
@@ -2768,6 +2783,17 @@ function setupCanvas(){
   document.querySelectorAll('.swatch').forEach(s=>{s.onclick=()=>{curC=s.getAttribute('data-color');document.querySelectorAll('.swatch').forEach(x=>x.classList.remove('on'));s.classList.add('on');};});
   document.querySelectorAll('.wbtn').forEach(b=>{b.onclick=()=>{curW=parseInt(b.getAttribute('data-width'));document.querySelectorAll('.wbtn').forEach(x=>x.classList.remove('on'));b.classList.add('on');};});
   ge('clearCanvas').onclick=()=>{window.__strokes=[];redraw();checkDraw();};
+  document.querySelectorAll('#visDrawSelector label').forEach(lbl=>{
+    lbl.onclick=()=>{
+      window._postVisibility=lbl.querySelector('input').value;
+      document.querySelectorAll('#visDrawSelector label').forEach(l=>{
+        const v=l.querySelector('input').value,on=v===window._postVisibility;
+        l.style.borderColor=on?'var(--warm)':'var(--border2)';
+        l.style.background=on?'rgba(176,120,48,.06)':'transparent';
+        l.querySelector('span').style.color=on?'var(--text)':'var(--text2)';
+      });
+    };
+  });
   ge('guardarDibujo').onclick=async()=>{
     const r=ge('razonDibujo').value.trim(),d=ge('descDibujo').value.trim();
     const btn=ge('guardarDibujo');btn.disabled=true;btn.textContent='...';

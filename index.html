@@ -37,7 +37,8 @@ button,a,input,label,select,textarea{touch-action:manipulation;}
 @keyframes lightningFlash{0%,80%,100%{opacity:0}88%{opacity:.95}94%{opacity:.3}}
 @keyframes flameDance{0%,100%{transform:scaleX(1) translateY(0)}40%{transform:scaleX(.92) translateY(-3px)}70%{transform:scaleX(1.05) translateY(1px)}}
 @keyframes brasaGlow{0%,100%{opacity:.35}50%{opacity:.92}}
-@keyframes iceGlimmer{0%,100%{transform:translateX(-60px) skewX(-12deg);opacity:0}40%,60%{opacity:1}50%{transform:translateX(260px) skewX(-12deg);opacity:.9}}
+@keyframes iceGlimmer{0%,100%{transform:translateX(-60px) skewX(-12deg);opacity:0}35%,65%{opacity:.55}50%{transform:translateX(260px) skewX(-12deg);opacity:.45}}
+@keyframes iceGlimmer2{0%,100%{transform:translateX(-60px) skewX(-12deg);opacity:0}35%,65%{opacity:.38}50%{transform:translateX(260px) skewX(-12deg);opacity:.30}}
 @keyframes iridShift{0%,100%{filter:drop-shadow(0 0 4px currentColor) hue-rotate(0deg)}50%{filter:drop-shadow(0 0 7px currentColor) hue-rotate(-22deg)}}
 @keyframes garnetPulse{0%,100%{filter:drop-shadow(0 0 2px #9B1B30) brightness(1)}50%{filter:drop-shadow(0 0 5px #C93050) brightness(1.15)}}
 @keyframes diamondShimmer{0%,100%{filter:drop-shadow(0 0 2px #89CFF0) brightness(1)}50%{filter:drop-shadow(0 0 4px #B0E0FF) brightness(1.15) hue-rotate(20deg)}}
@@ -1041,7 +1042,7 @@ function dollSVG(color,death,dead,poseName,px){
     const ibx=-sw, ibright=w+sw, ibw=ibright-ibx; // -22, 242, 264
     const ibtop=Math.round(-h*.18); // ≈ -50, cubre cabeza en todas las poses
     const ibh=h+sw; // 302 — cubre pies incluso en pose exploded
-    const oc=16; // oblique corner cut
+    const oc=30; // oblique corner cut
     const ibbot=ibh;
     fx=`<polygon points="${ibx+oc},${ibtop} ${ibright-oc},${ibtop} ${ibright},${ibtop+oc} ${ibright},${ibbot-oc} ${ibright-oc},${ibbot} ${ibx+oc},${ibbot} ${ibx},${ibbot-oc} ${ibx},${ibtop+oc}" fill="#A8D8F0" opacity=".20"/>`;
     // Facetas diagonales del cristal
@@ -1063,7 +1064,7 @@ function dollSVG(color,death,dead,poseName,px){
       fx+=`<polygon points="${x-hw*.35},${ibtop} ${x+hw*.35},${ibtop} ${x},${bot}" fill="white" opacity=".38"/>`;
       if(bot>h*.38)fx+=`<ellipse cx="${x}" cy="${bot+h*.012}" rx="${w*.013}" ry="${h*.012}" fill="#AADDFF" opacity=".55"/>`;
     });
-    fx+=`<clipPath id="iceClip${w}"><polygon points="${ibx+oc},${ibtop} ${ibright-oc},${ibtop} ${ibright},${ibtop+oc} ${ibright},${ibbot-oc} ${ibright-oc},${ibbot} ${ibx+oc},${ibbot} ${ibx},${ibbot-oc} ${ibx},${ibtop+oc}"/></clipPath><g clip-path="url(#iceClip${w})"><rect x="${ibx}" y="${ibtop}" width="${w*.1}" height="${ibh-ibtop}" fill="white" opacity="0" style="animation:iceGlimmer 4.5s 1.2s ease-in-out infinite"/></g>`;
+    fx+=`<clipPath id="iceClip${w}"><polygon points="${ibx+oc},${ibtop} ${ibright-oc},${ibtop} ${ibright},${ibtop+oc} ${ibright},${ibbot-oc} ${ibright-oc},${ibbot} ${ibx+oc},${ibbot} ${ibx},${ibbot-oc} ${ibx},${ibtop+oc}"/></clipPath><g clip-path="url(#iceClip${w})"><rect x="${ibx}" y="${ibtop}" width="${w*.055}" height="${ibh-ibtop}" fill="white" opacity="0" style="animation:iceGlimmer 3.8s 0.8s ease-in-out infinite"/><rect x="${ibx+w*.065}" y="${ibtop}" width="${w*.03}" height="${ibh-ibtop}" fill="white" opacity="0" style="animation:iceGlimmer2 3.8s 0.8s ease-in-out infinite"/></g>`;
   }
   if(death==="guillotina"){
     // Very dark wood + muted grey blade, structural and clean
@@ -2325,9 +2326,9 @@ function renderDibujo(){
     <div class="charcount" id="razonCount">${draftRazon.length}/280</div>
     ${posePicker}
     <div style="display:flex;justify-content:center;margin-top:10px;">
-      <div style="position:relative;width:220px;height:280px;border-radius:10px;border:1px solid var(--border2);">
-        <div id="drawDollWrap" style="position:absolute;inset:0;overflow:visible;">${dollSVG(profile.doll_color,null,false,curPose,220)}</div>
-        <canvas id="drawCanvas" width="220" height="280" style="position:absolute;inset:0;background:transparent;border:none;border-radius:0;"></canvas>
+      <div style="position:relative;width:264px;height:324px;border-radius:10px;border:1px solid var(--border2);">
+        <div id="drawDollWrap" style="position:absolute;left:22px;top:22px;overflow:visible;">${dollSVG(profile.doll_color,null,false,curPose,220)}</div>
+        <canvas id="drawCanvas" width="220" height="280" style="position:absolute;left:22px;top:22px;background:transparent;border:none;border-radius:0;"></canvas>
       </div>
     </div>
     <div class="swatches">${LINE_COLORS.map((c,i)=>`<button class="swatch ${i===0?'on':''}" data-color="${c}" style="background:${c};"></button>`).join('')}${(()=>{const uc=unlockedExtraColors();const tips=['1 dibujo','5 dibujos','10 dibujos','25 dibujos','50 dibujos'];return LINE_COLORS_EXTRA.map((c,i)=>i<uc?`<button class="swatch" data-color="${c}" style="background:${c};"></button>`:`<button class="swatch swatch-locked" title="${tips[i]}" style="background:${c};opacity:.22;cursor:not-allowed;" disabled></button>`).join('');})()}</div>

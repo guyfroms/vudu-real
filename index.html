@@ -1291,8 +1291,8 @@ async function loadFeed(){
   const byUser={};
   for(const p of todayRaw||[]){if(!byUser[p.user_id])byUser[p.user_id]=p;}
   feedData=Object.values(byUser).sort((a,b)=>{
-    const af=a.user_id===user.id?-1:myFollowing.has(a.user_id)?0:1;
-    const bf=b.user_id===user.id?-1:myFollowing.has(b.user_id)?0:1;
+    const af=a.user_id===user.id?-1:myFriends.has(a.user_id)?0:1;
+    const bf=b.user_id===user.id?-1:myFriends.has(b.user_id)?0:1;
     return af-bf||(new Date(b.created_at)-new Date(a.created_at));
   });
   // Past: group all posts by user+day, pick latest as primary, rest as chain
@@ -1307,7 +1307,7 @@ async function loadFeed(){
     g.primary._prevChain=g.chain;
     return g.primary;
   });
-  feedYesterday=pastGroups.filter(p=>p.post_date===yesterS()).sort((a,b)=>(myFollowing.has(a.user_id)?0:1)-(myFollowing.has(b.user_id)?0:1));
+  feedYesterday=pastGroups.filter(p=>p.post_date===yesterS()).sort((a,b)=>(myFriends.has(a.user_id)?0:1)-(myFriends.has(b.user_id)?0:1));
   feedOlder=pastGroups.filter(p=>p.post_date<yesterS()).sort((a,b)=>b.post_date.localeCompare(a.post_date));
   feedPreviousShown=10;
 }
@@ -1359,7 +1359,7 @@ async function toggleFollow(uid){
     myFollowing.add(uid);
   }
   friendsList=null;
-  feedData.sort((a,b)=>{const af=myFollowing.has(a.user_id)?0:1,bf=myFollowing.has(b.user_id)?0:1;return af-bf||(new Date(b.created_at)-new Date(a.created_at));});
+  feedData.sort((a,b)=>{const af=myFriends.has(a.user_id)?0:1,bf=myFriends.has(b.user_id)?0:1;return af-bf||(new Date(b.created_at)-new Date(a.created_at));});
   paint();
 }
 
@@ -1955,14 +1955,13 @@ async function loadProfileData(uid){
 }
 
 function renderAmigos(){
-  const friendIds=[...myFollowing];
   const pendingSection=pendingFriendReqs.length?`<div style="margin-bottom:clamp(14px,3.5vw,18px);border:1px solid var(--warm);border-radius:10px;overflow:hidden;">
-    <div style="padding:8px 12px;background:rgba(176,120,48,.08);font-size:clamp(10px,2.5vw,11px);color:var(--warm);font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Solicitudes de amistad · ${pendingFriendReqs.length}</div>
+    <div style="padding:8px 12px;background:rgba(176,120,48,.08);font-size:clamp(10px,2.5vw,11px);color:var(--warm);font-weight:700;text-transform:uppercase;letter-spacing:.5px;">${lang==='en'?'Friend requests':'Solicitudes de amistad'} · ${pendingFriendReqs.length}</div>
     ${pendingFriendReqs.map(r=>`<div class="amigo-row fr-row" data-uid="${r.sender_id}" style="border-top:1px solid var(--border);border-radius:0;">
       <div style="flex-shrink:0">${avatarDoll(r.sender?.doll_color||DOLL_COLORS[0],clamp(36,44))}</div>
       <div class="amigo-info" style="flex:1;">
         <div class="amigo-name">@${esc(r.sender?.username||'?')}</div>
-        <div class="amigo-meta" style="font-size:clamp(10px,2.5vw,11px);">quiere ser tu amigo/a</div>
+        <div class="amigo-meta" style="font-size:clamp(10px,2.5vw,11px);">${lang==='en'?'wants to be your friend':'quiere ser tu amigo/a'}</div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0;">
         <button class="fr-accept-inline" data-reqid="${r.id}" data-senderid="${r.sender_id}" style="padding:5px 10px;border-radius:8px;border:none;background:var(--warm);color:#fff;font-size:clamp(11px,2.8vw,12px);cursor:pointer;font-weight:700;">✓</button>
@@ -1970,39 +1969,24 @@ function renderAmigos(){
       </div>
     </div>`).join('')}
   </div>`:'';
-  const tabBar=`<div style="display:flex;border-bottom:1px solid var(--border);margin-bottom:clamp(16px,4vw,20px);">
-    <button id="tabFollowing" style="flex:1;padding:10px;background:none;border:none;border-bottom:2px solid ${amigosTab==='following'?'var(--red)':'transparent'};color:${amigosTab==='following'?'var(--text)':'var(--muted2)'};font-weight:${amigosTab==='following'?700:400};font-size:clamp(12px,3vw,13px);cursor:pointer;">${t('following_tab')} <span style="opacity:.6">${friendIds.length}</span></button>
-    <button id="tabFollowers" style="flex:1;padding:10px;background:none;border:none;border-bottom:2px solid ${amigosTab==='followers'?'var(--red)':'transparent'};color:${amigosTab==='followers'?'var(--text)':'var(--muted2)'};font-weight:${amigosTab==='followers'?700:400};font-size:clamp(12px,3vw,13px);cursor:pointer;">${t('followers_tab')} ${followersList?`<span style="opacity:.6">${followersList.length}</span>`:''}</button>
-  </div>`;
-  const friendBadge='<span style="font-size:clamp(9px,2.2vw,10px);padding:2px 6px;border-radius:8px;background:rgba(176,120,48,.15);color:var(--warm);font-weight:700;margin-left:6px;">Amigo</span>';
 
-  if(amigosTab==='following'){
-    if(!friendIds.length&&!pendingFriendReqs.length) return `<div class="screen">${hdr(t('amigos_title'),'')}${pendingSection}${tabBar}<p style="text-align:center;color:var(--muted2);margin-top:40px;font-size:clamp(13px,3.5vw,14px);">${t('amigos_empty')}<br><span style="font-size:clamp(11px,3vw,12px);opacity:.5;display:block;margin-top:6px;">${t('amigos_find')}</span></p></div>`;
-    if(friendsList===null) return `<div class="screen">${hdr(t('amigos_title'),'')}${pendingSection}${tabBar}<p style="text-align:center;color:var(--muted2);margin-top:40px;">${t('amigos_loading')}</p></div>`;
-    const rows=friendsList.map(f=>`
-      <div class="amigo-row" data-uid="${f.id}">
-        <div style="flex-shrink:0">${avatarDoll(f.doll_color||DOLL_COLORS[0],clamp(40,48))}</div>
-        <div class="amigo-info">
-          <div class="amigo-name">@${esc(f.username)}${myFriends.has(f.id)?friendBadge:''}</div>
-          <div class="amigo-meta">${f.streak||0} ${t('amigos_streak')}${f.created_at?new Date(f.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{month:'short',year:'numeric'}):'—'}</div>
-        </div>
-        <div class="amigo-arrow">›</div>
-      </div>`).join('');
-    return `<div class="screen">${hdr(t('amigos_title'),'')}${pendingSection}${tabBar}<div>${rows}</div></div>`;
-  } else {
-    if(followersList===null) return `<div class="screen">${hdr(t('amigos_title'),'')}${pendingSection}${tabBar}<p style="text-align:center;color:var(--muted2);margin-top:40px;">${t('amigos_loading')}</p></div>`;
-    if(!followersList.length) return `<div class="screen">${hdr(t('amigos_title'),'')}${pendingSection}${tabBar}<p style="text-align:center;color:var(--muted2);margin-top:40px;">${t('no_followers')}</p></div>`;
-    const rows=followersList.map(f=>`
-      <div class="amigo-row" data-uid="${f.id}">
-        <div style="flex-shrink:0">${avatarDoll(f.doll_color||DOLL_COLORS[0],clamp(40,48))}</div>
-        <div class="amigo-info">
-          <div class="amigo-name">@${esc(f.username)}${myFriends.has(f.id)?friendBadge:''}</div>
-          <div class="amigo-meta">${f.streak||0} ${t('amigos_streak')}${f.created_at?new Date(f.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{month:'short',year:'numeric'}):'—'}</div>
-        </div>
-        <div class="amigo-arrow">›</div>
-      </div>`).join('');
-    return `<div class="screen">${hdr(t('amigos_title'),'')}${pendingSection}${tabBar}<div>${rows}</div></div>`;
-  }
+  if(!myFriends.size&&!pendingFriendReqs.length)
+    return `<div class="screen">${hdr(t('amigos_title'),'')}${pendingSection}<p style="text-align:center;color:var(--muted2);margin-top:40px;font-size:clamp(13px,3.5vw,14px);">${t('amigos_empty')}<br><span style="font-size:clamp(11px,3vw,12px);opacity:.5;display:block;margin-top:6px;">${t('amigos_find')}</span></p></div>`;
+
+  if(friendsList===null)
+    return `<div class="screen">${hdr(t('amigos_title'),'')}${pendingSection}<p style="text-align:center;color:var(--muted2);margin-top:40px;">${t('amigos_loading')}</p></div>`;
+
+  const rows=friendsList.map(f=>`
+    <div class="amigo-row" data-uid="${f.id}">
+      <div style="flex-shrink:0;position:relative;">${avatarDoll(f.doll_color||DOLL_COLORS[0],clamp(40,48))}<span class="friend-dot" style="width:10px;height:10px;"></span></div>
+      <div class="amigo-info">
+        <div class="amigo-name">@${esc(f.username)}</div>
+        <div class="amigo-meta">${f.streak||0} ${t('amigos_streak')}${f.created_at?new Date(f.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{month:'short',year:'numeric'}):'—'}</div>
+      </div>
+      <div class="amigo-arrow">›</div>
+    </div>`).join('');
+
+  return `<div class="screen">${hdr(t('amigos_title'),'')}${pendingSection}<div>${rows}</div></div>`;
 }
 
 function renderProfile(){
@@ -2057,14 +2041,13 @@ function renderProfile(){
       ${!isSelf?(()=>{
         const incomingReq=pendingFriendReqs.find(r=>r.sender_id===prof.id);
         return `<div style="display:flex;gap:8px;justify-content:center;margin-top:12px;align-items:stretch;">
-          <button class="follow-btn ${isFollowing?'following':''}" id="profileFollow" data-uid="${prof.id}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;">${isFollowing?ICO.check+' '+t('btn_following'):ICO.plus+' '+t('btn_follow')}</button>
           ${myFriends.has(prof.id)
-            ?`<button class="follow-btn following" id="profileUnfriend" data-uid="${prof.id}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;">${ICO.check} ${lang==='en'?'Amigos':'Amigos'}</button>`
+            ?`<button class="follow-btn following" id="profileUnfriend" data-uid="${prof.id}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;">${ICO.check} ${lang==='en'?'Friends':'Amigos'}</button>`
             :incomingReq
-              ?`<button class="follow-btn" id="profileAcceptFriend" data-reqid="${incomingReq.id}" data-senderid="${incomingReq.sender_id}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:var(--warm);color:#120a02;border-color:var(--warm);">${ICO.check} ${lang==='en'?'Aceptar':'Aceptar'}</button>`
+              ?`<button class="follow-btn" id="profileAcceptFriend" data-reqid="${incomingReq.id}" data-senderid="${incomingReq.sender_id}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:var(--warm);color:#120a02;border-color:var(--warm);">${ICO.check} ${lang==='en'?'Accept':'Aceptar'}</button>`
               :sentFriendReqs.has(prof.id)
-                ?`<button class="follow-btn" id="profileCancelReq" data-uid="${prof.id}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;opacity:.7;">${ICO.people} ${lang==='en'?'Solicitado':'Solicitado'} ✕</button>`
-                :`<button class="follow-btn" id="profileFriendReq" data-uid="${prof.id}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;">${ICO.people} ${lang==='en'?'Añadir':'Añadir'}</button>`}
+                ?`<button class="follow-btn" id="profileCancelReq" data-uid="${prof.id}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;opacity:.7;">${ICO.people} ${lang==='en'?'Requested':'Solicitado'} ✕</button>`
+                :`<button class="follow-btn" id="profileFriendReq" data-uid="${prof.id}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;">${ICO.people} ${lang==='en'?'Add friend':'Añadir amigo'}</button>`}
         </div>`;
       })():''}
     </div>
@@ -2497,7 +2480,8 @@ function renderMuertes(){
 function feedCardHTML(item,older=false){
   const lbl=item.castigo==='dibujo'?esc(item.dibujo_descripcion):dl(item.castigo);
   const given=myDeps.has(item.id),own=item.user_id===user.id;
-  const friend=myFollowing.has(item.user_id);
+  const friend=myFriends.has(item.user_id);
+  const pendingSent=sentFriendReqs.has(item.user_id);
   const d=DEATHS.find(x=>x.id===item.castigo);
   const depCount=item.dep_count||0;
   const _d=new Date(item.created_at);const dateStr=_d.toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'short'})+' · '+_d.toLocaleTimeString(lang==='en'?'en-US':'es-ES',{hour:'2-digit',minute:'2-digit'});
@@ -2510,10 +2494,13 @@ function feedCardHTML(item,older=false){
       <div style="flex:1;min-width:0;">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
           <button class="feed-avatar-btn" data-uid="${item.user_id}" style="background:none;border:none;padding:0;cursor:pointer;display:flex;align-items:center;gap:6px;">
-            ${avatarDoll(item.doll_color,clamp(20,24))}
+            <div style="position:relative;display:inline-block;line-height:0;">
+              ${avatarDoll(item.doll_color,clamp(20,24))}
+              ${friend?'<span class="friend-dot"></span>':''}
+            </div>
             <span style="font-size:clamp(12px,3vw,13px);color:var(--text2);font-weight:600;">@${esc(item.username)}</span>
           </button>
-          ${!own?`<button class="follow-btn ${friend?'following':''}" data-uid="${item.user_id}">${friend?ICO.check+t('btn_following'):ICO.plus+t('btn_follow')}</button>`:''}
+          ${!own&&!friend?(!pendingSent?`<button class="follow-btn feed-add-friend-btn" data-uid="${item.user_id}">${ICO.plus}${lang==='en'?' add':' añadir'}</button>`:`<span style="font-size:clamp(9px,2.2vw,10px);color:var(--muted2);opacity:.6;">${lang==='en'?'sent':'enviado'}</span>`):''}
           <span style="font-size:clamp(10px,2.5vw,11px);color:var(--muted);margin-left:auto;flex-shrink:0;">${dateStr}</span>
         </div>
         <div style="font-size:clamp(10px,2.5vw,11px);color:var(--warm);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">${lbl}</div>
@@ -2743,14 +2730,14 @@ function renderAjustes(){
 
 function renderSearch(){
   const resultRows=(searchResults||[]).map(p=>{
-    const isFollowing=myFollowing.has(p.id),isSelf=p.id===user.id;
+    const isFriend=myFriends.has(p.id),isSelf=p.id===user.id;
     return `<div class="amigo-row search-result" data-uid="${p.id}">
-      <div style="flex-shrink:0;">${avatarDoll(p.doll_color||DOLL_COLORS[0],clamp(40,48))}</div>
+      <div style="flex-shrink:0;position:relative;">${avatarDoll(p.doll_color||DOLL_COLORS[0],clamp(40,48))}${isFriend?'<span class="friend-dot" style="width:10px;height:10px;"></span>':''}</div>
       <div class="amigo-info">
         <div class="amigo-name">@${esc(p.username)}</div>
         <div class="amigo-meta">${p.streak||0} ${t('amigos_streak')}${p.created_at?new Date(p.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{month:'short',year:'numeric'}):'—'}</div>
       </div>
-      ${!isSelf?`<div style="font-size:clamp(11px,2.8vw,12px);color:${isFollowing?'var(--muted2)':'var(--warm)'};">${isFollowing?t('btn_following'):t('btn_follow')}</div>`:''}
+      ${!isSelf&&isFriend?`<span style="font-size:clamp(9px,2.2vw,10px);color:var(--warm);opacity:.8;">${lang==='en'?'friends':'amigos'}</span>`:''}
     </div>`;
   }).join('');
   const bodyHTML=searchResults===null
@@ -2945,7 +2932,7 @@ function attachListeners(){
   }
   if(view==='feed'){
     document.querySelectorAll('.dep-btn').forEach(b=>{b.onclick=async()=>await toggleDep(b.getAttribute('data-pid'));});
-    document.querySelectorAll('.follow-btn').forEach(b=>{b.onclick=async()=>await toggleFollow(b.getAttribute('data-uid'));});
+    document.querySelectorAll('.feed-add-friend-btn').forEach(b=>{b.onclick=async()=>{const uid=b.getAttribute('data-uid');await sendFriendRequest(uid);b.textContent=lang==='en'?'sent':'enviado';b.disabled=true;b.style.opacity='.5';};});
     document.querySelectorAll('.doll-expand-btn').forEach(b=>{b.onclick=(e)=>{
       e.stopPropagation();
       const pid=b.getAttribute('data-pid');
@@ -3068,29 +3055,13 @@ function attachListeners(){
     };
   }
   if(view==='amigos'){
-    if(ge('tabFollowing'))ge('tabFollowing').onclick=()=>{amigosTab='following';paint();};
-    if(ge('tabFollowers'))ge('tabFollowers').onclick=()=>{
-      amigosTab='followers';
-      if(followersList===null){
-        (async()=>{
-          let fids=[];
-          try{const {data:rows}=await sb.from('follows').select('follower_id').eq('following_id',user.id);fids=(rows||[]).map(r=>r.follower_id);}catch(e){}
-          if(!fids.length){followersList=[];paint();return;}
-          let data;try{({data}=await sb.from('profiles').select('*').in('id',fids));}catch(e){data=[];}
-          followersList=data||[];paint();
-        })();
-      }
-      paint();
-    };
-    if(amigosTab==='following'&&!friendsList){
+    if(!friendsList&&myFriends.size){
       (async()=>{
-        const ids=[...myFollowing];
-        if(!ids.length){friendsList=[];paint();return;}
+        const ids=[...myFriends];
         let data;try{({data}=await sb.from('profiles').select('*').in('id',ids));}catch(e){data=[];}
-        friendsList=data||[];
-        paint();
+        friendsList=data||[];paint();
       })();
-    }
+    } else if(!myFriends.size){friendsList=[];}
     document.querySelectorAll('.fr-accept-inline').forEach(btn=>{
       btn.onclick=async(e)=>{e.stopPropagation();await acceptFriendRequest(btn.getAttribute('data-reqid'),btn.getAttribute('data-senderid'));};
     });
@@ -3147,13 +3118,6 @@ function attachListeners(){
   if(view==='profile'){
     if(ge('volverProfile'))ge('volverProfile').onclick=()=>{view=profileReturnView||'amigos';paint();};
     if(ge('btnAddBio'))ge('btnAddBio').onclick=()=>{view='ajustes';paint();};
-    const fb=ge('profileFollow');
-    if(fb)fb.onclick=async()=>{
-      const uid=fb.getAttribute('data-uid');
-      await toggleFollow(uid);
-      viewingProfile=await loadProfileData(uid);
-      paint();
-    };
     const frb=ge('profileFriendReq');
     if(frb)frb.onclick=async()=>{await sendFriendRequest(frb.getAttribute('data-uid'));};
     const crb=ge('profileCancelReq');

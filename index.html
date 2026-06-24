@@ -57,6 +57,8 @@ button,a,input,label,select,textarea{touch-action:manipulation;}
 .logro-badge.logro-t5 .badge-shine{animation:badgeSweep 12s 7s ease-in-out infinite;}
 .logro-badge.logro-special .badge-shine{animation:badgeSweep 10s 1s ease-in-out infinite;}
 #homeWalkInner.home-walking{animation:homeWalkBob 0.42s ease-in-out infinite;}
+@keyframes authWalkBob{0%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-6px) rotate(1deg)}100%{transform:translateY(0) rotate(-1deg)}}
+@keyframes authStoneKick{0%{transform:translateX(-50%) rotate(0deg) translateY(0);opacity:1}100%{transform:translateX(calc(-50% + 340px)) rotate(720deg) translateY(-80px);opacity:0}}
 .logro-badge{position:relative;cursor:default;}
 .logro-badge::after{content:attr(data-desc);position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--border2);color:var(--text2);font-size:clamp(10px,2.5vw,11px);padding:6px 9px;border-radius:7px;white-space:normal;width:max-content;max-width:180px;text-align:center;pointer-events:none;opacity:0;transition:opacity .15s;z-index:200;line-height:1.4;box-shadow:0 3px 10px rgba(0,0,0,.4);}
 .logro-badge::before{content:'';position:absolute;bottom:calc(100% + 1px);left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--border2);pointer-events:none;opacity:0;transition:opacity .15s;z-index:201;}
@@ -1768,7 +1770,7 @@ function renderAuth(){
       </div>`}
     </div>
     <div id="dayCounterMsg" style="text-align:center;font-size:clamp(11px,2.8vw,12px);color:var(--muted2);margin:4px 0 8px;min-height:18px;"></div>
-    <div class="auth-doll-preview"><div id="authWalkOuter" style="display:inline-block;will-change:transform;transform:translateX(-260px);opacity:0;">${homeWalkDollSVG(DOLL_COLORS[0],120)}</div></div>
+    <div class="auth-doll-preview" style="position:relative;"><div id="authStone" style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);pointer-events:none;z-index:1;"><svg viewBox="0 0 32 20" width="28" height="18" xmlns="http://www.w3.org/2000/svg"><ellipse cx="16" cy="13" rx="15" ry="7" fill="#888" opacity="0.55"/><ellipse cx="14" cy="10" rx="10" ry="5.5" fill="#aaa" opacity="0.45"/><ellipse cx="17" cy="9" rx="4" ry="2.5" fill="#ccc" opacity="0.3"/></svg></div><div id="authWalkOuter" style="display:inline-block;will-change:transform;transform:translateX(-260px);opacity:0;position:relative;z-index:2;"><div id="authWalkInner">${authLoginWalkSVG(DOLL_COLORS[0],120)}</div></div></div>
     <div class="auth-card">
       <div class="auth-tabs">
         <button class="auth-tab ${login?'on':''}" id="tLogin">${t('login_tab')}</button>
@@ -1797,7 +1799,42 @@ function renderAuth(){
   ge('tLogin').onclick=()=>{authTab='login';renderAuth();};
   ge('tReg').onclick=()=>{authTab='register';renderAuth();};
   // Walk-in animation for login doll
-  (()=>{const o=ge('authWalkOuter');if(!o)return;requestAnimationFrame(()=>requestAnimationFrame(()=>{o.style.transition='transform 1.4s cubic-bezier(0.25,0.46,0.45,0.94),opacity 0.3s ease';o.style.transform='translateX(0)';o.style.opacity='1';setTimeout(()=>{o.style.transition='';o.style.animation='breathe 3.5s ease-in-out infinite';},1500);}));})();
+  (()=>{
+    const outer=ge('authWalkOuter'),inner=ge('authWalkInner'),stone=ge('authStone');
+    if(!outer||!inner)return;
+    outer.style.transformOrigin='center 94%';
+    let authEyeCleanup=null;
+    function startAuthIdle(){
+      const svgEl=ge('authDollSVG'),eL=ge('authEyeL'),eR=ge('authEyeR'),aL=ge('authArmL'),aR=ge('authArmR');
+      if(!svgEl)return;
+      const cx=110,hr=84,hcy=98,er=hr*0.115;
+      const lx=cx-hr*0.28,rx=cx+hr*0.28,ey=hcy-hr*0.21;
+      const eyeR=er*0.88,maxEye=eyeR*0.25,lEx=36,lEy=226,rEx=184,rEy=226,reachR=78;
+      const vb=svgEl.viewBox.baseVal;
+      const onMove=e=>{
+        const r=svgEl.getBoundingClientRect();if(!r.width)return;
+        const mx=(e.clientX-r.left)*(vb.width/r.width)+vb.x,my=(e.clientY-r.top)*(vb.height/r.height)+vb.y;
+        if(eL&&eR){const dx=Math.max(-maxEye,Math.min(maxEye,(mx-cx)*0.07)),dy=Math.max(-maxEye,Math.min(maxEye,(my-ey)*0.055));eL.setAttribute('cx',lx+dx);eL.setAttribute('cy',ey+dy);eR.setAttribute('cx',rx+dx);eR.setAttribute('cy',ey+dy);}
+        if(aL){const dxL=mx-lEx,dyL=my-lEy,distL=Math.sqrt(dxL*dxL+dyL*dyL);if(distL<reachR){const t=Math.pow(1-distL/reachR,1.3)*0.82;aL.setAttribute('x2',lEx+dxL*t);aL.setAttribute('y2',lEy+dyL*t);}else{aL.setAttribute('x2',lEx);aL.setAttribute('y2',lEy);}}
+        if(aR){const dxR=mx-rEx,dyR=my-rEy,distR=Math.sqrt(dxR*dxR+dyR*dyR);if(distR<reachR){const t=Math.pow(1-distR/reachR,1.3)*0.82;aR.setAttribute('x2',rEx+dxR*t);aR.setAttribute('y2',rEy+dyR*t);}else{aR.setAttribute('x2',rEx);aR.setAttribute('y2',rEy);}}
+      };
+      document.addEventListener('mousemove',onMove);
+      authEyeCleanup=()=>document.removeEventListener('mousemove',onMove);
+    }
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      inner.style.animation='authWalkBob 0.92s ease-in-out infinite';
+      outer.style.transition='transform 3.0s linear,opacity 0.35s ease';
+      outer.style.transform='translateX(0)';outer.style.opacity='1';
+      setTimeout(()=>{const s=ge('authDollSVG');if(s&&s.pauseAnimations)s.pauseAnimations();inner.style.animation='none';outer.style.transition='transform 0.18s cubic-bezier(0.8,0,1,0.5)';outer.style.transform='translateX(10px) rotate(25deg)';},2950);
+      setTimeout(()=>{outer.style.transition='transform 0.42s cubic-bezier(0.55,0,0.7,-0.1)';outer.style.transform='translateX(20px) rotate(90deg)';},3140);
+      setTimeout(()=>{outer.style.transition='transform 0.7s cubic-bezier(0.3,0,0.5,1)';outer.style.transform='translateX(16px) rotate(60deg)';},4800);
+      setTimeout(()=>{outer.style.transition='transform 0.6s cubic-bezier(0.2,0,0.4,1)';outer.style.transform='translateX(10px) rotate(34deg)';},5550);
+      setTimeout(()=>{outer.style.transition='transform 0.65s cubic-bezier(0.25,0.1,0.4,1)';outer.style.transform='translateX(4px) rotate(10deg)';},6200);
+      setTimeout(()=>{outer.style.transition='transform 0.7s cubic-bezier(0.18,1.3,0.4,1)';outer.style.transform='translateX(0) rotate(0deg)';},6900);
+      setTimeout(()=>{outer.style.transition='transform 0.15s ease-out';outer.style.transform='rotate(-12deg)';setTimeout(()=>{if(stone)stone.style.animation='authStoneKick 0.6s cubic-bezier(0.2,0,0.35,1) forwards';outer.style.transition='transform 0.25s cubic-bezier(0.15,1.4,0.4,1)';outer.style.transform='rotate(0deg)';},160);},7750);
+      setTimeout(()=>{if(authEyeCleanup){authEyeCleanup();authEyeCleanup=null;}inner.innerHTML=authLoginIdleSVG(DOLL_COLORS[0],120);outer.style.transition='';outer.style.transformOrigin='';outer.style.animation='breathe 3.5s ease-in-out infinite';startAuthIdle();},8400);
+    }));
+  })();
   (async()=>{try{const {data:cnt}=await sb.rpc('get_today_post_count',{today_date:todayS()});const el=ge('dayCounterMsg');if(el&&cnt>0)el.textContent=(lang==='en'?`${cnt} people have also had a shit day today`:`${cnt} personas también han tenido un día de mierda hoy`);}catch(e){}})();
   if(ge('authLangEs'))ge('authLangEs').onclick=()=>{if(lang!=='es'){lang='es';localStorage.setItem('kill_lang','es');renderAuth();}};
   if(ge('authLangEn'))ge('authLangEn').onclick=()=>{if(lang!=='en'){lang='en';localStorage.setItem('kill_lang','en');renderAuth();}};
@@ -2768,6 +2805,61 @@ function renderSearch(){
     </div>
     ${bodyHTML}
   </div>`;
+}
+
+function authLoginWalkSVG(color,px){
+  px=px||120;
+  const w=220,h=280,sw=22,ht=Math.round(px*h/w);
+  const cx=110,hr=84,hcy=98,bHW=33,bT=174,bB=224;
+  const er=hr*0.115;
+  const lx=cx-hr*0.28,rx=cx+hr*0.28,ey=hcy-hr*0.21;
+  const eyeR=er*0.88;
+  const an='dur="0.92s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"';
+  const lLv='M96 224 Q104 245 110 271; M96 224 Q83 248 79 274; M96 224 Q104 245 110 271';
+  const lRv='M124 224 Q137 248 141 274; M124 224 Q118 245 110 271; M124 224 Q137 248 141 274';
+  const aLv='M77 195 Q28 212 8 230; M77 195 Q44 215 26 235; M77 195 Q28 212 8 230';
+  const aRv='M143 195 Q182 215 202 235; M143 195 Q178 212 198 230; M143 195 Q182 215 202 235';
+  const mech=`M${cx-hr*.36} ${hcy-hr*.78} C${cx-hr*.58} ${hcy-hr*.80} ${cx-hr*.60} ${hcy-hr*1.08} ${cx-hr*.26} ${hcy-hr*1.10} C${cx-hr*.08} ${hcy-hr*1.10} ${cx-hr*.06} ${hcy-hr*.84} ${cx-hr*.20} ${hcy-hr*.78} Z`;
+  return `<svg id="authDollSVG" viewBox="0 0 220 280" width="${px}" height="${ht}" overflow="visible" xmlns="http://www.w3.org/2000/svg">
+  <g stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M96 224 Q104 245 110 271"><animate attributeName="d" values="${lLv}" ${an}/></path>
+    <path d="M124 224 Q137 248 141 274"><animate attributeName="d" values="${lRv}" ${an}/></path>
+  </g>
+  <rect x="${cx-bHW}" y="${bT}" width="${bHW*2}" height="${bB-bT}" rx="9" fill="${color}"/>
+  <g stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M77 195 Q28 212 8 230"><animate attributeName="d" values="${aLv}" ${an}/></path>
+    <path d="M143 195 Q182 215 202 235"><animate attributeName="d" values="${aRv}" ${an}/></path>
+  </g>
+  <circle cx="${cx}" cy="${hcy}" r="${hr}" fill="${color}" stroke="none"/>
+  <path d="${mech}" fill="${color}"/>
+  <circle cx="${lx}" cy="${ey}" r="${eyeR}" fill="rgba(0,0,0,0.68)" id="authEyeL"/>
+  <circle cx="${rx}" cy="${ey}" r="${eyeR}" fill="rgba(0,0,0,0.68)" id="authEyeR"/>
+</svg>`;
+}
+
+function authLoginIdleSVG(color,px){
+  px=px||120;
+  const w=220,h=280,sw=22,ht=Math.round(px*h/w);
+  const cx=110,hr=84,hcy=98,bHW=33,bT=174,bB=224;
+  const er=hr*0.115;
+  const lx=cx-hr*0.28,rx=cx+hr*0.28,ey=hcy-hr*0.21;
+  const eyeR=er*0.88;
+  const mech=`M${cx-hr*.36} ${hcy-hr*.78} C${cx-hr*.58} ${hcy-hr*.80} ${cx-hr*.60} ${hcy-hr*1.08} ${cx-hr*.26} ${hcy-hr*1.10} C${cx-hr*.08} ${hcy-hr*1.10} ${cx-hr*.06} ${hcy-hr*.84} ${cx-hr*.20} ${hcy-hr*.78} Z`;
+  return `<svg id="authDollSVG" viewBox="0 0 220 280" width="${px}" height="${ht}" overflow="visible" xmlns="http://www.w3.org/2000/svg">
+  <g stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <line x1="96" y1="224" x2="91" y2="278"/>
+    <line x1="124" y1="224" x2="129" y2="278"/>
+  </g>
+  <rect x="${cx-bHW}" y="${bT}" width="${bHW*2}" height="${bB-bT}" rx="9" fill="${color}"/>
+  <g stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <line id="authArmL" x1="77" y1="195" x2="36" y2="226"/>
+    <line id="authArmR" x1="143" y1="195" x2="184" y2="226"/>
+  </g>
+  <circle cx="${cx}" cy="${hcy}" r="${hr}" fill="${color}" stroke="none"/>
+  <path d="${mech}" fill="${color}"/>
+  <circle cx="${lx}" cy="${ey}" r="${eyeR}" fill="rgba(0,0,0,0.68)" id="authEyeL"/>
+  <circle cx="${rx}" cy="${ey}" r="${eyeR}" fill="rgba(0,0,0,0.68)" id="authEyeR"/>
+</svg>`;
 }
 
 function homeWalkDollSVG(color,px){

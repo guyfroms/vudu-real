@@ -1956,7 +1956,7 @@ function renderProfile(){
     return `<div style="padding:clamp(10px,2.5vw,14px) 0;border-bottom:1px solid var(--border);${isToday?'border-left:2px solid var(--warm);padding-left:10px;margin-left:-10px;':''}">
       ${isToday?`<div style="font-size:clamp(9px,2.2vw,10px);color:var(--warm);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:6px;">☠ ${lang==='en'?'TODAY':'HOY'}</div>`:''}
       <div style="display:flex;gap:12px;align-items:flex-start;">
-        ${isToday?'':`<div style="flex-shrink:0;">${dollWithDraw(p.doll_color||prof.doll_color,p.castigo,p.dibujo_trazos,true,p?.pose||d?.pose||'idle',clamp(44,54))}</div>`}
+        ${isToday?'':`<div style="flex-shrink:0;">${dollWithDraw(p.doll_color||prof.doll_color,p.castigo,p.dibujo_trazos,true,p?.pose||d?.pose||'idle',clamp(52,64))}</div>`}
         <div style="flex:1;min-width:0;">
           <div style="font-size:clamp(10px,2.5vw,11px);color:var(--warm);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">${lbl} <span style="color:var(--muted2);font-weight:400;text-transform:none;">· ${dateStr}</span></div>
           <p style="font-size:clamp(13px,3.5vw,14px);color:var(--text2);font-style:italic;line-height:1.6;margin:4px 0 6px;">"${esc(p.razon)}"</p>
@@ -2078,7 +2078,7 @@ function prevPostHTML(p,size,idx=0){
   return `<div style="opacity:.65;margin:6px 0 2px;padding:10px 0 10px 12px;border-left:2px solid var(--border2);">
     <div style="font-size:clamp(9px,2.2vw,10px);color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:8px;">${label}</div>
     <div style="display:flex;gap:12px;align-items:flex-start;">
-      <div style="flex-shrink:0;">${dollWithDraw(p.doll_color||profile?.doll_color,p.castigo,p.dibujo_trazos,true,p?.pose||d?.pose||'idle',clamp(44,54))}</div>
+      <div style="flex-shrink:0;">${dollWithDraw(p.doll_color||profile?.doll_color,p.castigo,p.dibujo_trazos,true,p?.pose||d?.pose||'idle',clamp(52,64))}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">${lbl} <span style="opacity:.5;font-weight:400;text-transform:none;">· ${timeStr}</span></div>
         <div style="font-size:clamp(13px,3.5vw,14px);color:var(--text2);font-style:italic;line-height:1.5;">"${esc(p.razon)}"</div>
@@ -2097,7 +2097,7 @@ function cemRowHTML(p,showTime=false,showDelete=false){
     ?new Date(p.created_at).toLocaleTimeString(lang==='en'?'en-US':'es-ES',{hour:'2-digit',minute:'2-digit'})
     :new Date(p.post_date||p.created_at).toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'short',year:'numeric'});
   return `<div class="cemetery-row" data-cemid="${p.id}">
-    <div style="flex-shrink:0;">${dollWithDraw(p.doll_color||profile.doll_color,p.castigo,p.dibujo_trazos,true,p?.pose||d?.pose||'idle',clamp(44,54))}</div>
+    <div style="flex-shrink:0;">${dollWithDraw(p.doll_color||profile.doll_color,p.castigo,p.dibujo_trazos,true,p?.pose||d?.pose||'idle',clamp(52,64))}</div>
     <div style="flex:1;min-width:0;">
       <div style="font-size:clamp(10px,2.5vw,11px);color:var(--muted2);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">${lbl} <span style="opacity:.5;font-weight:400;text-transform:none;">· ${dateStr}</span></div>
       <div style="font-size:clamp(13px,3.5vw,14px);color:var(--text2);font-style:italic;line-height:1.5;">"${esc(p.razon)}"</div>
@@ -2426,12 +2426,12 @@ function renderCemetery(){
       let data;try{({data}=await sb.from('posts').select('*').eq('user_id',user.id).order('created_at',{ascending:false}).limit(60));}catch(e){data=[];}
       cemeteryPosts=data||[];paint();
     })();
-    return `<div class="screen">${hdr('🪦 '+t('cemetery_title'),'')}<p style="text-align:center;color:var(--muted2);margin-top:60px;">${t('amigos_loading')}</p></div>`;
+    return `<div class="screen">${hdr(ICO.tombstone+' '+t('cemetery_title'),'')}<p style="text-align:center;color:var(--muted2);margin-top:60px;">${t('amigos_loading')}</p></div>`;
   }
   const pastPosts=cemeteryPosts.filter(p=>(p.post_date||p.created_at?.slice(0,10))!==todayS());
   const rows=pastPosts.map(p=>cemRowHTML(p,false,true)).join('');
   return `<div class="screen">
-    ${hdr('🪦 '+t('cemetery_title'),t('cemetery_sub').replace('$n',pastPosts.length))}
+    ${hdr(ICO.tombstone+' '+t('cemetery_title'),t('cemetery_sub').replace('$n',pastPosts.length))}
     ${pastPosts.length?rows:`<p style="text-align:center;color:var(--muted2);margin-top:40px;">${t('cemetery_empty')}</p>`}
     <button class="btn-link" id="volverCemetery" style="margin-top:20px;">${t('btn_back')}</button>
   </div>`;
@@ -2494,14 +2494,14 @@ function renderFeed(){
   const visible=feedYesterday.slice(0,feedPreviousShown);
   const hasMore=feedYesterday.length>feedPreviousShown;
   const loadMoreBtn=hasMore?`<button class="btn-load-more" id="btnLoadMorePrev">${t('btn_load_more')}</button>`:'';
-  const yesterHTML=feedYesterday.length?`<div class="feed-older-hdr" style="display:flex;align-items:center;gap:6px;">${ICO.tombstone} ${t('feed_yesterday')}</div><div class="tomb-grid">${visible.map(tombstoneCardHTML).join('')}</div>${loadMoreBtn}`:'';
+  const yesterHTML=feedYesterday.length?`<div class="feed-older-hdr" style="">${ICO.tombstone} ${t('feed_yesterday')}</div><div class="tomb-grid">${visible.map(tombstoneCardHTML).join('')}</div>${loadMoreBtn}`:'';
   // Group feedOlder by date
   const olderByDate={};
   for(const p of feedOlder){const d=p.post_date||p.created_at?.slice(0,10);if(!olderByDate[d])olderByDate[d]=[];olderByDate[d].push(p);}
   const olderDates=Object.keys(olderByDate).sort((a,b)=>b.localeCompare(a));
   const olderHTML=olderDates.length?olderDates.map(date=>{
     const label=new Date(date+'T12:00:00').toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'long'});
-    return `<div class="feed-older-hdr" style="display:flex;align-items:center;gap:6px;">${ICO.tombstone} ${label}</div><div class="tomb-grid">${olderByDate[date].map(p=>tombstoneCardHTML(p)).join('')}</div>`;
+    return `<div class="feed-older-hdr" style="">${ICO.tombstone} ${label}</div><div class="tomb-grid">${olderByDate[date].map(p=>tombstoneCardHTML(p)).join('')}</div>`;
   }).join(''):'';
   if(!feedData.length)return`<div class="screen">${hdr(t('nav_feed'),t('feed_sub'))}<div style="text-align:center;color:var(--muted2);margin-top:40px;font-size:clamp(13px,3.5vw,15px);">${t('feed_empty')}<br><span style="font-size:clamp(11px,3vw,12px);opacity:.45;display:block;margin-top:6px;">${t('feed_empty_sub')}</span></div>${yesterHTML}${olderHTML}</div>`;
   const cards=feedData.map(item=>feedCardHTML(item,false)).join('');

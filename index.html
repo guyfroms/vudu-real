@@ -2177,20 +2177,27 @@ function cemRowHTML(p,showTime=false,showDelete=false){
 
 function renderHome(){
   if(cemeteryPosts===null){
+    cemeteryPosts=[];// evitar re-trigger; cargamos en background sin repaint
     (async()=>{
       let data;try{({data}=await sb.from('posts').select('*').eq('user_id',user.id).order('created_at',{ascending:false}).limit(60));}catch(e){data=[];}
-      cemeteryPosts=data||[];paint();
+      cemeteryPosts=data||[];
+      if(view!=='home')return;
+      // Actualizar solo la sección cem sin destruir la animación del muñeco
+      const el=ge('homeCemRows');
+      if(el){
+        const pp=cemeteryPosts.filter(p=>(p.post_date||p.created_at?.slice(0,10))!==todayS());
+        el.innerHTML=pp.length?pp.map(p=>cemRowHTML(p,false,true)).join(''):`<p style="text-align:center;color:var(--muted2);font-size:clamp(12px,3vw,13px);">${t('cemetery_empty')}</p>`;
+        attachListeners();
+      }else paint();
     })();
   }
-  const pastPosts=(cemeteryPosts||[]).filter(p=>(p.post_date||p.created_at?.slice(0,10))!==todayS());
+  const pastPosts=cemeteryPosts.filter(p=>(p.post_date||p.created_at?.slice(0,10))!==todayS());
   const cemSection=`
     <div class="feed-older-hdr" style="margin-top:clamp(20px,5vw,28px);">${ICO.tombstone} ${t('cemetery_title')}</div>
-    ${cemeteryPosts===null
-      ?`<p style="text-align:center;color:var(--muted2);font-size:clamp(12px,3vw,13px);">${t('amigos_loading')}</p>`
-      :pastPosts.length
-        ?pastPosts.map(p=>cemRowHTML(p,false,true)).join('')
-        :`<p style="text-align:center;color:var(--muted2);font-size:clamp(12px,3vw,13px);">${t('cemetery_empty')}</p>`
-    }`;
+    <div id="homeCemRows">${pastPosts.length
+      ?pastPosts.map(p=>cemRowHTML(p,false,true)).join('')
+      :`<p style="text-align:center;color:var(--muted2);font-size:clamp(12px,3vw,13px);">${t('cemetery_empty')}</p>`
+    }</div>`;
 
   if(todayPost){
     const hero=todayPost;

@@ -2706,7 +2706,7 @@ function renderAjustes(){
       ${profile.birth_date
         ?`<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:7px;font-size:clamp(13px,3.5vw,14px);">
             <span style="flex:1;color:var(--muted2);">${new Date(profile.birth_date+'T12:00:00').toLocaleDateString(lang==='en'?'en-US':'es-ES',{day:'numeric',month:'long',year:'numeric'})}</span>
-            <span style="font-size:clamp(11px,2.8vw,12px);color:var(--muted2);">${getZodiacSign(new Date(profile.birth_date+'T12:00:00'))}</span>
+            <span style="font-size:clamp(11px,2.8vw,12px);color:var(--muted2);">${(s=>s.charAt(0).toUpperCase()+s.slice(1))(getZodiacSign(new Date(profile.birth_date+'T12:00:00')))}</span>
           </div>`
         :`<div style="display:flex;flex-direction:column;gap:8px;">
             <input type="date" id="birthdayInput" value="" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:10px 12px;font-size:clamp(13px,3.5vw,14px);font-family:inherit;outline:none;box-sizing:border-box;" max="${new Date().toISOString().slice(0,10)}"/>
@@ -3045,8 +3045,13 @@ function attachListeners(){
       paint();
     };
     const bioInp=ge('ajustesBioInput');
-    if(bioInp){const bioCountEl=ge('bioCount');if(bioCountEl)bioInp.oninput=()=>{bioCountEl.textContent=`${bioInp.value.length}/160`;};}
-    if(ge('btnSaveProfile'))ge('btnSaveProfile').onclick=async()=>{
+    const socialInp=ge('ajustesSocialInput');
+    const saveBtn=ge('btnSaveProfile');
+    const origBio=bioInp?.value||'',origLink=socialInp?.value||'';
+    const markDirty=()=>{if(!saveBtn)return;const dirty=bioInp?.value!==origBio||socialInp?.value!==origLink;saveBtn.style.color=dirty?'var(--red)':'var(--muted2)';saveBtn.style.fontWeight=dirty?'700':'400';};
+    if(bioInp){const bioCountEl=ge('bioCount');if(bioCountEl)bioInp.oninput=()=>{bioCountEl.textContent=`${bioInp.value.length}/160`;markDirty();};bioInp.addEventListener('input',markDirty);}
+    if(socialInp)socialInp.addEventListener('input',markDirty);
+    if(saveBtn)saveBtn.onclick=async()=>{
       const btn=ge('btnSaveProfile');btn.disabled=true;btn.textContent='...';
       const bioVal=(ge('ajustesBioInput')?.value||'').trim();
       const linkVal=(ge('ajustesSocialInput')?.value||'').trim();

@@ -1771,33 +1771,9 @@ function renderAuth(){
     </div>
     <div id="dayCounterMsg" style="text-align:center;font-size:clamp(11px,2.8vw,12px);color:var(--muted2);margin:4px 0 8px;min-height:18px;"></div>
     <div class="auth-doll-preview" style="position:relative;"><div id="authStone" style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);pointer-events:none;z-index:1;"><svg viewBox="0 0 32 20" width="28" height="18" xmlns="http://www.w3.org/2000/svg"><ellipse cx="16" cy="13" rx="15" ry="7" fill="#888" opacity="0.55"/><ellipse cx="14" cy="10" rx="10" ry="5.5" fill="#aaa" opacity="0.45"/><ellipse cx="17" cy="9" rx="4" ry="2.5" fill="#ccc" opacity="0.3"/></svg></div><div id="authWalkOuter" style="display:inline-block;will-change:transform;transform:translateX(-260px);opacity:0;position:relative;z-index:2;"><div id="authWalkInner">${authLoginWalkSVG(DOLL_COLORS[0],120)}</div></div></div>
-    <div class="auth-card">
-      <div class="auth-tabs">
-        <button class="auth-tab ${login?'on':''}" id="tLogin">${t('login_tab')}</button>
-        <button class="auth-tab ${!login?'on':''}" id="tReg">${t('register_tab')}</button>
-      </div>
-      ${!login?`<div class="field"><label>${t('lbl_username')}</label><input type="text" id="aUser" placeholder="${t('ph_username')}" maxlength="20"/></div>`:''}
-      <div class="field"><label>${login?t('lbl_email_or_user'):t('lbl_email')}</label><input type="${login?'text':'email'}" id="aEmail" placeholder="${login?t('ph_email_or_user'):t('ph_email')}" autocomplete="${login?'username':'email'}"/></div>
-      <div class="field">
-        <label>${t('lbl_password')}</label>
-        <input type="password" id="aPass" placeholder="${login?t('ph_pass_login'):t('ph_pass_new')}" autocomplete="${login?'current-password':'new-password'}"/>
-        ${!login?`<div id="passReqs" style="margin-top:6px;"></div><div style="margin-top:8px;font-size:clamp(10px,2.6vw,11px);color:var(--muted);line-height:1.5;">${t('pass_tip')}</div>`:''}
-      </div>
-      <div class="auth-err" id="aErr"></div>
-      <button class="btn btn-red" id="btnAuth">${login?t('btn_login'):t('btn_next')}</button>
-      ${login?`<button class="btn-link" id="btnForgot" style="margin-top:2px;font-size:clamp(11px,2.5vw,12px);">${t('btn_forgot')}</button>`:''}
-      <div style="display:flex;justify-content:center;margin-top:16px;">
-        <div style="display:inline-flex;border:1px solid var(--border2);border-radius:8px;overflow:hidden;font-size:12px;">
-          <button id="authLangEs" style="padding:6px 16px;border:none;background:${lang==='es'?'var(--surface2)':'transparent'};color:${lang==='es'?'var(--text)':'var(--muted2)'};font-weight:${lang==='es'?700:400};cursor:pointer;">🇪🇸 ES</button>
-          <div style="width:1px;background:var(--border2);"></div>
-          <button id="authLangEn" style="padding:6px 16px;border:none;background:${lang==='en'?'var(--surface2)':'transparent'};color:${lang==='en'?'var(--text)':'var(--muted2)'};font-weight:${lang==='en'?700:400};cursor:pointer;">🇺🇸 EN</button>
-        </div>
-      </div>
-      <div style="margin-top:10px;text-align:center;font-size:clamp(9px,2.3vw,10px);color:var(--muted);line-height:1.6;">${t('safety_note')} <a href="https://www.telefonodelaesperanza.org" target="_blank" style="color:var(--muted2);">${t('safety_link')}</a></div>
-    </div>
+    <div class="auth-card" id="authCard"></div>
   </div>`;
-  ge('tLogin').onclick=()=>{authTab='login';renderAuth();};
-  ge('tReg').onclick=()=>{authTab='register';renderAuth();};
+  refreshAuthCard();
   // Walk-in animation for login doll
   (()=>{
     const outer=ge('authWalkOuter'),inner=ge('authWalkInner'),stone=ge('authStone');
@@ -1836,9 +1812,39 @@ function renderAuth(){
     }));
   })();
   (async()=>{try{const {data:cnt}=await sb.rpc('get_today_post_count',{today_date:todayS()});const el=ge('dayCounterMsg');if(el&&cnt>0)el.textContent=(lang==='en'?`${cnt} people have also had a shit day today`:`${cnt} personas también han tenido un día de mierda hoy`);}catch(e){}})();
+}
+
+function refreshAuthCard(){
+  const login=authTab==='login';
+  const card=ge('authCard');
+  if(!card)return;
+  card.innerHTML=`
+    <div class="auth-tabs">
+      <button class="auth-tab ${login?'on':''}" id="tLogin">${t('login_tab')}</button>
+      <button class="auth-tab ${!login?'on':''}" id="tReg">${t('register_tab')}</button>
+    </div>
+    ${!login?`<div class="field"><label>${t('lbl_username')}</label><input type="text" id="aUser" placeholder="${t('ph_username')}" maxlength="20"/></div>`:''}
+    <div class="field"><label>${login?t('lbl_email_or_user'):t('lbl_email')}</label><input type="${login?'text':'email'}" id="aEmail" placeholder="${login?t('ph_email_or_user'):t('ph_email')}" autocomplete="${login?'username':'email'}"/></div>
+    <div class="field">
+      <label>${t('lbl_password')}</label>
+      <input type="password" id="aPass" placeholder="${login?t('ph_pass_login'):t('ph_pass_new')}" autocomplete="${login?'current-password':'new-password'}"/>
+      ${!login?`<div id="passReqs" style="margin-top:6px;"></div><div style="margin-top:8px;font-size:clamp(10px,2.6vw,11px);color:var(--muted);line-height:1.5;">${t('pass_tip')}</div>`:''}
+    </div>
+    <div class="auth-err" id="aErr"></div>
+    <button class="btn btn-red" id="btnAuth">${login?t('btn_login'):t('btn_next')}</button>
+    ${login?`<button class="btn-link" id="btnForgot" style="margin-top:2px;font-size:clamp(11px,2.5vw,12px);">${t('btn_forgot')}</button>`:''}
+    <div style="display:flex;justify-content:center;margin-top:16px;">
+      <div style="display:inline-flex;border:1px solid var(--border2);border-radius:8px;overflow:hidden;font-size:12px;">
+        <button id="authLangEs" style="padding:6px 16px;border:none;background:${lang==='es'?'var(--surface2)':'transparent'};color:${lang==='es'?'var(--text)':'var(--muted2)'};font-weight:${lang==='es'?700:400};cursor:pointer;">🇪🇸 ES</button>
+        <div style="width:1px;background:var(--border2);"></div>
+        <button id="authLangEn" style="padding:6px 16px;border:none;background:${lang==='en'?'var(--surface2)':'transparent'};color:${lang==='en'?'var(--text)':'var(--muted2)'};font-weight:${lang==='en'?700:400};cursor:pointer;">🇺🇸 EN</button>
+      </div>
+    </div>
+    <div style="margin-top:10px;text-align:center;font-size:clamp(9px,2.3vw,10px);color:var(--muted);line-height:1.6;">${t('safety_note')} <a href="https://www.telefonodelaesperanza.org" target="_blank" style="color:var(--muted2);">${t('safety_link')}</a></div>`;
+  ge('tLogin').onclick=()=>{authTab='login';refreshAuthCard();};
+  ge('tReg').onclick=()=>{authTab='register';refreshAuthCard();};
   if(ge('authLangEs'))ge('authLangEs').onclick=()=>{if(lang!=='es'){lang='es';localStorage.setItem('kill_lang','es');renderAuth();}};
   if(ge('authLangEn'))ge('authLangEn').onclick=()=>{if(lang!=='en'){lang='en';localStorage.setItem('kill_lang','en');renderAuth();}};
-
   if(!login&&ge('aPass')){
     ge('aPass').oninput=()=>{const pr=ge('passReqs');if(pr)pr.innerHTML=passReqsHTML(ge('aPass').value);};
   }

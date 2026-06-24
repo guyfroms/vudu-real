@@ -977,7 +977,9 @@ function dollSVG(color,death,dead,poseName,px){
     // 4 capas de agua superpuestas animadas — sin borde duro, degradado natural por solapamiento
     // x/width extendidos en sw/2 para cubrir puntas redondeadas de brazos y piernas
     const bx=-sw,br=w+sw,bb=h+sw; // -22, 242, 302 — cubre manos y pies de todas las poses
-    fx=`<path fill="#04111E" opacity=".30" style="animation:wfD 4.0s .7s ease-in-out infinite" d="M${bx} 42 C48 18 85 58 110 36 C135 16 178 54 ${br} 28 L${br} ${bb} L${bx} ${bb} Z"/>`;
+    const oc=30, atop=Math.round(-h*.18); // esquinas oblicuas igual que hielo
+    fx=`<clipPath id="ahogoClip${w}"><polygon points="${bx+oc},${atop} ${br-oc},${atop} ${br},${atop+oc} ${br},${bb-oc} ${br-oc},${bb} ${bx+oc},${bb} ${bx},${bb-oc} ${bx},${atop+oc}"/></clipPath><g clip-path="url(#ahogoClip${w})">`;
+    fx+=`<path fill="#04111E" opacity=".30" style="animation:wfD 4.0s .7s ease-in-out infinite" d="M${bx} 42 C48 18 85 58 110 36 C135 16 178 54 ${br} 28 L${br} ${bb} L${bx} ${bb} Z"/>`;
     fx+=`<path fill="#061828" opacity=".28" style="animation:wfC 2.8s 1.0s ease-in-out infinite" d="M${bx} 14 C22 -6 52 30 110 8 C166 -10 200 26 ${br} 4 L${br} ${bb} L${bx} ${bb} Z"/>`;
     fx+=`<path fill="#081C30" opacity=".30" style="animation:wfB 3.4s .2s ease-in-out infinite" d="M${bx} 32 C38 8 72 52 110 24 C148 0 188 44 ${br} 20 L${br} ${bb} L${bx} ${bb} Z"/>`;
     fx+=`<path fill="#0D2A42" opacity=".28" style="animation:wfA 2.2s 0s ease-in-out infinite" d="M${bx} 20 C25 -2 60 38 110 14 C160 -8 198 32 ${br} 10 L${br} ${bb} L${bx} ${bb} Z"/>`;
@@ -1007,6 +1009,7 @@ function dollSVG(color,death,dead,poseName,px){
         <animate attributeName="opacity" values=".85;.55;0" keyTimes="0;.8;1" dur="${dur}" begin="${beg}" repeatCount="indefinite"/>
       </circle>`;
     });
+    fx+=`</g>`;
   }
   if(death==="rayo"){
     // Stark bone-white zigzag — no glow, no color, pure line

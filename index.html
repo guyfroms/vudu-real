@@ -1233,7 +1233,7 @@ async function sendFriendRequest(uid){
     if(error)throw error;
     sentFriendReqs.add(uid);
     if(!myFollowing.has(uid)){
-      await sb.from('follows').insert({follower_id:user.id,following_id:uid}).catch(()=>{});
+      try{await sb.from('follows').insert({follower_id:user.id,following_id:uid});}catch(_){}
       myFollowing.add(uid);
     }
     paint();
@@ -1246,7 +1246,7 @@ async function acceptFriendRequest(reqId,senderId){
     myFriends.add(senderId);
     señalesBadge=pendingFriendReqs.length>0;
     if(!myFollowing.has(senderId)){
-      await sb.from('follows').insert({follower_id:user.id,following_id:senderId}).catch(()=>{});
+      try{await sb.from('follows').insert({follower_id:user.id,following_id:senderId});}catch(_){}
       myFollowing.add(senderId);
     }
     paint();

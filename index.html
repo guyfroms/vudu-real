@@ -962,15 +962,17 @@ function dollSVG(color,death,dead,poseName,px){
   if(death==="hielo"){
     // Bloque de hielo en frente del muñeco, llega hasta el suelo
     // Relleno semitransparente — muñeco visible dentro
-    fx=`<rect x="${w*.05}" y="${h*.03}" width="${w*.9}" height="${h*.98}" rx="5" fill="#A8D8F0" opacity=".20"/>`;
+    // x/height extendidos en sw/2 en cada lado para cubrir las puntas redondeadas (stroke-linecap round) de brazos y piernas
+    const ibx=-sw*.5, ibw=w+sw, ibh=h*.97+sw*.5; // left=-11, width=242, bottom covers leg tips
+    fx=`<rect x="${ibx}" y="${h*.03}" width="${ibw}" height="${ibh}" rx="5" fill="#A8D8F0" opacity=".20"/>`;
     // Borde del bloque
-    fx+=`<rect x="${w*.05}" y="${h*.03}" width="${w*.9}" height="${h*.98}" rx="5" fill="none" stroke="#C8EEFF" stroke-width="2.2" opacity=".65"/>`;
+    fx+=`<rect x="${ibx}" y="${h*.03}" width="${ibw}" height="${ibh}" rx="5" fill="none" stroke="#C8EEFF" stroke-width="2.2" opacity=".65"/>`;
     // Facetas diagonales del cristal
-    fx+=`<line x1="${w*.05}" y1="${h*.22}" x2="${w*.95}" y2="${h*.14}" stroke="#C8EEFF" stroke-width=".8" opacity=".22"/>`;
-    fx+=`<line x1="${w*.05}" y1="${h*.52}" x2="${w*.95}" y2="${h*.44}" stroke="#C8EEFF" stroke-width=".7" opacity=".18"/>`;
-    fx+=`<line x1="${w*.05}" y1="${h*.78}" x2="${w*.95}" y2="${h*.71}" stroke="#C8EEFF" stroke-width=".6" opacity=".14"/>`;
-    fx+=`<line x1="${w*.26}" y1="${h*.03}" x2="${w*.20}" y2="${h*1.01}" stroke="#C8EEFF" stroke-width=".7" opacity=".16"/>`;
-    fx+=`<line x1="${w*.64}" y1="${h*.03}" x2="${w*.70}" y2="${h*1.01}" stroke="#C8EEFF" stroke-width=".7" opacity=".16"/>`;
+    fx+=`<line x1="${ibx}" y1="${h*.22}" x2="${ibx+ibw}" y2="${h*.14}" stroke="#C8EEFF" stroke-width=".8" opacity=".22"/>`;
+    fx+=`<line x1="${ibx}" y1="${h*.52}" x2="${ibx+ibw}" y2="${h*.44}" stroke="#C8EEFF" stroke-width=".7" opacity=".18"/>`;
+    fx+=`<line x1="${ibx}" y1="${h*.78}" x2="${ibx+ibw}" y2="${h*.71}" stroke="#C8EEFF" stroke-width=".6" opacity=".14"/>`;
+    fx+=`<line x1="${w*.26}" y1="${h*.03}" x2="${w*.20}" y2="${h*.03+ibh}" stroke="#C8EEFF" stroke-width=".7" opacity=".16"/>`;
+    fx+=`<line x1="${w*.64}" y1="${h*.03}" x2="${w*.70}" y2="${h*.03+ibh}" stroke="#C8EEFF" stroke-width=".7" opacity=".16"/>`;
     // Burbujas de aire atrapadas
     fx+=`<ellipse cx="${w*.24}" cy="${h*.58}" rx="${w*.036}" ry="${h*.022}" fill="none" stroke="#C8EEFF" stroke-width="1" opacity=".32"/>`;
     fx+=`<ellipse cx="${w*.76}" cy="${h*.32}" rx="${w*.026}" ry="${h*.016}" fill="none" stroke="#C8EEFF" stroke-width=".8" opacity=".28"/>`;
@@ -978,10 +980,10 @@ function dollSVG(color,death,dead,poseName,px){
     fx+=`<path d="M${w*.70} ${h*.08} L${w*.63} ${h*.26} L${w*.68} ${h*.34} L${w*.60} ${h*.52}" stroke="#E8F8FF" stroke-width="1.5" fill="none" opacity=".38" stroke-linecap="round" stroke-linejoin="round"/>`;
     fx+=`<path d="M${w*.63} ${h*.26} L${w*.56} ${h*.30}" stroke="#E8F8FF" stroke-width=".9" fill="none" opacity=".28"/>`;
     // Reflejo superior (cara brillante del bloque)
-    fx+=`<rect x="${w*.05}" y="${h*.03}" width="${w*.9}" height="${h*.06}" rx="5" fill="#DDEEFF" opacity=".1"/>`;
+    fx+=`<rect x="${ibx}" y="${h*.03}" width="${ibw}" height="${h*.06}" rx="5" fill="#DDEEFF" opacity=".1"/>`;
     // Barra de hielo superior de donde cuelgan los cárambanos
-    fx+=`<rect x="0" y="0" width="${w}" height="${h*.052}" fill="#1A3A5A"/>`;
-    fx+=`<rect x="0" y="0" width="${w}" height="${h*.052}" fill="none" stroke="#4A8AB0" stroke-width="1" opacity=".5"/>`;
+    fx+=`<rect x="${ibx}" y="0" width="${ibw}" height="${h*.052}" fill="#1A3A5A"/>`;
+    fx+=`<rect x="${ibx}" y="0" width="${ibw}" height="${h*.052}" fill="none" stroke="#4A8AB0" stroke-width="1" opacity=".5"/>`;
     // Cárambanos de distintas longitudes
     [[.08,h*.44,w*.038],[.20,h*.30,w*.034],[.34,h*.62,w*.044],[.50,h*.78,w*.040],[.64,h*.55,w*.038],[.78,h*.36,w*.032],[.92,h*.25,w*.030]].forEach(([cx,bot,hw],i)=>{
       const x=w*cx,delay=`${i*.15}s`;
@@ -989,7 +991,7 @@ function dollSVG(color,death,dead,poseName,px){
       fx+=`<polygon points="${x-hw*.35},${h*.052} ${x+hw*.35},${h*.052} ${x},${bot}" fill="white" opacity=".38"/>`;
       if(bot>h*.5)fx+=`<ellipse cx="${x}" cy="${bot+h*.012}" rx="${w*.013}" ry="${h*.012}" fill="#AADDFF" opacity=".55"/>`;
     });
-    fx+=`<clipPath id="iceClip${w}"><rect x="${w*.05}" y="${h*.03}" width="${w*.9}" height="${h*.98}" rx="5"/></clipPath><g clip-path="url(#iceClip${w})"><rect x="${w*.02}" y="${h*.03}" width="${w*.1}" height="${h*.98}" fill="white" opacity="0" style="animation:iceGlimmer 4.5s 1.2s ease-in-out infinite"/></g>`;
+    fx+=`<clipPath id="iceClip${w}"><rect x="${ibx}" y="${h*.03}" width="${ibw}" height="${ibh}" rx="5"/></clipPath><g clip-path="url(#iceClip${w})"><rect x="${ibx}" y="${h*.03}" width="${w*.1}" height="${ibh}" fill="white" opacity="0" style="animation:iceGlimmer 4.5s 1.2s ease-in-out infinite"/></g>`;
   }
   if(death==="guillotina"){
     // Very dark wood + muted grey blade, structural and clean

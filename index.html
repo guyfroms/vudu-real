@@ -1902,7 +1902,7 @@ function renderRecovery(){
 }
 
 function paint(){
-  if(view!=='home')window.__homeAnimDone=false;
+  if(view!=='home'){window.__homeAnimDone=false;window.__homeAnimPlaying=false;}
   if(view==='loading'){ge('root').innerHTML='<div class="pg-load"><div class="brand cinzel">kill<em>.me</em></div><div class="spin"></div></div>';return;}
   if(view==='auth'){renderAuth();return;}
   if(view==='verify'){renderVerify();return;}
@@ -2808,14 +2808,18 @@ function setupHomeAnim(){
   const stone=ge('homeStone');
   if(!outer||!inner)return;
 
-  // Swap static doll for walking-animated SVG
-  inner.innerHTML=homeWalkDollSVG(profile.doll_color,clamp(150,180));
-
-  // If animation already played (re-render from async paint), skip straight to idle
+  // If animation is done: restore idle state (inner needs new SVG for eye tracking)
   if(window.__homeAnimDone){
+    inner.innerHTML=homeWalkDollSVG(profile.doll_color,clamp(150,180));
     outer.style.cssText='display:inline-block;will-change:transform;transform:translateX(0);opacity:1;animation:breathe 3.5s ease-in-out infinite;';
     startEyes();return;
   }
+  // If animation is already running, don't restart — leave DOM untouched
+  if(window.__homeAnimPlaying)return;
+  window.__homeAnimPlaying=true;
+
+  // Only now swap in the walking SVG
+  inner.innerHTML=homeWalkDollSVG(profile.doll_color,clamp(150,180));
 
   const cx=110,hr=84,hcy=98,er=Math.max(5,hr*0.115);
   const lx=cx-hr*0.28,rx=cx+hr*0.28,ey=hcy-hr*0.21;
@@ -2892,6 +2896,7 @@ function setupHomeAnim(){
     // Phase 8: idle breathe + eye tracking (5.75s)
     setTimeout(()=>{
       window.__homeAnimDone=true;
+      window.__homeAnimPlaying=false;
       outer.style.transition='';
       outer.style.transformOrigin='';
       outer.style.animation='breathe 3.5s ease-in-out infinite';

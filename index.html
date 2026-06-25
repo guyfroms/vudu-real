@@ -212,6 +212,8 @@ button,a,input,label,select,textarea{touch-action:manipulation;}
 .own-dep{text-align:center;color:var(--muted2);font-size:clamp(11px,3vw,12px);padding:7px;display:flex;align-items:center;justify-content:center;gap:5px;}
 /* Canvas */
 canvas{background:var(--surface2);border-radius:10px;border:1px solid var(--border2);touch-action:none;display:block;margin:0 auto;max-width:100%;}
+#drawDollWrap .doll-wrap{width:100%;}
+#drawDollWrap .doll-wrap svg{width:100%;height:auto;}
 .swatches{display:flex;justify-content:center;gap:clamp(8px,2vw,11px);margin-top:12px;flex-wrap:wrap;}
 .swatch{width:clamp(20px,5vw,25px);height:clamp(20px,5vw,25px);border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;transition:transform .13s;}
 .swatch.on{border-color:var(--text);transform:scale(1.2);}
@@ -2361,9 +2363,9 @@ function renderDibujo(){
     <div class="charcount" id="razonCount">${draftRazon.length}/280</div>
     ${posePicker}
     <div style="display:flex;justify-content:center;margin-top:10px;">
-      <div style="position:relative;width:296px;height:345px;border-radius:10px;border:1px solid var(--border2);">
-        <div id="drawDollWrap" style="position:absolute;left:38px;top:22px;overflow:visible;">${dollSVG(profile.doll_color,null,false,curPose,220)}</div>
-        <canvas id="drawCanvas" width="220" height="280" style="position:absolute;left:38px;top:22px;background:transparent;border:none;border-radius:0;"></canvas>
+      <div id="drawZone" style="position:relative;width:clamp(296px,calc(100vw - 32px),380px);aspect-ratio:296/345;border-radius:10px;border:1px solid var(--border2);">
+        <div id="drawDollWrap" style="position:absolute;left:12.8%;top:6.4%;width:74.3%;overflow:visible;">${dollSVG(profile.doll_color,null,false,curPose,220)}</div>
+        <canvas id="drawCanvas" width="220" height="280" style="position:absolute;left:12.8%;top:6.4%;width:74.3%;height:81.2%;background:transparent;border:none;border-radius:0;"></canvas>
       </div>
     </div>
     <div class="swatches">${LINE_COLORS.map((c,i)=>`<button class="swatch ${i===0?'on':''}" data-color="${c}" style="background:${c};"></button>`).join('')}${(()=>{const uc=unlockedExtraColors();const tips=['1 dibujo','5 dibujos','10 dibujos','25 dibujos','50 dibujos'];return LINE_COLORS_EXTRA.map((c,i)=>i<uc?`<button class="swatch" data-color="${c}" style="background:${c};"></button>`:`<button class="swatch swatch-locked" title="${tips[i]}" style="background:${c};opacity:.22;cursor:not-allowed;" disabled></button>`).join('');})()}</div>
